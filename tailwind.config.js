@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        tall: { raw: "(min-height: 1080px)" },
+        tall: { raw: "(min-height: 1081px)" },
         // => @media (min-height: 800px) { ... }
       },
       colors: {

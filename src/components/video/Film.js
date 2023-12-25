@@ -1,594 +1,594 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
-	createVideoProcess,
-	changeStatus,
-	deleteVideoProcess,
-} from '../../store/features/videoProcessSlice';
-import PulseLoader from 'react-spinners/PulseLoader';
-import { getGreenFilters } from '../../store/features/greenFilterSlice';
-import ModalGreenFilter from '../modals/ModalGreenFilter';
-import { SelfieSegmentation } from '@mediapipe/selfie_segmentation';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import Tuto from '../Tuto';
+  createVideoProcess,
+  changeStatus,
+  deleteVideoProcess,
+} from "../../store/features/videoProcessSlice";
+import PulseLoader from "react-spinners/PulseLoader";
+import { getGreenFilters } from "../../store/features/greenFilterSlice";
+import ModalGreenFilter from "../modals/ModalGreenFilter";
+import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import Tuto from "../Tuto";
 
 export default function Film() {
-	const BASE_URL = 'https://test.jobissim.com/uploads/greenFilters';
+  const BASE_URL = "https://test.jobissim.com/uploads/greenFilters";
 
-	const selfieSegmentation = new SelfieSegmentation({
-		locateFile: (file) =>
-			`https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
-	});
+  const selfieSegmentation = new SelfieSegmentation({
+    locateFile: (file) =>
+      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+  });
 
-	const navigate = useNavigate();
-	const user = useSelector((state) => state.user.user);
-	const { status, error } = useSelector((state) => state.videoProcess);
-	const { token } = user;
-	const dispatch = useDispatch();
-	const [questions, setQuestions] = useState([]);
-	const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-	const [videoBase64, setVideoBase64] = useState(null);
-	const [recording, setRecording] = useState(false);
-	const [timer, setTimer] = useState(0);
-	const [timerIntervalId, setTimerIntervalId] = useState(null);
-	const videoCameraRef = useRef(null);
-	const [mediaStream, setMediaStream] = useState(null);
-	const [mediaRecorder, setMediaRecorder] = useState(null);
-	const selectedTheme = JSON.parse(localStorage.getItem('selectedTheme'));
-	const selectedMusic = JSON.parse(localStorage.getItem('selectedMusic'));
-	const textStyle = JSON.parse(localStorage.getItem('textStyle'));
-	const [createdVideoId, setCreatedVideoId] = useState(null);
-	const [greenFilters, setGreenFilters] = useState([]);
-	const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [modalAddOpen, setModalAddOpen] = useState(false);
-	const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user.user);
+  const { status, error } = useSelector((state) => state.videoProcess);
+  const { token } = user;
+  const dispatch = useDispatch();
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [videoBase64, setVideoBase64] = useState(null);
+  const [recording, setRecording] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [timerIntervalId, setTimerIntervalId] = useState(null);
+  const videoCameraRef = useRef(null);
+  const [mediaStream, setMediaStream] = useState(null);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const selectedTheme = JSON.parse(localStorage.getItem("selectedTheme"));
+  const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
+  const textStyle = JSON.parse(localStorage.getItem("textStyle"));
+  const [createdVideoId, setCreatedVideoId] = useState(null);
+  const [greenFilters, setGreenFilters] = useState([]);
+  const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAddOpen, setModalAddOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-	const refVideoRecord = useRef();
-	const canvasRef = useRef();
-	const contextRef = useRef();
-	const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const refVideoRecord = useRef();
+  const canvasRef = useRef();
+  const contextRef = useRef();
+  const [isFilterApplied, setIsFilterApplied] = useState(false);
 
-	// Make Pad working
-	const handleKeyPress = (event) => {
-		if (event.key === "é" || event.key === "è") {
-			if (recording) {
-				toggleRecording();
-			} else {
-				toggleRecording();
-			}
-		}
-	};
+  // Make Pad working
+  const handleKeyPress = (event) => {
+    if (event.key === "é" || event.key === "è") {
+      if (recording) {
+        toggleRecording();
+      } else {
+        toggleRecording();
+      }
+    }
+  };
 
-	useEffect(() => {
-		window.addEventListener("keydown", handleKeyPress);
-		return () => {
-			window.removeEventListener("keydown", handleKeyPress);
-		};
-	}, [recording]);
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [recording]);
 
-	const openModal = () => {
-		setIsModalOpen(true);
-		fetchGreenFilters();
-	};
+  const openModal = () => {
+    setIsModalOpen(true);
+    fetchGreenFilters();
+  };
 
-	const closeModal = () => {
-		setIsModalOpen(false);
-	};
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
-	const handleNewGreenFilter = () => {
-		setModalAddOpen(true);
-	};
+  const handleNewGreenFilter = () => {
+    setModalAddOpen(true);
+  };
 
-	useEffect(() => {
-		const selectedQuestions = JSON.parse(
-			localStorage.getItem('selectedQuestions'),
-		);
-		if (selectedQuestions) {
-			setQuestions(selectedQuestions);
-		}
+  useEffect(() => {
+    const selectedQuestions = JSON.parse(
+      localStorage.getItem("selectedQuestions")
+    );
+    if (selectedQuestions) {
+      setQuestions(selectedQuestions);
+    }
 
-		contextRef.current = canvasRef.current.getContext('2d');
+    contextRef.current = canvasRef.current.getContext("2d");
 
-		initializeCamera();
-	}, []);
+    initializeCamera();
+  }, []);
 
-	const initializeCamera = async () => {
-		try {
-			const stream = await navigator.mediaDevices
-				.getUserMedia({
-					video: {
-						facingMode: 'portrait',
-						width: { ideal: 640 }, // Largeur souhaitée
-						height: { ideal: 1136 }, // Hauteur souhaitée
-					},
-					audio: true,
-				})
-				.then((stream) => (videoCameraRef.current.srcObject = stream));
-			setMediaStream(stream);
-			const recorder = new MediaRecorder(stream);
-			setMediaRecorder(recorder);
-			recorder.ondataavailable = (e) => {
-				if (e.data.size > 0) {
-					const chunks = videoBase64 ? [...videoBase64, e.data] : [e.data];
-					setVideoBase64(chunks);
-				}
-			};
-		} catch (error) {
-			console.error("Erreur lors de l'accès à la caméra : ", error);
-		}
-	};
+  const initializeCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            facingMode: "portrait",
+            width: { ideal: 640 }, // Largeur souhaitée
+            height: { ideal: 1136 }, // Hauteur souhaitée
+          },
+          audio: true,
+        })
+        .then((stream) => (videoCameraRef.current.srcObject = stream));
+      setMediaStream(stream);
+      const recorder = new MediaRecorder(stream);
+      setMediaRecorder(recorder);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          const chunks = videoBase64 ? [...videoBase64, e.data] : [e.data];
+          setVideoBase64(chunks);
+        }
+      };
+    } catch (error) {
+      console.error("Erreur lors de l'accès à la caméra : ", error);
+    }
+  };
 
-	const toggleRecording = async () => {
-		if (!recording) {
-			try {
-				dispatch(changeStatus('loading'));
+  const toggleRecording = async () => {
+    if (!recording) {
+      try {
+        dispatch(changeStatus("loading"));
 
-				const audioStream = await navigator.mediaDevices.getUserMedia({
-					audio: true,
-				});
+        const audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
 
-				const stream = isFilterApplied
-					? canvasRef.current.captureStream()
-					: await navigator.mediaDevices.getUserMedia({
-							video: {
-								facingMode: 'portrait',
-								width: { ideal: 640 }, // Largeur souhaitée
-								height: { ideal: 1136 }, // Hauteur souhaitée
-							},
-					  });
+        const stream = isFilterApplied
+          ? canvasRef.current.captureStream()
+          : await navigator.mediaDevices.getUserMedia({
+              video: {
+                facingMode: "portrait",
+                width: { ideal: 640 }, // Largeur souhaitée
+                height: { ideal: 1136 }, // Hauteur souhaitée
+              },
+            });
 
-				audioStream.getTracks().map((track) => stream.addTrack(track));
+        audioStream.getTracks().map((track) => stream.addTrack(track));
 
-				refVideoRecord.current.srcObject = stream;
-				setMediaStream(stream);
+        refVideoRecord.current.srcObject = stream;
+        setMediaStream(stream);
 
-				const recorder = new MediaRecorder(stream);
-				setMediaRecorder(recorder);
+        const recorder = new MediaRecorder(stream);
+        setMediaRecorder(recorder);
 
-				const chunks = [];
-				recorder.ondataavailable = (e) => {
-					if (e.data.size > 0) {
-						chunks.push(e.data);
-					}
-				};
+        const chunks = [];
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            chunks.push(e.data);
+          }
+        };
 
-				recorder.onstop = () => {
-					const blob = new Blob(chunks, { type: 'video/webm' });
-					const videoFile = new File([blob], 'video.mp4', {
-						type: 'video/mp4',
-					});
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: "video/webm" });
+          const videoFile = new File([blob], "video.mp4", {
+            type: "video/mp4",
+          });
 
-					setVideoBase64(blob);
-					stream.getTracks().forEach((track) => track.stop());
-					setRecording(false);
-					setTimer(0);
-					clearInterval(timerIntervalId);
+          setVideoBase64(blob);
+          stream.getTracks().forEach((track) => track.stop());
+          setRecording(false);
+          setTimer(0);
+          clearInterval(timerIntervalId);
 
-					// Convertir la vidéo en base64
-					const reader = new FileReader();
-					reader.readAsDataURL(blob);
-					reader.onload = async function () {
-						let res;
-						try {
-							const values = {
-								token,
-								video: videoFile,
-								questionId: questions[currentQuestionIndex].id,
-								themeId: selectedTheme.id,
-								musicId: selectedMusic.id,
-								fontSize: textStyle.fontSize,
-								fontColor: textStyle.textColor,
-							};
-							res = await dispatch(createVideoProcess(values));
-						} catch (error) {
-							console.error('Erreur lors de la sauvegarde du clip :', error);
-						} finally {
-							if (res.meta.requestStatus === 'fulfilled') {
-								setCreatedVideoId(res.payload.id);
-								dispatch(changeStatus(''));
-							}
-						}
-					};
-				};
+          // Convertir la vidéo en base64
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onload = async function () {
+            let res;
+            try {
+              const values = {
+                token,
+                video: videoFile,
+                questionId: questions[currentQuestionIndex].id,
+                themeId: selectedTheme.id,
+                musicId: selectedMusic.id,
+                fontSize: textStyle.fontSize,
+                fontColor: textStyle.textColor,
+              };
+              res = await dispatch(createVideoProcess(values));
+            } catch (error) {
+              console.error("Erreur lors de la sauvegarde du clip :", error);
+            } finally {
+              if (res.meta.requestStatus === "fulfilled") {
+                setCreatedVideoId(res.payload.id);
+                dispatch(changeStatus(""));
+              }
+            }
+          };
+        };
 
-				recorder.start();
-				setRecording(true);
+        recorder.start();
+        setRecording(true);
 
-				const intervalId = setInterval(() => {
-					setTimer((prevTimer) => prevTimer + 1);
-				}, 1000);
+        const intervalId = setInterval(() => {
+          setTimer((prevTimer) => prevTimer + 1);
+        }, 1000);
 
-				setTimerIntervalId(intervalId);
-			} catch (error) {
-				console.error("Erreur lors de l'accès à la caméra : ", error);
-			}
-		} else {
-			if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-				mediaRecorder.stop();
-				clearInterval(timerIntervalId);
-			}
-		}
-	};
+        setTimerIntervalId(intervalId);
+      } catch (error) {
+        console.error("Erreur lors de l'accès à la caméra : ", error);
+      }
+    } else {
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+        clearInterval(timerIntervalId);
+      }
+    }
+  };
 
-	const handleNextQuestion = () => {
-		if (currentQuestionIndex < questions.length - 1) {
-			setCurrentQuestionIndex(currentQuestionIndex + 1);
-			setVideoBase64(null);
-			setRecording(false);
-			initializeCamera();
-		} else {
-			localStorage.removeItem('selectedQuestions');
-			navigate('/review');
-		}
-	};
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setVideoBase64(null);
+      setRecording(false);
+      initializeCamera();
+    } else {
+      localStorage.removeItem("selectedQuestions");
+      navigate("/review");
+    }
+  };
 
-	const deleteLastVideo = async () => {
-		try {
-			await dispatch(
-				deleteVideoProcess({
-					token: token,
-					id: createdVideoId,
-				}),
-			);
-		} catch (error) {
-			console.error('Error :', error);
-		} finally {
-		}
-	};
+  const deleteLastVideo = async () => {
+    try {
+      await dispatch(
+        deleteVideoProcess({
+          token: token,
+          id: createdVideoId,
+        })
+      );
+    } catch (error) {
+      console.error("Error :", error);
+    } finally {
+    }
+  };
 
-	const handleRedoRecording = () => {
-		deleteLastVideo();
-		setVideoBase64(null);
-		setTimer(0);
-		clearInterval(timerIntervalId);
-		initializeCamera();
-	};
+  const handleRedoRecording = () => {
+    deleteLastVideo();
+    setVideoBase64(null);
+    setTimer(0);
+    clearInterval(timerIntervalId);
+    initializeCamera();
+  };
 
-	const formatTime = (seconds) => {
-		const hours = Math.floor(seconds / 3600)
-			.toString()
-			.padStart(2, '0');
-		const minutes = Math.floor((seconds % 3600) / 60)
-			.toString()
-			.padStart(2, '0');
-		const remainingSeconds = (seconds % 60).toString().padStart(2, '0');
-		return `${hours}:${minutes}:${remainingSeconds}`;
-	};
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600)
+      .toString()
+      .padStart(2, "0");
+    const minutes = Math.floor((seconds % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
+    const remainingSeconds = (seconds % 60).toString().padStart(2, "0");
+    return `${hours}:${minutes}:${remainingSeconds}`;
+  };
 
-	// GreenFilter
-	const fetchGreenFilters = async () => {
-		try {
-			const response = await dispatch(getGreenFilters(token));
-			const greenFiltersData = response.payload;
-			setGreenFilters(greenFiltersData);
-		} catch (error) {
-			console.error('Erreur lors de la récupération des filtres :', error);
-		} finally {
-			setLoading(false);
-		}
-	};
+  // GreenFilter
+  const fetchGreenFilters = async () => {
+    try {
+      const response = await dispatch(getGreenFilters(token));
+      const greenFiltersData = response.payload;
+      setGreenFilters(greenFiltersData);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des filtres :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	// GREEN FILTER
-	let backgroundImage;
+  // GREEN FILTER
+  let backgroundImage;
 
-	const handleApplyBackground = async () => {
-		if (
-			selectedGreenFilterIndex >= 0 &&
-			greenFilters[selectedGreenFilterIndex]
-		) {
-			if (canvasRef.current) {
+  const handleApplyBackground = async () => {
+    if (
+      selectedGreenFilterIndex >= 0 &&
+      greenFilters[selectedGreenFilterIndex]
+    ) {
+      if (canvasRef.current) {
+        backgroundImage = new Image();
+        backgroundImage.src = `${BASE_URL}/${greenFilters[selectedGreenFilterIndex].image}`;
 
-				backgroundImage = new Image();
-				backgroundImage.src = `${BASE_URL}/${greenFilters[selectedGreenFilterIndex].image}`;
+        canvasRef.current.width = videoCameraRef.current.clientWidth;
+        canvasRef.current.height = videoCameraRef.current.clientHeight;
 
-				canvasRef.current.width = videoCameraRef.current.clientWidth;
-				canvasRef.current.height = videoCameraRef.current.clientHeight;
+        selfieSegmentation.setOptions({
+          modelSelection: 1,
+          selfieMode: true,
+        });
+        selfieSegmentation.onResults(onResults);
 
-				selfieSegmentation.setOptions({
-					modelSelection: 1,
-					selfieMode: true,
-				});
-				selfieSegmentation.onResults(onResults);
+        sendToMediaPipe();
 
-				sendToMediaPipe();
+        setIsFilterApplied(true);
+        closeModal();
+      } else {
+        console.error("canvasRef is not defined.");
+      }
+    }
+  };
 
-				setIsFilterApplied(true);
-				closeModal();
-			} else {
-				console.error('canvasRef is not defined.');
-			}
-		}
-	};
+  const onResults = (results) => {
+    contextRef.current.save();
+    contextRef.current.clearRect(
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
 
-	const onResults = (results) => {
-		contextRef.current.save();
-		contextRef.current.clearRect(
-			0,
-			0,
-			canvasRef.current.width,
-			canvasRef.current.height,
-		);
+    const wRatio = canvasRef.current.width / results.image.width;
+    const hRatio = canvasRef.current.height / results.image.height;
+    const ratio = Math.max(wRatio, hRatio);
+    const offsetX = (canvasRef.current.width - results.image.width * ratio) / 2;
+    const offsetY =
+      (canvasRef.current.height - results.image.height * ratio) / 2;
 
-		const wRatio = canvasRef.current.width / results.image.width;
-		const hRatio = canvasRef.current.height / results.image.height;
-		const ratio = Math.max(wRatio, hRatio);
-		const offsetX = (canvasRef.current.width - results.image.width * ratio) / 2;
-		const offsetY =
-			(canvasRef.current.height - results.image.height * ratio) / 2;
+    contextRef.current.drawImage(
+      results.segmentationMask,
+      offsetX,
+      offsetY,
+      results.image.width * ratio,
+      results.image.height * ratio
+    );
 
-		contextRef.current.drawImage(
-			results.segmentationMask,
-			offsetX,
-			offsetY,
-			results.image.width * ratio,
-			results.image.height * ratio,
-		);
+    contextRef.current.globalCompositeOperation = "source-out";
 
-		contextRef.current.globalCompositeOperation = 'source-out';
+    if (
+      selectedGreenFilterIndex >= 0 &&
+      greenFilters[selectedGreenFilterIndex]
+    ) {
+      contextRef.current.drawImage(
+        backgroundImage,
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
+    }
 
-		if (
-			selectedGreenFilterIndex >= 0 &&
-			greenFilters[selectedGreenFilterIndex]
-		) {
+    contextRef.current.globalCompositeOperation = "destination-atop";
+    contextRef.current.drawImage(
+      results.image,
+      offsetX,
+      offsetY,
+      results.image.width * ratio,
+      results.image.height * ratio
+    );
 
-			contextRef.current.drawImage(
-				backgroundImage,
-				0,
-				0,
-				canvasRef.current.width,
-				canvasRef.current.height,
-			);
-		}
+    contextRef.current.restore();
+  };
 
-		contextRef.current.globalCompositeOperation = 'destination-atop';
-		contextRef.current.drawImage(
-			results.image,
-			offsetX,
-			offsetY,
-			results.image.width * ratio,
-			results.image.height * ratio,
-		);
+  const handleRemoveBackground = () => {
+    setIsFilterApplied(false);
+    initializeCamera();
+  };
 
-		contextRef.current.restore();
-	};
+  async function sendToMediaPipe() {
+    if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
+      requestAnimationFrame(sendToMediaPipe);
+    } else {
+      await selfieSegmentation.send({ image: videoCameraRef.current });
+      requestAnimationFrame(sendToMediaPipe);
+    }
+  }
 
-	const handleRemoveBackground = () => {
-		setIsFilterApplied(false);
-		initializeCamera();
-	};
+  return (
+    <div className="flex flex-col justify-center h-[80%] w-full max-w-[70%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
+      <div className="text-center dark:text-dark_text_1">
+        <h2 className="mt-6 text-3xl font-bold">Enregistrement</h2>
+        {currentQuestionIndex < questions.length && (
+          <div className="mt-2 text-sm">
+            <p>{questions[currentQuestionIndex].title}</p>
+          </div>
+        )}
+      </div>
 
-	async function sendToMediaPipe() {
-		if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
-			requestAnimationFrame(sendToMediaPipe);
-		} else {
-			await selfieSegmentation.send({ image: videoCameraRef.current });
-			requestAnimationFrame(sendToMediaPipe);
-		}
-	}
+      <div className="dark:text-dark_text_1">
+        <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[36rem] mx-auto flex items-center justify-center">
+          {videoBase64 && (
+            <video
+              src={URL.createObjectURL(videoBase64)}
+              style={{ transform: isFilterApplied ? "" : "scaleX(-1)" }}
+              controls
+              autoPlay
+              className="w-full h-full object-contain mirror"
+            />
+          )}
 
-	return (
-		<div className="w-full max-w-md space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
-			<div className="text-center dark:text-dark_text_1">
-				<h2 className="mt-6 text-3xl font-bold">Enregistrement</h2>
-				{currentQuestionIndex < questions.length && (
-					<div className="mt-2 text-sm">
-						<p>{questions[currentQuestionIndex].title}</p>
-					</div>
-				)}
-			</div>
+          <video
+            ref={videoCameraRef}
+            className={`w-full h-full object-contain ${
+              videoBase64 ? "hidden" : ""
+            }`}
+            style={{ transform: "scaleX(-1)" }}
+            autoPlay
+            muted
+          />
 
-			<div className="dark:text-dark_text_1">
-				<div className="relative w-full h-96 mx-auto flex items-center justify-center">
-					{videoBase64 && (
-						<video
-							src={URL.createObjectURL(videoBase64)}
-							style={{ transform: isFilterApplied ? '' : 'scaleX(-1)' }}
-							controls
-							autoPlay
-							className="w-full h-full object-cover mirror"
-						/>
-					)}
+          <canvas
+            ref={canvasRef}
+            className={`w-full h-full object-contain ${
+              videoBase64 ? "hidden" : ""
+            } ${isFilterApplied ? "" : "hidden"}`}
+            style={{ left: 0, position: "absolute", top: 0 }}
+          />
+          <video
+            ref={refVideoRecord}
+            className={`w-full h-full object-contain ${
+              videoBase64 ? "hidden" : ""
+            } ${recording ? "" : "hidden"}`}
+            style={{
+              left: 0,
+              position: "absolute",
+              top: 0,
+              transform: isFilterApplied ? "" : "scaleX(-1)",
+            }}
+            autoPlay
+            muted
+          />
 
-					<video
-						ref={videoCameraRef}
-						className={`w-full h-full object-cover ${
-							videoBase64 ? 'hidden' : ''
-						}`}
-						style={{ transform: 'scaleX(-1)' }}
-						autoPlay
-						muted
-					/>
+          {recording && (
+            <div
+              className="absolute bottom-2 left-0 right-0 text-center text-white"
+              style={{ opacity: 0.85 }}
+            >
+              {formatTime(timer)}
+            </div>
+          )}
+        </div>
 
-					<canvas
-						ref={canvasRef}
-						className={`w-full h-full object-cover ${
-							videoBase64 ? 'hidden' : ''
-						} ${isFilterApplied ? '' : 'hidden'}`}
-						style={{ left: 0, position: 'absolute', top: 0 }}
-					/>
-					<video
-						ref={refVideoRecord}
-						className={`w-full h-full object-cover ${
-							videoBase64 ? 'hidden' : ''
-						} ${recording ? '' : 'hidden'}`}
-						style={{
-							left: 0,
-							position: 'absolute',
-							top: 0,
-							transform: isFilterApplied ? '' : 'scaleX(-1)',
-						}}
-						autoPlay
-						muted
-					/>
+        <div className="mt-4 flex items-center justify-center">
+          {videoBase64 ? (
+            <button
+              onClick={handleRedoRecording}
+              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+                status === "loading" ? "opacity-50 pointer-events-none" : ""
+              }`}
+              disabled={status === "loading"}
+            >
+              Recommencer
+            </button>
+          ) : (
+            <button
+              onClick={toggleRecording}
+              className={`${
+                recording
+                  ? "bg-red-500 hover.bg-red-700"
+                  : "bg-green_2 hover:bg-green_1"
+              } text-white px-4 py-2 rounded-lg actionBtn`}
+            >
+              {recording
+                ? "Arrêter l'enregistrement"
+                : "Démarrer l'enregistrement"}
+            </button>
+          )}
+          {isFilterApplied ? (
+            <button
+              onClick={handleRemoveBackground}
+              className="ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg"
+            >
+              <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
+            </button>
+          ) : (
+            <button
+              onClick={openModal}
+              className="greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg"
+            >
+              Ecran vert
+            </button>
+          )}
+        </div>
+      </div>
 
-					{recording && (
-						<div
-							className="absolute bottom-2 left-0 right-0 text-center text-white"
-							style={{ opacity: 0.85 }}
-						>
-							{formatTime(timer)}
-						</div>
-					)}
-				</div>
+      <button
+        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+          !videoBase64 || status === "loading"
+            ? "opacity-50 pointer-events-none"
+            : ""
+        }`}
+        onClick={handleNextQuestion}
+        disabled={!videoBase64 || status === "loading"}
+        style={{ marginTop: 20 }}
+      >
+        {status === "loading" ? (
+          <PulseLoader color="#fff" size={16} />
+        ) : (
+          "Continuer"
+        )}
+      </button>
 
-				<div className="mt-4 flex items-center justify-center">
-					{videoBase64 ? (
-						<button
-							onClick={handleRedoRecording}
-							className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
-								status === 'loading' ? 'opacity-50 pointer-events-none' : ''
-							}`}
-							disabled={status === 'loading'}
-						>
-							Recommencer
-						</button>
-					) : (
-						<button
-							onClick={toggleRecording}
-							className={`${
-								recording
-									? 'bg-red-500 hover.bg-red-700'
-									: 'bg-green_2 hover:bg-green_1'
-							} text-white px-4 py-2 rounded-lg actionBtn`}
-						>
-							{recording
-								? "Arrêter l'enregistrement"
-								: "Démarrer l'enregistrement"}
-						</button>
-					)}
-					{isFilterApplied ? (
-						<button
-							onClick={handleRemoveBackground}
-							className="ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg"
-						>
-							<FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
-						</button>
-					) : (
-						<button
-							onClick={openModal}
-							className="greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg"
-						>
-							Ecran vert
-						</button>
-					)}
-				</div>
-			</div>
+      {/* GreenFilter Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
+          {loading ? (
+            <div className="text-center">
+              <PulseLoader color="#808080" size={16} />
+            </div>
+          ) : (
+            <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
+              <p className="text-gray-800 text-lg">Liste des écrans verts</p>
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                {/* Ajouter la première image en haut de la liste */}
+                <div
+                  className={`card cursor-pointer mb-2 mx-2 ${
+                    selectedGreenFilterIndex === -1 ? "filter-selected" : ""
+                  }`}
+                  onClick={() => handleNewGreenFilter(-1)}
+                >
+                  <img
+                    src="assets/themes/addTheme.png"
+                    alt="Ajouter un thème"
+                    className="w-full h-32 object-cover rounded-md mb-2"
+                  />
+                  {selectedGreenFilterIndex === -1 && (
+                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+                      <p className="text-blue-500 text-3xl">&hearts;</p>
+                    </div>
+                  )}
+                </div>
 
-			<button
-				className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
-					!videoBase64 || status === 'loading'
-						? 'opacity-50 pointer-events-none'
-						: ''
-				}`}
-				onClick={handleNextQuestion}
-				disabled={!videoBase64 || status === 'loading'}
-				style={{ marginTop: 20 }}
-			>
-				{status === 'loading' ? (
-					<PulseLoader color="#fff" size={16} />
-				) : (
-					'Continuer'
-				)}
-			</button>
+                {greenFilters.map((filter, index) => (
+                  <div
+                    key={filter.id}
+                    className={`card cursor-pointer mb-2 mx-2 relative ${
+                      selectedGreenFilterIndex === index
+                        ? "filter-selected"
+                        : ""
+                    }`}
+                    onClick={() => setSelectedGreenFilterIndex(index)}
+                  >
+                    <img
+                      src={`${BASE_URL}/${filter.image}`}
+                      alt={filter.title}
+                      className="w-full h-32 object-cover rounded-md mb-2"
+                    />
+                    {selectedGreenFilterIndex === index && (
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <p className="text-blue-500 text-3xl">&hearts;</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button
+                className="mt-4 mr-4 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+                onClick={handleApplyBackground}
+              >
+                Appliquer
+              </button>
+              <button
+                className="mt-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-md"
+                onClick={closeModal}
+              >
+                Fermer
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {/* ---- */}
 
-			{/* GreenFilter Modal */}
-			{isModalOpen && (
-				<div className="fixed inset-0 flex items-center justify-center z-50">
-					<div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
-					{loading ? (
-						<div className="text-center">
-							<PulseLoader color="#808080" size={16} />
-						</div>
-					) : (
-						<div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-							<p className="text-gray-800 text-lg">Liste des écrans verts</p>
-							<div className="grid grid-cols-3 gap-4 mt-4">
-								{/* Ajouter la première image en haut de la liste */}
-								<div
-									className={`card cursor-pointer mb-2 mx-2 ${
-										selectedGreenFilterIndex === -1 ? 'filter-selected' : ''
-									}`}
-									onClick={() => handleNewGreenFilter(-1)}
-								>
-									<img
-										src="assets/themes/addTheme.png"
-										alt="Ajouter un thème"
-										className="w-full h-32 object-cover rounded-md mb-2"
-									/>
-									{selectedGreenFilterIndex === -1 && (
-										<div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-											<p className="text-blue-500 text-3xl">&hearts;</p>
-										</div>
-									)}
-								</div>
+      <ModalGreenFilter
+        isOpen={modalAddOpen}
+        onClose={() => setModalAddOpen(false)}
+        fetchGreenFilters={fetchGreenFilters}
+      />
 
-								{greenFilters.map((filter, index) => (
-									<div
-										key={filter.id}
-										className={`card cursor-pointer mb-2 mx-2 relative ${
-											selectedGreenFilterIndex === index
-												? 'filter-selected'
-												: ''
-										}`}
-										onClick={() => setSelectedGreenFilterIndex(index)}
-									>
-										<img
-											src={`${BASE_URL}/${filter.image}`}
-											alt={filter.title}
-											className="w-full h-32 object-cover rounded-md mb-2"
-										/>
-										{selectedGreenFilterIndex === index && (
-											<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-												<p className="text-blue-500 text-3xl">&hearts;</p>
-											</div>
-										)}
-									</div>
-								))}
-							</div>
-							<button
-								className="mt-4 mr-4 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-								onClick={handleApplyBackground}
-							>
-								Appliquer
-							</button>
-							<button
-								className="mt-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-md"
-								onClick={closeModal}
-							>
-								Fermer
-							</button>
-						</div>
-					)}
-				</div>
-			)}
-			{/* ---- */}
-
-			<ModalGreenFilter
-				isOpen={modalAddOpen}
-				onClose={() => setModalAddOpen(false)}
-				fetchGreenFilters={fetchGreenFilters}
-			/>
-
-			<Tuto
-				steps={[
-					{
-						element: '.currentQuestion',
-						intro: "Le titre de la question en cours s'affichera ici.",
-					},
-					{
-						element: '.actionBtn',
-						intro: 'Démarre, recommence ou arrête un enregistrement depuis ce bouton.',
-					},
-					{
-						element: '.greenFilter',
-						intro: 'Tu peux aussi appliquer un écran vert pour changer le décor derrière toi.',
-					},
-				]}
-				tutorialKey="filmTuto"
-			/>
-		</div>
-	);
+      <Tuto
+        steps={[
+          {
+            element: ".currentQuestion",
+            intro: "Le titre de la question en cours s'affichera ici.",
+          },
+          {
+            element: ".actionBtn",
+            intro:
+              "Démarre, recommence ou arrête un enregistrement depuis ce bouton.",
+          },
+          {
+            element: ".greenFilter",
+            intro:
+              "Tu peux aussi appliquer un écran vert pour changer le décor derrière toi.",
+          },
+        ]}
+        tutorialKey="filmTuto"
+      />
+    </div>
+  );
 }
