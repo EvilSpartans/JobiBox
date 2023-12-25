@@ -4,6 +4,10 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      screens: {
+        tall: { raw: "(min-height: 1080px)" },
+        // => @media (min-height: 800px) { ... }
+      },
       colors: {
         dark_bg_1: "#111B21",
         dark_bg_2: "#202C33",
@@ -31,9 +35,9 @@ module.exports = {
         green_3: "#005C4B",
         green_4: "#025144",
         red_1: "#E55151",
-        red_2: "#9E2B40"
+        red_2: "#9E2B40",
       },
     },
   },
   plugins: [],
-}
+};
