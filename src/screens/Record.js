@@ -3,11 +3,11 @@ import Film from "../components/video/Film";
 
 export default function Record() {
   return (
-    <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
+    <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center py-[39px] overflow-hidden">
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
-        <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
+        <div className="w-full flex items-center justify-center overflow-hidden">
           {/* Container */}
           <Film />
         </div>

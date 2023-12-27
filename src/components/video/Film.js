@@ -368,7 +368,7 @@ export default function Film() {
   }
 
   return (
-    <div className="flex flex-col justify-center h-[80%] w-full max-w-[70%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
+    <div className="flex flex-col justify-center h-fit w-full max-w-[70%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Enregistrement</h2>
         {currentQuestionIndex < questions.length && (
@@ -386,13 +386,13 @@ export default function Film() {
               style={{ transform: isFilterApplied ? "" : "scaleX(-1)" }}
               controls
               autoPlay
-              className="w-full h-full object-contain mirror"
+              className="w-full h-full object-contain tall:object-cover mirror"
             />
           )}
 
           <video
             ref={videoCameraRef}
-            className={`w-full h-full object-contain ${
+            className={`w-full h-full object-contain tall:object-cover ${
               videoBase64 ? "hidden" : ""
             }`}
             style={{ transform: "scaleX(-1)" }}
@@ -402,14 +402,14 @@ export default function Film() {
 
           <canvas
             ref={canvasRef}
-            className={`w-full h-full object-contain ${
+            className={`w-full h-full object-contain tall:object-cover ${
               videoBase64 ? "hidden" : ""
             } ${isFilterApplied ? "" : "hidden"}`}
             style={{ left: 0, position: "absolute", top: 0 }}
           />
           <video
             ref={refVideoRecord}
-            className={`w-full h-full object-contain ${
+            className={`w-full h-full object-contain tall:object-cover ${
               videoBase64 ? "hidden" : ""
             } ${recording ? "" : "hidden"}`}
             style={{
