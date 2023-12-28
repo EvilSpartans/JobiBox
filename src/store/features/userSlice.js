@@ -65,7 +65,7 @@ export const userSlice = createSlice({
         })
         .addCase(registerUser.fulfilled, (state, action) => {
             state.status = "succeeded";
-            state.error = action.payload.data.detail;
+            state.error = action.payload.data;
             state.user = {
                 ...action.payload.user,
                 token: action.payload.token
