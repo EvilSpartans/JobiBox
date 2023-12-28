@@ -379,7 +379,7 @@ export default function Film() {
       </div>
 
       <div className="dark:text-dark_text_1">
-        <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[36rem] mx-auto flex items-center justify-center">
+        <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[56rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
               src={URL.createObjectURL(videoBase64)}
