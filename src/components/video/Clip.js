@@ -185,6 +185,7 @@ export default function Clip() {
           </div>
         )}
 
+        <div className="max-h-56 tall:max-h-96 overflow-y-auto">
         {status !== "loading" &&
           questions.map((question, index) => (
             <div key={index} className="mb-3 flex items-center">
@@ -209,6 +210,7 @@ export default function Clip() {
               </button>
             </div>
           ))}
+          </div>
 
         {/* Show */}
         {showModalOpen && selectedQuestionIndex !== null && (
@@ -225,6 +227,8 @@ export default function Clip() {
                 <video
                   src={`${BASE_URL}/${questions[selectedQuestionIndex].video}`}
                   controls
+                  disablePictureInPicture
+                  controlsList="nodownload"
                   autoPlay
                   className="w-full h-full object-cover"
                 ></video>
@@ -268,6 +272,7 @@ export default function Clip() {
                     src={`${BASE_URL}/${questions[selectedQuestionIndex].video}`}
                     autoPlay
                     controls
+                    disablePictureInPicture
                     controlsList="nodownload"
                     className="w-full h-full object-cover hide-video-controls"
                   ></video>

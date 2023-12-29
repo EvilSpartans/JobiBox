@@ -102,6 +102,8 @@ export default function Transcription() {
               videoPath && (
                 <video
                   controls
+                  disablePictureInPicture
+                  controlsList="nodownload"
                   width="100%"
                   className="mb-4 h-48 md:h-64 lg:h-96 xl:h-120"
                   poster={thumbnail}
