@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPen, faTrash, faCut } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import {
   getVideoProcesses,
@@ -27,6 +27,7 @@ export default function Clip() {
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(null);
   const [showModalOpen, setShowModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [trimModalOpen, setTrimModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [startValue, setStartValue] = useState(0);
   const [endValue, setEndValue] = useState(100);
@@ -71,6 +72,16 @@ export default function Clip() {
     setEditModalOpen(false);
   };
 
+  const openTrimModal = (index) => {
+    setSelectedQuestionIndex(index);
+    setTrimModalOpen(true);
+  };
+
+  const closeTrimModal = () => {
+    setSelectedQuestionIndex(null);
+    setTrimModalOpen(false);
+  };
+
   const openConfirmationModal = (index) => {
     setSelectedQuestionIndex(index);
     setIsConfirmationModalOpen(true);
@@ -101,8 +112,8 @@ export default function Clip() {
     }
   };
 
-  const handleEdit = async (index) => {
-    closeEditModal();
+  const handleTrim = async (index) => {
+    closeTrimModal();
 
     let res;
     try {
@@ -122,6 +133,19 @@ export default function Clip() {
         dispatch(changeStatus(""));
       }
     }
+  };
+
+  const handleEdit = async (index) => {
+    closeEditModal();
+
+    const selectedQuestion = {
+      id: questions[index].questionId,
+      title: questions[index].questionTitle
+    };
+
+    localStorage.setItem("selectedQuestions", JSON.stringify([selectedQuestion]));
+    await handleDelete(index);
+    navigate("/record");
   };
 
   const handleDelete = async (index) => {
@@ -203,6 +227,12 @@ export default function Clip() {
                 <FontAwesomeIcon icon={faPen} className="" />
               </button>
               <button
+                onClick={() => openTrimModal(index)}
+                className="trimIcon bg-yellow-100 hover-bg-yellow-200 text-yellow-500 font-semibold px-1 rounded-md mr-1"
+              >
+                <FontAwesomeIcon icon={faCut} className="" />
+              </button>
+              <button
                 onClick={() => openConfirmationModal(index)}
                 className="deleteIcon bg-red-100 hover-bg-red-200 text-red-500 font-semibold px-1 rounded-md"
               >
@@ -237,12 +267,12 @@ export default function Clip() {
           </div>
         )}
 
-        {/* Edit */}
-        {editModalOpen && selectedQuestionIndex !== null && (
+        {/* Trim */}
+        {trimModalOpen && selectedQuestionIndex !== null && (
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div
               className="absolute inset-0 bg-gray-900 opacity-75"
-              onClick={closeEditModal}
+              onClick={closeTrimModal}
             ></div>
             <div className="relative flex items-center justify-center">
               <div className="modal-content bg-white p-4 rounded-lg text-center z-50 relative">
@@ -301,18 +331,44 @@ export default function Clip() {
                         ? "bg-green-500 text-white"
                         : "bg-gray-300 text-gray-600 cursor-not-allowed"
                     } px-4 py-2 rounded-md mr-2`}
-                    onClick={() => handleEdit(selectedQuestionIndex)}
+                    onClick={() => handleTrim(selectedQuestionIndex)}
                     disabled={!isSliderMoved}
                   >
                     Valider
                   </button>
                   <button
                     className="bg-red-500 text-white px-4 py-2 rounded-md"
-                    onClick={closeEditModal}
+                    onClick={closeTrimModal}
                   >
                     Annuler
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit */}
+        {editModalOpen && selectedQuestionIndex !== null && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
+            <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
+              <p className="text-gray-800 text-lg">
+                Voulez-vous vraiment recommencer cette séquence ?
+              </p>
+              <div className="mt-4">
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded-md mr-2"
+                  onClick={() => handleEdit(selectedQuestionIndex)}
+                >
+                  Oui
+                </button>
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded-md"
+                  onClick={closeEditModal}
+                >
+                  Non
+                </button>
               </div>
             </div>
           </div>
@@ -367,6 +423,10 @@ export default function Clip() {
           },
           {
             element: ".editIcon",
+            intro: "Refaire le clip,",
+          },
+          {
+            element: ".trimIcon",
             intro: "Scinder le clip,",
           },
           {
