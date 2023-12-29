@@ -50,14 +50,13 @@ export default function Film() {
   const refVideoRecord = useRef();
   const canvasRef = useRef();
   const contextRef = useRef();
+  const currentQuestionIdRef = useRef();
   const [isFilterApplied, setIsFilterApplied] = useState(false);
 
   // Make Pad working
   const handleKeyPress = (event) => {
     if (event.key === "é" || event.key === "è") {
-      if (recording) {
-        toggleRecording();
-      } else {
+      if (!videoBase64) {
         toggleRecording();
       }
     }
@@ -68,7 +67,11 @@ export default function Film() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [recording]);
+  }, [recording, videoBase64]);
+
+  useEffect(() => {
+    currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
+  }, [currentQuestionIndex, questions]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -127,6 +130,7 @@ export default function Film() {
   };
 
   const toggleRecording = async () => {
+    const questionId = currentQuestionIdRef.current;
     if (!recording) {
       try {
         dispatch(changeStatus("loading"));
@@ -181,7 +185,7 @@ export default function Film() {
               const values = {
                 token,
                 video: videoFile,
-                questionId: questions[currentQuestionIndex].id,
+                questionId: questionId,
                 themeId: selectedTheme.id,
                 musicId: selectedMusic.id,
                 fontSize: textStyle.fontSize,
