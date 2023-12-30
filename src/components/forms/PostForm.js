@@ -19,6 +19,7 @@ import SelectMultiple from "../fields/SelectMultiple";
 import FileInput from "../fields/FileInput";
 
 import { PostSchema } from "../../utils/validation";
+import GoBack from "../GoBack";
 
 export default function PostForm() {
   const dispatch = useDispatch();
@@ -220,6 +221,7 @@ export default function PostForm() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
+      <GoBack />
       {/* Container */}
       <div className="flex flex-col justify-center h-fit w-full max-w-[70%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
         {/*Heading*/}
@@ -232,6 +234,8 @@ export default function PostForm() {
         {videoPath && (
           <video
             controls
+            disablePictureInPicture
+            controlsList="nodownload"
             width="100%"
             className="mb-4 h-48 md:h-64 lg:h-96 xl:h-120"
             poster={thumbnail}

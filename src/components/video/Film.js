@@ -45,18 +45,18 @@ export default function Film() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAddOpen, setModalAddOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [cameraLoading, setCameraLoading] = useState(true);
 
   const refVideoRecord = useRef();
   const canvasRef = useRef();
   const contextRef = useRef();
+  const currentQuestionIdRef = useRef();
   const [isFilterApplied, setIsFilterApplied] = useState(false);
 
   // Make Pad working
   const handleKeyPress = (event) => {
     if (event.key === "é" || event.key === "è") {
-      if (recording) {
-        toggleRecording();
-      } else {
+      if (!videoBase64) {
         toggleRecording();
       }
     }
@@ -67,7 +67,11 @@ export default function Film() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [recording]);
+  }, [recording, videoBase64]);
+
+  useEffect(() => {
+    currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
+  }, [currentQuestionIndex, questions]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -97,6 +101,7 @@ export default function Film() {
 
   const initializeCamera = async () => {
     try {
+      setCameraLoading(true);
       const stream = await navigator.mediaDevices
         .getUserMedia({
           video: {
@@ -118,10 +123,13 @@ export default function Film() {
       };
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
+    } finally {
+      setCameraLoading(false);
     }
   };
 
   const toggleRecording = async () => {
+    const questionId = currentQuestionIdRef.current;
     if (!recording) {
       try {
         dispatch(changeStatus("loading"));
@@ -176,7 +184,7 @@ export default function Film() {
               const values = {
                 token,
                 video: videoFile,
-                questionId: questions[currentQuestionIndex].id,
+                questionId: questionId,
                 themeId: selectedTheme.id,
                 musicId: selectedMusic.id,
                 fontSize: textStyle.fontSize,
@@ -379,12 +387,22 @@ export default function Film() {
       </div>
 
       <div className="dark:text-dark_text_1">
+        {cameraLoading ? (
+          <div className="flex items-center justify-center h-screen w-screen fixed top-0 left-0 bg-black bg-opacity-75">
+            <div className="text-center">
+              <PulseLoader color="#808080" size={16} />
+            </div>
+          </div>
+        ) : null}
+
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[56rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
               src={URL.createObjectURL(videoBase64)}
               style={{ transform: isFilterApplied ? "" : "scaleX(-1)" }}
               controls
+              disablePictureInPicture
+              controlsList="nodownload"
               autoPlay
               className="w-full h-full object-contain tall:object-cover mirror"
             />
@@ -397,6 +415,8 @@ export default function Film() {
             }`}
             style={{ transform: "scaleX(-1)" }}
             autoPlay
+            disablePictureInPicture
+            controlsList="nodownload"
             muted
           />
 
@@ -419,6 +439,8 @@ export default function Film() {
               transform: isFilterApplied ? "" : "scaleX(-1)",
             }}
             autoPlay
+            disablePictureInPicture
+            controlsList="nodownload"
             muted
           />
 
@@ -460,17 +482,25 @@ export default function Film() {
           {isFilterApplied ? (
             <button
               onClick={handleRemoveBackground}
-              className="ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg"
+              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
+                status === "loading" ? "opacity-50 pointer-events-none" : ""
+              }`}
+              disabled={status === "loading"}
             >
               <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
             </button>
           ) : (
-            <button
-              onClick={openModal}
-              className="greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg"
-            >
-              Ecran vert
-            </button>
+            !videoBase64 && (
+              <button
+                onClick={openModal}
+                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
+                  status === "loading" ? "opacity-50 pointer-events-none" : ""
+                }`}
+                disabled={status === "loading"}
+              >
+                Ecran vert
+              </button>
+            )
           )}
         </div>
       </div>
