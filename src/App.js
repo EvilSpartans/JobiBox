@@ -13,30 +13,37 @@ import Review from "./screens/Review";
 import Post from "./screens/Post";
 import Thanks from "./screens/Thanks";
 import Transcription from "./screens/Transcription";
+import OnlineStatus from "./components/OnlineStatus";
+import Offline from "./screens/Offline";
 
 export default function App() {
-
     const user = useSelector((state) => state.user.user);
     const { token } = user;
 
     return (
-        <div className="dark">
-            <Router>
-                <Routes>
-                    <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
-                    <Route path="/questions" element={token ? <Questions /> : <Navigate to="/login" />} />
-                    <Route path="/themes" element={token ? <Themes /> : <Navigate to="/login" />} />
-                    <Route path="/textStyles" element={token ? <TextStyles /> : <Navigate to="/login" />} />
-                    <Route path="/musics" element={token ? <Musics /> : <Navigate to="/login" />} />
-                    <Route path="/record" element={token ? <Record /> : <Navigate to="/login" />} />
-                    <Route path="/review" element={token ? <Review /> : <Navigate to="/login" />} />
-                    <Route path="/transcription" element={token ? <Transcription /> : <Navigate to="/login" />} />
-                    <Route path="/post" element={token ? <Post /> : <Navigate to="/login" />} />
-                    <Route path="/thanks" element={token ? <Thanks /> : <Navigate to="/login" />} />
-                    <Route path="/login" element={!token ? <Login /> : <Navigate to="/" />} />
-                    <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
-                </Routes>
-            </Router>
-        </div>
-    )
+        <Router>
+            <OnlineStatus>
+                {(isOnline) => (
+                    <div className={`dark ${isOnline ? '' : 'offline'}`}>
+                        {!isOnline && <Navigate to="/offline" />}
+                        <Routes>
+                            <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
+                            <Route path="/offline" element={<Offline />} />
+                            <Route path="/questions" element={token ? <Questions /> : <Navigate to="/login" />} />
+                            <Route path="/themes" element={token ? <Themes /> : <Navigate to="/login" />} />
+                            <Route path="/textStyles" element={token ? <TextStyles /> : <Navigate to="/login" />} />
+                            <Route path="/musics" element={token ? <Musics /> : <Navigate to="/login" />} />
+                            <Route path="/record" element={token ? <Record /> : <Navigate to="/login" />} />
+                            <Route path="/review" element={token ? <Review /> : <Navigate to="/login" />} />
+                            <Route path="/transcription" element={token ? <Transcription /> : <Navigate to="/login" />} />
+                            <Route path="/post" element={token ? <Post /> : <Navigate to="/login" />} />
+                            <Route path="/thanks" element={token ? <Thanks /> : <Navigate to="/login" />} />
+                            <Route path="/login" element={!token ? <Login /> : <Navigate to="/" />} />
+                            <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
+                        </Routes>
+                    </div>
+                )}
+            </OnlineStatus>
+        </Router>
+    );
 }
