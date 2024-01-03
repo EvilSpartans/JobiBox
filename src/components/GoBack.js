@@ -17,10 +17,10 @@ const GoBack = ({ itemToRemove }) => {
     return (
         <div className="fixed top-4 left-4">
             <button
-                className="flex items-center text-blue-500 hover:text-blue-700 focus:outline-none"
+                className="flex items-center text-blue-500 hover:text-blue-700 focus:outline-none text-lg font-bold p-2 blinking"
                 onClick={handleBack}
             >
-                <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                <FontAwesomeIcon icon={faArrowLeft} className="mr-2 text-xl" />
                 Retour
             </button>
         </div>

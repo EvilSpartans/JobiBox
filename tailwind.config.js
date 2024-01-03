@@ -4,6 +4,9 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      screens: {
+        tall: { raw: "(min-height: 1081px)" },
+      },
       colors: {
         dark_bg_1: "#111B21",
         dark_bg_2: "#202C33",
