@@ -28,11 +28,11 @@
   "build": {
     "productName": "jobibox",
     "appId": "com.jobibox",
-    "publish" : [
-      { 
-        "provider": "github", 
-        "private": false, 
-        "releaseType": "release" 
+    "publish": [
+      {
+        "provider": "github",
+        "private": false,
+        "releaseType": "release"
       }
     ],
     "files": [

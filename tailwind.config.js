@@ -6,7 +6,6 @@ module.exports = {
     extend: {
       screens: {
         tall: { raw: "(min-height: 1081px)" },
-        // => @media (min-height: 800px) { ... }
       },
       colors: {
         dark_bg_1: "#111B21",
