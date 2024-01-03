@@ -4,7 +4,7 @@ import Input from "../fields/Input";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
-import { signInSchema } from "../../utils/validation";
+import { signInSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
 import { changeStatus, loginUser } from "../../store/features/userSlice";
 import { sendWelcomeNotification } from "../Notification";

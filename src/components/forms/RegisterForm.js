@@ -1,10 +1,11 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../fields/Input";
+import Checkbox from "../fields/Checkbox";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
-import { signUpSchema } from "../../utils/validation";
+import { signUpSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
 import { changeStatus, registerUser } from "../../store/features/userSlice";
 import { sendWelcomeNotification } from "../Notification";
@@ -71,6 +72,27 @@ export default function RegisterForm() {
             register={register}
             error={errors?.password?.message}
           />
+          <Input
+            name="confirmPassword"
+            type="password"
+            placeholder="Confirmer mot de passe"
+            register={register}
+            error={errors?.confirmPassword?.message}
+          />
+          <Checkbox 
+            name="terms"
+            label="J'accepte les conditions d'utilisation"
+            register={register}
+            error={errors?.terms?.message}
+          />
+          <Link
+            to="https://jobissim.com/conditions" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:underline cursor-pointer transition ease-in duration-300 text-blue_3"
+          >
+            Prendre connaissance
+          </Link>
           {/*if we have an error*/}
           {error ? (
             <div>

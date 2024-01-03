@@ -18,7 +18,7 @@ import Select from "../fields/Select";
 import SelectMultiple from "../fields/SelectMultiple";
 import FileInput from "../fields/FileInput";
 
-import { PostSchema } from "../../utils/validation";
+import { PostSchema } from "../../utils/Validation";
 import GoBack from "../GoBack";
 
 export default function PostForm() {
@@ -183,6 +183,7 @@ export default function PostForm() {
       salary: data.salary,
       hmy: data.hmy,
       activateComments: data.activateComments,
+      formation: data.formation === "Oui",
       remote: data.remote,
       date: formattedDate,
       contracts: selectedContracts,
@@ -302,6 +303,13 @@ export default function PostForm() {
             placeholder="Autoriser les commentaires"
             register={register}
             error={errors?.activateComments?.message}
+            options={commentOptions}
+          />
+          <Select
+            name="formation"
+            placeholder="Es-tu en formation ?"
+            register={register}
+            error={errors?.formation?.message}
             options={commentOptions}
           />
           <div className="flex space-x-2 !mt-0">

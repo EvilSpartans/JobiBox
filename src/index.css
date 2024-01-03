@@ -371,3 +371,8 @@ select, input, textarea {
 .blinking {
     animation: blink 1.5s infinite;
 }
+
+label[for=terms]
+{
+    margin-right: 2%;
+}

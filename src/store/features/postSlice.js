@@ -24,6 +24,7 @@ export const createPost = createAsyncThunk(
             contracts,
             hmy,
             activateComments,
+            formation,
             remote,
             video,
             image,
@@ -44,6 +45,7 @@ export const createPost = createAsyncThunk(
             formData.append("contracts", contracts);
             formData.append("hmy", hmy);
             formData.append("activateComments", activateComments);
+            formData.append("formation", formation);
             formData.append("remote", remote);
             formData.append("image", image);
             formData.append("video", video);

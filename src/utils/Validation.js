@@ -20,6 +20,11 @@ export const signUpSchema = Yup.object({
             /^[A-Za-z\d@!$%*?&]{4,}$/,
             "Le mot de passe doit contenir au moins 4 caractères."
         ),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password'), null], 'Les mots de passe ne correspondent pas.')
+        .required('La confirmation du mot de passe est requise'),
+    terms: Yup.boolean()
+        .oneOf([true], "Tu dois accepter les conditions d'utilisation.")
 });
 
 export const signInSchema = Yup.object({
@@ -48,5 +53,6 @@ export const PostSchema = Yup.object({
     image: Yup.string(),
     cpf: Yup.boolean(),
     compagny: Yup.string(),
+    formation: Yup.string(),
     businessId: Yup.boolean(),
 });
