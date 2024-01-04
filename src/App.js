@@ -15,6 +15,8 @@ import Thanks from "./screens/Thanks";
 import Transcription from "./screens/Transcription";
 import OnlineStatus from "./components/OnlineStatus";
 import Offline from "./screens/Offline";
+import Config from "./screens/Config";
+import Portal from "./screens/Portal";
 
 export default function App() {
     const user = useSelector((state) => state.user.user);
@@ -28,6 +30,8 @@ export default function App() {
                         {!isOnline && <Navigate to="/offline" />}
                         <Routes>
                             <Route path="/" element={token ? <Home /> : <Navigate to="/login" />} />
+                            <Route path="/config" element={<Config />} />
+                            <Route path="/portal" element={<Portal />} />
                             <Route path="/offline" element={<Offline />} />
                             <Route path="/questions" element={token ? <Questions /> : <Navigate to="/login" />} />
                             <Route path="/themes" element={token ? <Themes /> : <Navigate to="/login" />} />

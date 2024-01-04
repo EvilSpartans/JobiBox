@@ -13,7 +13,9 @@ export const getQuestions = createAsyncThunk(
     "api/questions",
     async (token, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get(`${BASE_URL}/questions`, {
+            const businessId = localStorage.getItem("businessId");
+            const url = businessId ? `${BASE_URL}/questions?businessId=${businessId}` : `${BASE_URL}/questions`;
+            const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -28,14 +30,15 @@ export const getQuestions = createAsyncThunk(
 export const createQuestion = createAsyncThunk(
     "question/create",
     async (values, { rejectWithValue }) => {
-        const { token, title, type, userId } = values;
+        const { token, title, type, userId, businessId } = values;
         try {
             const { data } = await axios.post(
                 `${BASE_URL}/question/create`,
                 {
                     title,
                     type,
-                    userId
+                    userId,
+                    businessId
                 },
                 {
                     headers: {

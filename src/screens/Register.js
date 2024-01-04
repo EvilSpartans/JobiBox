@@ -1,8 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import RegisterForm from "../components/forms/RegisterForm";
 import Tuto from "../components/Tuto";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const existingBusiness = localStorage.getItem("businessId");
+    if (!existingBusiness) {
+      navigate("/config");
+    }
+  }, []);
+
   return (
     <div className="min-h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/*Container */}

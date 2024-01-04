@@ -13,7 +13,9 @@ export const getMusics = createAsyncThunk(
     "api/musics",
     async (token, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get(`${BASE_URL}/musics`, {
+            const businessId = localStorage.getItem("businessId");
+            const url = businessId ? `${BASE_URL}/musics?businessId=${businessId}` : `${BASE_URL}/musics`;
+            const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

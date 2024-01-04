@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Logout from "../components/Logout";
 
 export default function Home() {
+
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    const existingBusiness = localStorage.getItem("businessId");
+    if (!existingBusiness) {
+      navigate("/config");
+    }
+  }, []);
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">

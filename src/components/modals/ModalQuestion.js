@@ -7,6 +7,7 @@ export default function ModalQuestion({ isOpen, onClose, fetchQuestions, current
     const { token } = user;
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
     const dispatch = useDispatch();
+    const businessId = localStorage.getItem('businessId');
 
     const handleAddQuestion = async () => {
         if (newQuestionTitle) {
@@ -16,6 +17,7 @@ export default function ModalQuestion({ isOpen, onClose, fetchQuestions, current
                     token,
                     title: newQuestionTitle,
                     userId: user.id,
+                    businessId,
                     type,
                 };
 

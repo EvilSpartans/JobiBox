@@ -13,7 +13,9 @@ export const getThemes = createAsyncThunk(
     "api/themes",
     async (token, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get(`${BASE_URL}/themes`, {
+            const businessId = localStorage.getItem("businessId");
+            const url = businessId ? `${BASE_URL}/themes?businessId=${businessId}` : `${BASE_URL}/themes`;
+            const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

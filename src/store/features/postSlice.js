@@ -28,8 +28,8 @@ export const createPost = createAsyncThunk(
             remote,
             video,
             image,
-            date
-            // businessId,
+            date,
+            businessId
             // cpf,
             // compagny
         } = values;
@@ -50,9 +50,9 @@ export const createPost = createAsyncThunk(
             formData.append("image", image);
             formData.append("video", video);
             formData.append("date", date);
+            formData.append("businessId", businessId);
             // formData.append("cpf", cpf);
             // formData.append("compagny", compagny);
-            // formData.append("businessId", businessId);
 
             const { data } = await axios.post(
                 `${BASE_URL}/post/create`,

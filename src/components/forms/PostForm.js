@@ -33,7 +33,8 @@ export default function PostForm() {
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const BASE_URL = "https://test.jobissim.com";
-
+  const businessId = localStorage.getItem('businessId') | null;
+  
   const handleSelectContracts = (selectedValues) => {
     setContracts(selectedValues);
   };
@@ -189,6 +190,7 @@ export default function PostForm() {
       contracts: selectedContracts,
       video: selectedVideo,
       image: selectedImage,
+      businessId
     };
 
     try {

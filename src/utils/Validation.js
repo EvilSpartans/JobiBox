@@ -56,3 +56,8 @@ export const PostSchema = Yup.object({
     formation: Yup.string(),
     businessId: Yup.boolean(),
 });
+
+export const portalSchema = Yup.object({
+    business: Yup.string().required("Le portail est requis."),
+    password: Yup.string().required("Le mot de passe est requis"),
+});

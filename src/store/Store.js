@@ -6,6 +6,7 @@ import createFilter from "redux-persist-transform-filter";
 import postSlice from "./features/postSlice";
 import videoProcessSlice from "./features/videoProcessSlice";
 import transcriptSlice from "./features/transcriptSlice";
+import portalSlice from "./features/portalSlice";
 
 // saveUserOnlyFilter
 const saveUserOnlyFilter = createFilter("user", ["user"]);
@@ -22,7 +23,8 @@ const rootReducer = combineReducers({
     user: userSlice,
     post: postSlice,
     videoProcess: videoProcessSlice,
-    transcription: transcriptSlice
+    transcription: transcriptSlice,
+    portal: portalSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

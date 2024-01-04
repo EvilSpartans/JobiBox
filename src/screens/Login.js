@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LoginForm from "../components/forms/LoginForm";
 import Tuto from "../components/Tuto";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const existingBusiness = localStorage.getItem("businessId");
+    if (!existingBusiness) {
+      navigate("/config");
+    }
+  }, []);
+
+
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/*Container*/}
