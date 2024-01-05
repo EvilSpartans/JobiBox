@@ -180,7 +180,7 @@ export default function PostForm() {
       title: data.title,
       description: data.description,
       category: data.category,
-      subCategory: data.subCategory,
+      subCategory: data.subCategory || "Portail",
       city: data.city,
       salary: data.salary,
       hmy: data.hmy,
