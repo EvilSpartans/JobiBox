@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback  } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Logout from "../components/Logout";
@@ -7,9 +7,26 @@ export default function Home() {
 
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
+  const existingBusiness = localStorage.getItem("businessId");
+
+  // Hidden cmd to reset config
+  const handleKeyDown = useCallback((e) => {
+    if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "b") {
+      localStorage.removeItem("businessId");
+      alert("Configuration réinitialisée");
+      navigate("/config");
+    }
+  }, []);
 
   useEffect(() => {
-    const existingBusiness = localStorage.getItem("businessId");
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+  // ----------------------------
+
+  useEffect(() => {
     if (!existingBusiness) {
       navigate("/config");
     }

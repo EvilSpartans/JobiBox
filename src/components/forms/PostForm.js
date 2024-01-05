@@ -34,6 +34,7 @@ export default function PostForm() {
   const [startDate, setStartDate] = useState(null);
   const BASE_URL = "https://test.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
+  const showPortalCheckbox = businessId !== null && businessId !== 0;
   
   const handleSelectContracts = (selectedValues) => {
     setContracts(selectedValues);
@@ -190,13 +191,13 @@ export default function PostForm() {
       contracts: selectedContracts,
       video: selectedVideo,
       image: selectedImage,
-      businessId
+      businessId,
+      portal: data.portal
     };
 
     try {
       const res = await dispatch(createPost(postData));
-      console.log(res);
-
+      // console.log(res);
       if (res?.payload?.title) {
         navigate("/thanks");
         sendConfirmNotification();
@@ -277,6 +278,14 @@ export default function PostForm() {
             error={errors?.category?.message}
             options={categoryOptions}
           />
+          {showPortalCheckbox && (
+          <Checkbox
+            name="portal"
+            label="Portail"
+            register={register}
+            error={errors?.portal?.message}
+          />
+          )}
           <Input
             name="city"
             type="text"

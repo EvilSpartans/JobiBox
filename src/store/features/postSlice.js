@@ -29,7 +29,8 @@ export const createPost = createAsyncThunk(
             video,
             image,
             date,
-            businessId
+            businessId,
+            portal
             // cpf,
             // compagny
         } = values;
@@ -51,6 +52,7 @@ export const createPost = createAsyncThunk(
             formData.append("video", video);
             formData.append("date", date);
             formData.append("businessId", businessId);
+            formData.append("portal", portal);
             // formData.append("cpf", cpf);
             // formData.append("compagny", compagny);
 

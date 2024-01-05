@@ -372,7 +372,7 @@ select, input, textarea {
     animation: blink 1.5s infinite;
 }
 
-label[for=terms]
+label[for=terms], label[for=portal]
 {
     margin-right: 2%;
 }

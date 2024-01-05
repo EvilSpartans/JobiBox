@@ -34,10 +34,19 @@ export const signInSchema = Yup.object({
     password: Yup.string().required("Le mot de passe est requis"),
 });
 
-export const PostSchema = Yup.object({
+export const PostSchema = Yup.object().shape({
     title: Yup.string().required("Le titre est requis."),
     category: Yup.string().required("La catégorie est requise."),
-    subCategory: Yup.string().required("La classification est requise."),
+    subCategory: Yup.string().when("portal", {
+        is: (portal) => !portal,
+        then: () => Yup.string().required("La classification est requise."),
+        otherwise: () => Yup.string().notRequired(),
+      }),
+      portal: Yup.boolean().when("subCategory", {
+        is: (subCategory) => !subCategory,
+        then: () => Yup.boolean().oneOf([true], "Tu dois choisir une classification ou un portail."),
+        otherwise: () => Yup.boolean().notRequired(),
+      }),
     description: Yup.string(),
     city: Yup.string(),
     salary: Yup.string().matches(/^[0-9, ]*$/, "Ce champ doit contenir uniquement des chiffres et des virgules."),
@@ -54,8 +63,8 @@ export const PostSchema = Yup.object({
     cpf: Yup.boolean(),
     compagny: Yup.string(),
     formation: Yup.string(),
-    businessId: Yup.boolean(),
-});
+    businessId: Yup.boolean()
+}, ['subCategory', 'portal']);
 
 export const portalSchema = Yup.object({
     business: Yup.string().required("Le portail est requis."),
