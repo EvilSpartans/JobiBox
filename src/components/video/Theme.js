@@ -24,8 +24,8 @@ export default function Theme() {
   const sliderSettings = {
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
+    slidesToShow: 4,
+    slidesToScroll: 3,
   };
 
   const navigate = useNavigate();

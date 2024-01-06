@@ -100,7 +100,7 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
     title: "Mise à jour disponible",
     message: process.platform === "win32" ? releaseNotes : releaseName,
     detail:
-      "Une nouvelle version est disponible. L'application va redémarrer pour l'installer.",
+      "Une nouvelle version est disponible, elle est en cours de téléchargement.",
   };
   dialog.showMessageBox(dialogOpts);
 
@@ -111,11 +111,11 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
 autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
   const dialogOpts = {
     type: "info",
-    buttons: ["Restart", "Later"],
-    title: "Application mise à jour",
+    buttons: ["Redémarrer", "Plus tard"],
+    title: "Installation requise",
     message: process.platform === "win32" ? releaseNotes : releaseName,
     detail:
-      "Une mise à jour a été téléchargée. Redémarrez l'application pour l'appliquer.",
+      "Une mise à jour a été téléchargée. Redémarrez l'application pour l'installer.",
   };
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) autoUpdater.quitAndInstall();
