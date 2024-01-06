@@ -268,7 +268,7 @@ export default function PostForm() {
             name="subCategory"
             placeholder="Classification"
             register={register}
-            error={errors?.subCategory?.message}
+            error={errors?.portal ? errors?.subCategory?.message : null}
             options={subCategoryOptions}
           />
           <Select
@@ -283,7 +283,7 @@ export default function PostForm() {
             name="portal"
             label="Portail"
             register={register}
-            error={errors?.portal?.message}
+            error={errors?.subCategory ? errors?.portal?.message : null}
           />
           )}
           <Input
