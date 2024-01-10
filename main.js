@@ -8,6 +8,7 @@ const {
   dialog,
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
+const localShortcut = require("electron-localshortcut");
 const path = require("path");
 const isDev = !app.isPackaged;
 let updateInterval = null;
@@ -88,8 +89,15 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
+  // Block computer swipe
+  localShortcut.register(mainApp, 'Left', () => {});
+  localShortcut.register(mainApp, 'Right', () => {});
+  localShortcut.register(mainApp, 'Up', () => {});
+  localShortcut.register(mainApp, 'Down', () => {});
+
   // Update app
   updateInterval = setInterval(() => autoUpdater.checkForUpdates(), 600000);
+
 });
 
 // Update app
