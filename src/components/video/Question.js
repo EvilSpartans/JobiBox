@@ -195,11 +195,7 @@ export default function Question() {
             element: ".addButton",
             intro:
               "Si tu le souhaites, tu pourras également créer des questions afin de personnaliser ton CV vidéo du mieux possible.",
-          },
-          {
-            intro:
-              "Information : Sélectionner les questions “peux-tu te présenter” et “quel poste cherches-tu et pourquoi” est fortement conseillé dans la création d’un CV vidéo.",
-          },
+          }
         ]}
         tutorialKey="questionTuto"
       />

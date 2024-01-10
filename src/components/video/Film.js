@@ -55,7 +55,7 @@ export default function Film() {
 
   // Make Pad working
   const handleKeyPress = (event) => {
-    if (event.key === "é" || event.key === "è") {
+    if (event.key === "é" || event.key === "è" || event.key === "&") {
       if (!videoBase64) {
         toggleRecording();
       }
@@ -151,15 +151,6 @@ export default function Film() {
           audio: true,
         });
 
-        // const stream = isFilterApplied
-        //   ? canvasRef.current.captureStream()
-        //   : await navigator.mediaDevices.getUserMedia({
-        //       video: {
-        //         facingMode: "portrait",
-        //         width: { ideal: 640 }, // Largeur souhaitée
-        //         height: { ideal: 1136 }, // Hauteur souhaitée
-        //       },
-        //     });
         const stream = canvasRef.current.captureStream();
 
         audioStream.getTracks().map((track) => stream.addTrack(track));
@@ -280,7 +271,7 @@ export default function Film() {
     return `${hours}:${minutes}:${remainingSeconds}`;
   };
 
-  // GreenFilter
+  // GREEN FILTER
   const fetchGreenFilters = async () => {
     try {
       const response = await dispatch(getGreenFilters(token));
@@ -293,7 +284,6 @@ export default function Film() {
     }
   };
 
-  // GREEN FILTER
   let backgroundImage;
 
   const handleApplyBackground = async () => {
@@ -391,12 +381,6 @@ export default function Film() {
       canvasRef.current.width,
       canvasRef.current.height
     );
-    // contextRef.current.beginPath();
-    // contextRef.current.lineWidth = "6";
-    // contextRef.current.strokeStyle = "red";
-    // contextRef.current.rect(5, 5, 290, 140);
-    // contextRef.current.stroke();
-
     contextRef.current.restore();
   };
 
@@ -441,7 +425,6 @@ export default function Film() {
               controls
               disablePictureInPicture
               controlsList="nodownload"
-              autoPlay
               className="w-full h-full object-contain tall:object-cover"
             />
           )}
@@ -474,9 +457,7 @@ export default function Film() {
               left: 0,
               position: "absolute",
               top: 0,
-              // transform: isFilterApplied ? "" : "scaleX(-1)",
             }}
-            autoPlay
             disablePictureInPicture
             controlsList="nodownload"
             muted

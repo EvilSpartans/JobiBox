@@ -25,20 +25,12 @@ export default function Login() {
       <Tuto
         steps={[
           {
-            intro: "Bonjour à toi et bienvenue dans la Jobibox.",
+            intro: "Bonjour à toi et bienvenue dans la Jobibox. Nous allons créer ensemble ton CV vidéo afin que tu te démarques dans ta recherche de stage, d’alternance ou d’emploi.",
           },
           {
             intro:
-              "Nous allons créer ensemble ton CV vidéo afin que tu te démarques dans ta recherche de stage, d’alternance ou d’emploi.",
-          },
-          {
-            intro:
-              "Ton CV vidéo sera ensuite référencé sur la plateforme d’emploi Jobissim afin que de nombreux recruteurs le voient et te contactent.",
-          },
-          {
-            intro:
-              "Il te sera également envoyé par mail pour que tu le diffuses où tu le souhaites. Information : La vidéo t’appartient, tu es libre de la diffuser ou tu le souhaites.",
-          },
+              "Ton CV vidéo sera ensuite référencé sur la plateforme d’emploi Jobissim afin que de nombreux recruteurs le voient et te contactent. Il te sera également envoyé par mail pour que tu le diffuses où tu le souhaites. Information : La vidéo t’appartient, tu es libre de la diffuser ou tu le souhaites.",
+          }
         ]}
         tutorialKey="loginTuto"
       />

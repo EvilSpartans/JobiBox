@@ -117,7 +117,7 @@ export default function RegisterForm() {
             <span>Déjà membre ?</span>
             <Link
               to="/login"
-              className=" hover:underline cursor-pointer transition ease-in duration-300"
+              className="underline cursor-pointer transition ease-in duration-300 text-blue-500 text-lg"
             >
               Connexion
             </Link>

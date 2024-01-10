@@ -192,7 +192,7 @@ export default function Transcription() {
         steps={[
           {
             intro:
-              "Si tu le souhaites, tu peux ajouter les sous-titres automatiques afin de rendre ton CV vidéo dynamique et plus compréhensible. N’hésite pas à les relire afin de voir si tout est correct.",
+              "Si tu le souhaites, tu peux ajouter les sous-titres automatiques afin de rendre ton CV vidéo dynamique et plus compréhensible.",
           },
         ]}
         tutorialKey="transcriptionTuto"

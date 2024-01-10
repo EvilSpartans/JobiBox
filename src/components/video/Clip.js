@@ -212,7 +212,7 @@ export default function Clip() {
         <div className="max-h-56 tall:max-h-96 overflow-y-auto">
         {status !== "loading" &&
           questions.map((question, index) => (
-            <div key={index} className="mb-3 flex items-center">
+            <div key={index} className="mb-3 flex items-center allIcons">
               <span className="flex-grow">{question.questionTitle}</span>
               <button
                 onClick={() => openShowModal(index)}
@@ -418,25 +418,9 @@ export default function Clip() {
               "Si tu as oublié d'aborder un sujet, il est encore possible d'ajouter une question !",
           },
           {
-            element: ".showIcon",
-            intro: "Tu peux aussi revoir une séquence,",
-          },
-          {
-            element: ".editIcon",
-            intro: "Refaire le clip,",
-          },
-          {
-            element: ".trimIcon",
-            intro: "Scinder le clip,",
-          },
-          {
-            element: ".deleteIcon",
-            intro: "Ou supprimer l'élément.",
-          },
-          {
-            intro:
-              "Lorsque chaque séquence est parfaite, tu peux cliquer sur continuer et laisser la magie de la Jobibox opérer.",
-          },
+            element: ".allIcons",
+            intro: "Tu peux aussi revoir, refaire, scinder ou supprimer une séquence,",
+          }
         ]}
         tutorialKey="clipTuto"
       />

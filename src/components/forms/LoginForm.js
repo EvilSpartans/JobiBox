@@ -81,7 +81,7 @@ export default function LoginForm() {
             <span>Pas encore membre ?</span>
             <Link
               to="/register"
-              className=" hover:underline cursor-pointer transition ease-in duration-300"
+              className=" underline cursor-pointer transition ease-in duration-300 text-blue-500 text-lg"
             >
               Inscription
             </Link>
