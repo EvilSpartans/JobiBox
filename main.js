@@ -8,7 +8,6 @@ const {
   dialog,
 } = require("electron");
 const { autoUpdater } = require("electron-updater");
-const localShortcut = require("electron-localshortcut");
 const path = require("path");
 const isDev = !app.isPackaged;
 let updateInterval = null;
@@ -47,13 +46,6 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
     },
   });
-
-  // Block computer swipe
-  win.setHasShadow(false);
-  localShortcut.register(win, 'Left', () => {});
-  localShortcut.register(win, 'Right', () => {});
-  localShortcut.register(win, 'Up', () => {});
-  localShortcut.register(win, 'Down', () => {});
   
   win.loadFile("index.html");
   isDev && win.webContents.openDevTools();

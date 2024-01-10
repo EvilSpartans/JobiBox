@@ -16,7 +16,6 @@ import Textarea from "../fields/Textarea";
 import Checkbox from "../fields/Checkbox";
 import Select from "../fields/Select";
 import SelectMultiple from "../fields/SelectMultiple";
-import FileInput from "../fields/FileInput";
 
 import { PostSchema } from "../../utils/Validation";
 import GoBack from "../GoBack";
@@ -28,7 +27,6 @@ export default function PostForm() {
   const user = useSelector((state) => state.user.user);
   const { token } = user;
   const [contracts, setContracts] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
@@ -38,12 +36,6 @@ export default function PostForm() {
   
   const handleSelectContracts = (selectedValues) => {
     setContracts(selectedValues);
-  };
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-    }
   };
 
   // Form's options
@@ -165,6 +157,48 @@ export default function PostForm() {
     fetchVideoAndSetSelected();
   }, [videoPath]);
 
+  const generateImageFromVideo = async () => {
+    const videoElement = document.createElement('video');
+    videoElement.src = URL.createObjectURL(selectedVideo);
+
+    return new Promise((resolve) => {
+      let seekedEventFired = false;
+
+      const setupCanvas = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        const ctx = canvas.getContext('2d');
+        return { canvas, ctx };
+      };
+
+      const onLoadedMetadata = () => {
+        if (!seekedEventFired) {
+          const { ctx } = setupCanvas();
+          videoElement.currentTime = 4;
+        }
+      };
+
+      const onSeeked = () => {
+        if (!seekedEventFired) {
+          const { ctx, canvas } = setupCanvas();
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            resolve(blob);
+          }, 'image/jpeg');
+          seekedEventFired = true;
+        }
+      };
+
+      videoElement.addEventListener('loadedmetadata', onLoadedMetadata);
+      videoElement.addEventListener('seeked', onSeeked);
+      videoElement.addEventListener('canplaythrough', () => {
+        videoElement.play();
+      });
+      videoElement.load();
+    });
+  };
+
   // Submit Form
   const onSubmit = async (data) => {
     dispatch(changeStatus("loading"));
@@ -174,6 +208,9 @@ export default function PostForm() {
     if (startDate) {
       formattedDate = format(startDate, "yyyy-MM-dd HH:mm:ss");
     }
+
+    const imageBlob = await generateImageFromVideo();
+    const imageFile = new File([imageBlob], 'thumbnail.jpg', { type: 'image/jpeg' });
 
     const postData = {
       token: token,
@@ -190,9 +227,9 @@ export default function PostForm() {
       date: formattedDate,
       contracts: selectedContracts,
       video: selectedVideo,
-      image: selectedImage,
+      image: imageFile,
       businessId,
-      portal: data.portal
+      portal: data.portal ? 1 : 0
     };
 
     try {
@@ -209,16 +246,7 @@ export default function PostForm() {
       localStorage.removeItem("selectedTheme");
       localStorage.removeItem("selectedMusic");
       localStorage.removeItem("videoPath");
-      localStorage.removeItem("questionTuto");
-      localStorage.removeItem("themeTuto");
-      localStorage.removeItem("musicTuto");
-      localStorage.removeItem("filmTuto");
-      localStorage.removeItem("clipTuto");
-      localStorage.removeItem("textStyleTuto");
       localStorage.removeItem("textStyle");
-      localStorage.removeItem("transcriptionTuto");
-      localStorage.removeItem("loginTuto");
-      localStorage.removeItem("registerTuto");
       dispatch(changeStatus(""));
     }
   };
@@ -252,11 +280,6 @@ export default function PostForm() {
 
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
-          <FileInput
-            name="image"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
           <Input
             name="title"
             type="text"
