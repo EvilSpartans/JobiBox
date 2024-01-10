@@ -48,6 +48,13 @@ const createWindow = () => {
     },
   });
 
+  // Block computer swipe
+  win.setHasShadow(false);
+  localShortcut.register(win, 'Left', () => {});
+  localShortcut.register(win, 'Right', () => {});
+  localShortcut.register(win, 'Up', () => {});
+  localShortcut.register(win, 'Down', () => {});
+  
   win.loadFile("index.html");
   isDev && win.webContents.openDevTools();
   return win;
@@ -88,12 +95,6 @@ app.whenReady().then(() => {
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-  // Block computer swipe
-  localShortcut.register(mainApp, 'Left', () => {});
-  localShortcut.register(mainApp, 'Right', () => {});
-  localShortcut.register(mainApp, 'Up', () => {});
-  localShortcut.register(mainApp, 'Down', () => {});
 
   // Update app
   updateInterval = setInterval(() => autoUpdater.checkForUpdates(), 600000);
