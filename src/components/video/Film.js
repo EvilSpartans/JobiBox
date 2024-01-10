@@ -112,6 +112,19 @@ export default function Film() {
           audio: true,
         })
         .then((stream) => (videoCameraRef.current.srcObject = stream));
+
+      canvasRef.current.width = videoCameraRef.current.clientWidth;
+      canvasRef.current.height = videoCameraRef.current.clientHeight;
+
+      selfieSegmentation.setOptions({
+        modelSelection: 1,
+        selfieMode: true,
+      });
+      selfieSegmentation.onResults(onResultsNotFilter);
+
+      sendToMediaPipe();
+      setIsFilterApplied(false);
+
       setMediaStream(stream);
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
@@ -123,8 +136,7 @@ export default function Film() {
       };
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
-    }
-    finally {
+    } finally {
       setCameraLoading(false);
     }
   };
@@ -139,15 +151,16 @@ export default function Film() {
           audio: true,
         });
 
-        const stream = isFilterApplied
-          ? canvasRef.current.captureStream()
-          : await navigator.mediaDevices.getUserMedia({
-              video: {
-                facingMode: "portrait",
-                width: { ideal: 640 }, // Largeur souhaitée
-                height: { ideal: 1136 }, // Hauteur souhaitée
-              },
-            });
+        // const stream = isFilterApplied
+        //   ? canvasRef.current.captureStream()
+        //   : await navigator.mediaDevices.getUserMedia({
+        //       video: {
+        //         facingMode: "portrait",
+        //         width: { ideal: 640 }, // Largeur souhaitée
+        //         height: { ideal: 1136 }, // Hauteur souhaitée
+        //       },
+        //     });
+        const stream = canvasRef.current.captureStream();
 
         audioStream.getTracks().map((track) => stream.addTrack(track));
 
@@ -362,6 +375,31 @@ export default function Film() {
     contextRef.current.restore();
   };
 
+  const onResultsNotFilter = (results) => {
+    contextRef.current.save();
+    contextRef.current.clearRect(
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+
+    contextRef.current.drawImage(
+      results.image,
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+    // contextRef.current.beginPath();
+    // contextRef.current.lineWidth = "6";
+    // contextRef.current.strokeStyle = "red";
+    // contextRef.current.rect(5, 5, 290, 140);
+    // contextRef.current.stroke();
+
+    contextRef.current.restore();
+  };
+
   const handleRemoveBackground = () => {
     setIsFilterApplied(false);
     initializeCamera();
@@ -388,7 +426,6 @@ export default function Film() {
       </div>
 
       <div className="dark:text-dark_text_1">
-
         {cameraLoading ? (
           <div className="flex items-center justify-center h-screen w-screen fixed top-0 left-0 bg-black bg-opacity-75">
             <div className="text-center">
@@ -401,12 +438,11 @@ export default function Film() {
           {videoBase64 && (
             <video
               src={URL.createObjectURL(videoBase64)}
-              style={{ transform: isFilterApplied ? "" : "scaleX(-1)" }}
               controls
               disablePictureInPicture
               controlsList="nodownload"
               autoPlay
-              className="w-full h-full object-contain tall:object-cover mirror"
+              className="w-full h-full object-contain tall:object-cover"
             />
           )}
 
@@ -426,7 +462,7 @@ export default function Film() {
             ref={canvasRef}
             className={`w-full h-full object-contain tall:object-cover ${
               videoBase64 ? "hidden" : ""
-            } ${isFilterApplied ? "" : "hidden"}`}
+            } ${isFilterApplied ? "" : ""}`}
             style={{ left: 0, position: "absolute", top: 0 }}
           />
           <video
@@ -438,7 +474,7 @@ export default function Film() {
               left: 0,
               position: "absolute",
               top: 0,
-              transform: isFilterApplied ? "" : "scaleX(-1)",
+              // transform: isFilterApplied ? "" : "scaleX(-1)",
             }}
             autoPlay
             disablePictureInPicture
@@ -484,21 +520,25 @@ export default function Film() {
           {isFilterApplied ? (
             <button
               onClick={handleRemoveBackground}
-              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${status === "loading" ? "opacity-50 pointer-events-none" : ""
-                }`}
+              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
+                status === "loading" ? "opacity-50 pointer-events-none" : ""
+              }`}
               disabled={status === "loading"}
             >
               <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
             </button>
-          ) : !videoBase64 && (
-            <button
-              onClick={openModal}
-              className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${status === "loading" ? "opacity-50 pointer-events-none" : ""
+          ) : (
+            !videoBase64 && (
+              <button
+                onClick={openModal}
+                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
+                  status === "loading" ? "opacity-50 pointer-events-none" : ""
                 }`}
-              disabled={status === "loading"}
-            >
-              Ecran vert
-            </button>
+                disabled={status === "loading"}
+              >
+                Ecran vert
+              </button>
+            )
           )}
         </div>
       </div>
