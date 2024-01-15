@@ -178,7 +178,8 @@ export default function Clip() {
     } finally {
       if (res.meta.requestStatus === "fulfilled") {
         localStorage.setItem("videoPath", res.payload.video);
-        navigate("/transcription");
+        navigate("/post");
+        // navigate("/transcription");
         dispatch(changeStatus(""));
       }
     }

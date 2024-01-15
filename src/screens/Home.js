@@ -8,6 +8,7 @@ export default function Home() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const existingBusiness = localStorage.getItem("businessId");
+  const existingvideoPath = localStorage.getItem("videoPath");
 
   // Hidden cmd to reset config
   const handleKeyDown = useCallback((e) => {
@@ -29,6 +30,9 @@ export default function Home() {
   useEffect(() => {
     if (!existingBusiness) {
       navigate("/config");
+    }
+    if (existingvideoPath) {
+      navigate("/post");
     }
   }, []);
 

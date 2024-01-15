@@ -446,7 +446,11 @@ export default function Film() {
             className={`w-full h-full object-contain tall:object-cover ${
               videoBase64 ? "hidden" : ""
             } ${isFilterApplied ? "" : ""}`}
-            style={{ left: 0, position: "absolute", top: 0 }}
+            style={{ 
+              // left: 0, 
+              position: "absolute", 
+              // top: 0 
+            }}
           />
           <video
             ref={refVideoRecord}
@@ -454,9 +458,9 @@ export default function Film() {
               videoBase64 ? "hidden" : ""
             } ${recording ? "" : "hidden"}`}
             style={{
-              left: 0,
+              // left: 0,
               position: "absolute",
-              top: 0,
+              // top: 0,
             }}
             disablePictureInPicture
             controlsList="nodownload"

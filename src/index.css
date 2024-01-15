@@ -376,3 +376,8 @@ label[for=terms], label[for=portal]
 {
     margin-right: 2%;
 }
+
+video, canvas {
+    width: 640px !important;
+    height: 1136px !important;
+}
