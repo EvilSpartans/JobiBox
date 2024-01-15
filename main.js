@@ -34,7 +34,7 @@ function createSplashWindow() {
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 720,
+    width: 800,
     height: 1280,
     fullscreen: !isDev,
     autoHideMenuBar: !isDev,

@@ -378,6 +378,6 @@ label[for=terms], label[for=portal]
 }
 
 video, canvas {
-    width: 640px !important;
-    height: 1136px !important;
+    max-width: 640px !important;
+    max-height: 1136px !important;
 }
