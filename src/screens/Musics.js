@@ -1,11 +1,13 @@
 import React from "react";
 import Music from "../components/video/Music";
 import GoBack from "../components/GoBack";
+import LogoutBtn from "../components/LogoutBtn"
 
 export default function Musics() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       <GoBack itemToRemove={"textStyle"} />
+      <LogoutBtn />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
