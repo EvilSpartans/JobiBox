@@ -89,7 +89,7 @@ app.whenReady().then(() => {
   });
 
   // Update app
-  updateInterval = setInterval(() => autoUpdater.checkForUpdates(), 180000);
+  updateInterval = setInterval(() => autoUpdater.checkForUpdates(), 300000);
 
 });
 

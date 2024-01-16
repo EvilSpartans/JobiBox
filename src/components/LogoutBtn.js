@@ -35,7 +35,7 @@ export default function LogoutBtn() {
     };
 
     return (
-        <div className='fixed top-4 right-4 z-50'>
+        <div className='fixed top-3 right-4 z-50'>
             <button
                 className="w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
                     font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"

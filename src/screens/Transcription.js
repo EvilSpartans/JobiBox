@@ -9,6 +9,7 @@ import {
 } from "../store/features/transcriptSlice";
 import Tuto from "../components/Tuto";
 import LogoutBtn from "../components/LogoutBtn";
+import GoBack from "../components/GoBack";
 
 export default function Transcription() {
   const { status, error } = useSelector((state) => state.transcription);
@@ -81,6 +82,7 @@ export default function Transcription() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/* Container */}
+      <GoBack />
       <LogoutBtn />
       <div className="flex w-full mx-auto h-full">
         {/* Login Form */}
