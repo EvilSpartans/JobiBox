@@ -403,7 +403,7 @@ export default function Film() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Enregistrement</h2>
         {currentQuestionIndex < questions.length && (
-          <div className="mt-2 text-sm">
+          <div className="mt-2 text-lg">
             <p>{questions[currentQuestionIndex].title}</p>
           </div>
         )}

@@ -46,7 +46,7 @@ export default function TextStyle() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Style des questions</h2>
         <p className="mt-6 text-sm">
-          Ajustez la taille et la couleur de vos questions
+          Ajuste la taille et la couleur de tes questions
         </p>
       </div>
       <div className="dark:text-dark_text_1">

@@ -3,5 +3,5 @@ export const sendWelcomeNotification = () => {
 }
 
 export const sendConfirmNotification = () => {
-    electron.notificationApi.sendNotification('Votre vidéo est maintenant en ligne !');
+    electron.notificationApi.sendNotification('Ta vidéo est maintenant en ligne !');
 }

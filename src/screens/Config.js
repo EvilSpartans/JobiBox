@@ -83,7 +83,7 @@ export default function Config() {
         isOpen={publicModalOpen}
         onClose={() => closeModal("public")}
         onConfirm={() => handleConfirm("public")}
-        title="Voulez-vous vraiment que la JobiBox soit publique ?"
+        title="Veux-tu vraiment que la JobiBox soit publique ?"
       />
 
       {/* Private Modal */}
@@ -91,7 +91,7 @@ export default function Config() {
         isOpen={privateModalOpen}
         onClose={() => closeModal("private")}
         onConfirm={() => handleConfirm("private")}
-        title="Voulez-vous vraiment que la JobiBox soit privée ?"
+        title="Veux-tu vraiment que la JobiBox soit privée ?"
       />
     </div>
   );

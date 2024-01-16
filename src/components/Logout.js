@@ -56,7 +56,7 @@ export default function Logout() {
                     <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
                     <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
                         <p className="text-gray-800 text-lg">
-                            Voulez-vous vraiment vous déconnecter ?
+                            Veux-tu vraiment te déconnecter ?
                         </p>
                         <div className="mt-4">
                             <button

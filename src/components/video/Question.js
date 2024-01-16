@@ -103,7 +103,7 @@ export default function Question() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des questions</h2>
         <p className="mt-6 text-sm">
-          Sélectionnez les questions auxquelles vous souhaitez répondre
+          Sélectionne les questions auxquelles tu souhaites répondre
         </p>
       </div>
       <div className="dark:text-dark_text_1">

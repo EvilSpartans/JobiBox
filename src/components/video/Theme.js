@@ -73,7 +73,7 @@ export default function Theme() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des thèmes</h2>
         <p className="mt-6 text-sm">
-          Sélectionnez le thème qui vous correspond
+          Sélectionne le thème qui te correspond
         </p>
       </div>
       <div className="dark:text-dark_text_1">
@@ -90,8 +90,8 @@ export default function Theme() {
                   alt={themes[selectedThemeIndex].title}
                   className="rounded-lg h-64 w-96 mx-auto"
                 />
-                <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm whitespace-nowrap">
-                  Vos questions apparaîtront ici
+                <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-lg whitespace-nowrap">
+                  Tes questions apparaîtront ici
                 </p>
               </div>
             )}
