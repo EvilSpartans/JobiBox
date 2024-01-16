@@ -18,7 +18,6 @@ import Select from "../fields/Select";
 import SelectMultiple from "../fields/SelectMultiple";
 
 import { PostSchema } from "../../utils/Validation";
-import GoBack from "../GoBack";
 
 export default function PostForm() {
   const dispatch = useDispatch();
@@ -253,9 +252,8 @@ export default function PostForm() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
-      <GoBack />
       {/* Container */}
-      <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
+      <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-2 p-10 dark:bg-dark_bg_2 rounded-xl">
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Publication</h2>
@@ -269,7 +267,7 @@ export default function PostForm() {
             disablePictureInPicture
             controlsList="nodownload"
             width="100%"
-            className="mb-4 h-48 md:h-64 lg:h-96 xl:h-120"
+            className="h-48 md:h-64 lg:h-96 xl:h-120"
             poster={thumbnail}
             onLoadedMetadata={handleMetadata}
           >
@@ -279,7 +277,7 @@ export default function PostForm() {
         )}
 
         {/*Form*/}
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Input
             name="title"
             type="text"
