@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import LogoutBtn from "../components/LogoutBtn";
 
 export default function Thanks() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function Thanks() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/*Container*/}
+      <LogoutBtn />
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">

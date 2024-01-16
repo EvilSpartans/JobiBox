@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/modals/Modal";
+import LogoutBtn from "../components/LogoutBtn";
 
 export default function Config() {
 
@@ -45,6 +46,7 @@ export default function Config() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/*Container*/}
+      <LogoutBtn />
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
