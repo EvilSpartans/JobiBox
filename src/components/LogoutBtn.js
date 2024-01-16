@@ -16,7 +16,7 @@ export default function LogoutBtn() {
         localStorage.removeItem('selectedQuestions');
         localStorage.removeItem('selectedTheme');
         localStorage.removeItem('selectedMusic');
-        localStorage.removeItem('videoPath');
+        // localStorage.removeItem('videoPath');
         localStorage.removeItem('questionTuto');
         localStorage.removeItem('themeTuto');
         localStorage.removeItem('musicTuto');

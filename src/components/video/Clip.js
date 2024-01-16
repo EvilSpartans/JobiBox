@@ -177,6 +177,9 @@ export default function Clip() {
       console.error("Erreur lors de la compilation du clip :", error);
     } finally {
       if (res.meta.requestStatus === "fulfilled") {
+        if (localStorage.getItem('videoPath')) {
+          localStorage.removeItem('videoPath');
+        }
         localStorage.setItem("videoPath", res.payload.video);
         navigate("/post");
         // navigate("/transcription");
