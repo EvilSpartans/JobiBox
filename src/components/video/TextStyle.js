@@ -7,7 +7,7 @@ import { CirclePicker } from "react-color";
 import Tuto from "../Tuto";
 
 export default function TextStyle() {
-  const BASE_URL = "https://test.jobissim.com/uploads/themes";
+  const BASE_URL = "https://jobibox.jobissim.com/uploads/themes";
   const selectedTheme = JSON.parse(localStorage.getItem("selectedTheme"));
   const user = useSelector((state) => state.user.user);
   const [textStyle, setTextStyle] = useState({

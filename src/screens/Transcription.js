@@ -22,7 +22,7 @@ export default function Transcription() {
   const dispatch = useDispatch();
 
   const videoPath = localStorage.getItem("videoPath");
-  const BASE_URL = "https://test.jobissim.com";
+  const BASE_URL = "https://jobibox.jobissim.com";
   const { token } = user;
 
   const handleMetadata = (e) => {

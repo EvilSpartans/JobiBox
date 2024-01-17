@@ -16,7 +16,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
 export default function Clip() {
-  const BASE_URL = `https://test.jobissim.com/uploads/videoProcess`;
+  const BASE_URL = `https://jobibox.jobissim.com/uploads/videoProcess`;
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const { token } = user;

@@ -12,7 +12,7 @@ import Tuto from "../Tuto";
 export default function Theme() {
   const user = useSelector((state) => state.user.user);
   const { token } = user;
-  const BASE_URL = "https://test.jobissim.com/uploads/themes";
+  const BASE_URL = "https://jobibox.jobissim.com/uploads/themes";
 
   const dispatch = useDispatch();
 

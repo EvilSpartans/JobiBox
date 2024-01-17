@@ -15,7 +15,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
 
 export default function Film() {
-  const BASE_URL = "https://test.jobissim.com/uploads/greenFilters";
+  const BASE_URL = "https://jobibox.jobissim.com/uploads/greenFilters";
 
   const selfieSegmentation = new SelfieSegmentation({
     locateFile: (file) =>

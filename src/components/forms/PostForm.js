@@ -29,7 +29,7 @@ export default function PostForm() {
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
-  const BASE_URL = "https://test.jobissim.com";
+  const BASE_URL = "https://jobibox.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
   
@@ -136,7 +136,7 @@ export default function PostForm() {
   const [selectedVideo, setSelectedVideo] = useState(
     videoPath
       ? fetchVideoAndCreateFile(
-          `https://test.jobissim.com/${videoPath}`,
+          `https://jobibox.jobissim.com/${videoPath}`,
           "video.mp4"
         )
       : null
@@ -145,7 +145,7 @@ export default function PostForm() {
   const fetchVideoAndSetSelected = async () => {
     const newSelectedVideo = videoPath
       ? await fetchVideoAndCreateFile(
-          `https://test.jobissim.com/${videoPath}`,
+          `https://jobibox.jobissim.com/${videoPath}`,
           "video.mp4"
         )
       : null;
