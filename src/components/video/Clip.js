@@ -41,6 +41,11 @@ export default function Clip() {
       const response = await dispatch(getVideoProcesses(token));
       const payload = response.payload;
       setQuestions(payload);
+
+      if (payload.length === 0) {
+        navigate("/questions");
+      }
+      
     } catch (error) {
       console.error("Erreur lors de la récupération des questions :", error);
     } finally {

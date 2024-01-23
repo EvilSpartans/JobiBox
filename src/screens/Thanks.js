@@ -1,10 +1,9 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import LogoutBtn from "../components/LogoutBtn";
+import Logout from "../components/Logout";
 
 export default function Thanks() {
-  const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
 
   return (
@@ -26,14 +25,7 @@ export default function Thanks() {
               </p>
             </div>
             {/*Buttons*/}
-            <button
-              className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
-          font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300
-          "
-              onClick={() => navigate("/")}
-            >
-              Retour à l'accueil
-            </button>
+            <Logout />
           </div>
         </div>
       </div>
