@@ -245,6 +245,7 @@ export default function PostForm() {
       localStorage.removeItem("selectedTheme");
       localStorage.removeItem("selectedMusic");
       localStorage.removeItem("videoPath");
+      localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
       dispatch(changeStatus(""));
     }

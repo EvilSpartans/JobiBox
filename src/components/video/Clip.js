@@ -54,6 +54,27 @@ export default function Clip() {
   };
 
   useEffect(() => {
+    const videoId = localStorage.getItem("videoId");
+    const removeCompiledVideo = async () => {
+      try {
+        await dispatch(
+          deleteVideoProcess({
+            token: token,
+            id: videoId,
+          })
+        );
+      } catch (error) {
+        console.error("Error :", error);
+      } finally {
+      }
+    };
+    
+    if (videoId != null) {
+      removeCompiledVideo()
+    }
+  }, [dispatch, token]);
+
+  useEffect(() => {
     fetchQuestions();
   }, [dispatch, token]);
 
@@ -186,6 +207,7 @@ export default function Clip() {
           localStorage.removeItem('videoPath');
         }
         localStorage.setItem("videoPath", res.payload.video);
+        localStorage.setItem("videoId", res.payload.id);
         navigate("/post");
         // navigate("/transcription");
         dispatch(changeStatus(""));

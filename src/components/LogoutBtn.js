@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { logout } from "../store/features/userSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteVideoProcess } from '../store/features/videoProcessSlice';
 
 export default function LogoutBtn() {
 
     const dispatch = useDispatch();
     const [showModal, setShowModal] = useState(false);
+    const videoId = localStorage.getItem("videoId");
+    const user = useSelector((state) => state.user.user);
+    const { token } = user;
 
     const handleLogout = () => {
         setShowModal(true);
@@ -17,6 +21,7 @@ export default function LogoutBtn() {
         localStorage.removeItem('selectedTheme');
         localStorage.removeItem('selectedMusic');
         localStorage.removeItem('videoPath');
+        localStorage.removeItem("videoId");
         localStorage.removeItem('questionTuto');
         localStorage.removeItem('themeTuto');
         localStorage.removeItem('musicTuto');
@@ -28,10 +33,28 @@ export default function LogoutBtn() {
         localStorage.removeItem('loginTuto');
         localStorage.removeItem('registerTuto');
         setShowModal(false);
+
+        if (videoId != null) {
+            handleDelete()
+        }
     };
 
     const cancelLogout = () => {
         setShowModal(false);
+    };
+
+    const handleDelete = async () => {
+        try {
+            await dispatch(
+                deleteVideoProcess({
+                    token: token,
+                    id: videoId,
+                })
+            );
+        } catch (error) {
+            console.error("Error :", error);
+        } finally {
+        }
     };
 
     return (
