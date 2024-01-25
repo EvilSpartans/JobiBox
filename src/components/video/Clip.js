@@ -66,6 +66,7 @@ export default function Clip() {
       } catch (error) {
         console.error("Error :", error);
       } finally {
+        localStorage.removeItem("videoId")
       }
     };
     

@@ -15,7 +15,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
 
 export default function Film() {
-  const BASE_URL = "https://jobibox.jobissim.com/uploads/greenFilters";
+  const BASE_URL = "https://jobibox.jobissim.com";
 
   const selfieSegmentation = new SelfieSegmentation({
     locateFile: (file) =>
@@ -40,6 +40,7 @@ export default function Film() {
   const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
   const textStyle = JSON.parse(localStorage.getItem("textStyle"));
   const [createdVideoId, setCreatedVideoId] = useState(null);
+  const [createdVideoPath, setCreatedVideoPath] = useState(null);
   const [greenFilters, setGreenFilters] = useState([]);
   const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -201,6 +202,7 @@ export default function Film() {
             } finally {
               if (res.meta.requestStatus === "fulfilled") {
                 setCreatedVideoId(res.payload.id);
+                setCreatedVideoPath(res.payload.video);
                 dispatch(changeStatus(""));
               }
             }
@@ -293,7 +295,7 @@ export default function Film() {
     ) {
       if (canvasRef.current) {
         backgroundImage = new Image();
-        backgroundImage.src = `${BASE_URL}/${greenFilters[selectedGreenFilterIndex].image}`;
+        backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[selectedGreenFilterIndex].image}`;
 
         canvasRef.current.width = videoCameraRef.current.clientWidth;
         canvasRef.current.height = videoCameraRef.current.clientHeight;
@@ -421,7 +423,7 @@ export default function Film() {
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
-              src={URL.createObjectURL(videoBase64)}
+              src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
               controls
               disablePictureInPicture
               controlsList="nodownload"
@@ -587,7 +589,7 @@ export default function Film() {
                     onClick={() => setSelectedGreenFilterIndex(index)}
                   >
                     <img
-                      src={`${BASE_URL}/${filter.image}`}
+                      src={`${BASE_URL}/uploads/greenFilters/${filter.image}`}
                       alt={filter.title}
                       className="w-full h-32 object-cover rounded-md mb-2"
                     />
