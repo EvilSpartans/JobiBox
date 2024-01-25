@@ -82,14 +82,17 @@ app.whenReady().then(() => {
       splash.destroy();
       mainApp.show();
     }, 2000);
+
+    // Update app only on startup
+    autoUpdater.checkForUpdates();
   });
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
-  // Update app
-  updateInterval = setInterval(() => autoUpdater.checkForUpdates(), 300000);
+  // Update app at interval
+  // updateInterval = setInterval(() => autoUpdater.checkForUpdates(), 300000);
 
 });
 

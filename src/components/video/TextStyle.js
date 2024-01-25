@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
-import { CirclePicker } from "react-color";
+import Wheel from '@uiw/react-color-wheel';
 import Tuto from "../Tuto";
 
 export default function TextStyle() {
@@ -78,8 +78,8 @@ export default function TextStyle() {
               onChange={handleFontSizeChange}
             />
           </div>
-          <div className="mt-8 flex items-center justify-center">
-            <CirclePicker
+          <div className="mt-12 flex items-center justify-center">
+            <Wheel
               color={textStyle.textColor}
               onChange={handleTextColorChange}
             />
