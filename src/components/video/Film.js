@@ -560,7 +560,7 @@ export default function Film() {
               <p className="text-gray-800 text-lg">Liste des écrans verts</p>
               <div className="grid grid-cols-3 gap-4 mt-4">
                 {/* Ajouter la première image en haut de la liste */}
-                <div
+                {/* <div
                   className={`card cursor-pointer mb-2 mx-2 ${
                     selectedGreenFilterIndex === -1 ? "filter-selected" : ""
                   }`}
@@ -576,7 +576,7 @@ export default function Film() {
                       <p className="text-blue-500 text-3xl">&hearts;</p>
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 {greenFilters.map((filter, index) => (
                   <div
