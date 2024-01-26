@@ -290,7 +290,7 @@ export default function PostForm() {
             name="subCategory"
             placeholder="Classification"
             register={register}
-            error={errors?.portal ? errors?.subCategory?.message : null}
+            error={showPortalCheckbox ? errors?.portal ? errors?.subCategory?.message : null : errors?.subCategory?.message}
             options={subCategoryOptions}
           />
           <Select

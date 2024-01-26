@@ -25,6 +25,22 @@ export const getVideoProcesses = createAsyncThunk(
     }
 );
 
+export const getVideoProcess = createAsyncThunk(
+    "videoProcess/show",
+    async ({ token, id }, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(`${BASE_URL}/videoProcess/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response);
+        }
+    }
+);
+
 export const createVideoProcess = createAsyncThunk(
     "videoProcess/create",
     async (values, { rejectWithValue }) => {
@@ -71,6 +87,7 @@ export const updateVideoProcess = createAsyncThunk(
 
         const {
             token,
+            video,
             startValue,
             endValue,
             id
@@ -78,6 +95,7 @@ export const updateVideoProcess = createAsyncThunk(
 
         try {
             const formData = new FormData();
+            formData.append("video", video);
             formData.append("startValue", startValue);
             formData.append("endValue", endValue);
 
@@ -144,6 +162,7 @@ export const videoProcessSlice = createSlice({
     },
     extraReducers(builder) {
         builder
+            /** Get all */
             .addCase(getVideoProcesses.pending, (state) => {
                 state.status = "loading";
             })
@@ -155,6 +174,19 @@ export const videoProcessSlice = createSlice({
                 state.status = "failed";
                 state.error = action.payload;
             })
+            /** Get one */
+            .addCase(getVideoProcess.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(getVideoProcess.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.videoProcesses = action.payload;
+            })
+            .addCase(getVideoProcess.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload;
+            })
+            /** Create */
             .addCase(createVideoProcess.pending, (state) => {
                 state.status = "loading";
             })
@@ -165,6 +197,7 @@ export const videoProcessSlice = createSlice({
                 state.status = "failed";
                 state.error = action.payload;
             })
+            /** Update */
             .addCase(updateVideoProcess.pending, (state) => {
                 state.status = "loading";
             })
@@ -175,6 +208,7 @@ export const videoProcessSlice = createSlice({
                 state.status = "failed";
                 state.error = action.payload;
             })
+            /** Compile */
             .addCase(compileVideoProcess.pending, (state) => {
                 state.status = "loading";
             })
@@ -186,6 +220,7 @@ export const videoProcessSlice = createSlice({
                 state.status = "failed";
                 state.error = action.payload;
             })
+            /** Delete */
             .addCase(deleteVideoProcess.pending, (state) => {
                 state.status = "loading";
             })

@@ -147,6 +147,7 @@ export default function Clip() {
       dispatch(changeStatus("loading"));
       const values = {
         token,
+        video: null,
         startValue,
         endValue,
         id: questions[index].id,
@@ -166,12 +167,11 @@ export default function Clip() {
     closeEditModal();
 
     const selectedQuestion = {
-      id: questions[index].questionId,
-      title: questions[index].questionTitle
+      id: questions[index].id,
+      title: questions[index].questionTitle,
+      updateState: true
     };
-
     localStorage.setItem("selectedQuestions", JSON.stringify([selectedQuestion]));
-    await handleDelete(index);
     navigate("/record");
   };
 

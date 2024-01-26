@@ -5,6 +5,8 @@ import {
   createVideoProcess,
   changeStatus,
   deleteVideoProcess,
+  getVideoProcess,
+  updateVideoProcess,
 } from "../../store/features/videoProcessSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 import { getGreenFilters } from "../../store/features/greenFilterSlice";
@@ -29,6 +31,7 @@ export default function Film() {
   const dispatch = useDispatch();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const selectedQuestionRef = useRef(null);
   const [videoBase64, setVideoBase64] = useState(null);
   const [recording, setRecording] = useState(false);
   const [timer, setTimer] = useState(0);
@@ -53,6 +56,11 @@ export default function Film() {
   const contextRef = useRef();
   const currentQuestionIdRef = useRef();
   const [isFilterApplied, setIsFilterApplied] = useState(false);
+
+  useEffect(() => {
+    currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
+    selectedQuestionRef.current = questions[currentQuestionIndex];
+  }, [currentQuestionIndex, questions]);
 
   // Make Pad working
   const handleKeyPress = (event) => {
@@ -144,6 +152,8 @@ export default function Film() {
 
   const toggleRecording = async () => {
     const questionId = currentQuestionIdRef.current;
+    const selectedQuestion = selectedQuestionRef.current;
+
     if (!recording) {
       try {
         dispatch(changeStatus("loading"));
@@ -187,22 +197,37 @@ export default function Film() {
           reader.onload = async function () {
             let res;
             try {
-              const values = {
-                token,
-                video: videoFile,
-                questionId: questionId,
-                themeId: selectedTheme.id,
-                musicId: selectedMusic.id,
-                fontSize: textStyle.fontSize,
-                fontColor: textStyle.textColor,
-              };
-              res = await dispatch(createVideoProcess(values));
+              let values;
+              if (selectedQuestion.updateState) {
+                values = {
+                  token,
+                  video: videoFile,
+                  startValue: null,
+                  endValue: null,
+                  id: selectedQuestion.id,
+                };
+              } else {
+                values = {
+                  token,
+                  video: videoFile,
+                  questionId: questionId,
+                  themeId: selectedTheme.id,
+                  musicId: selectedMusic.id,
+                  fontSize: textStyle.fontSize,
+                  fontColor: textStyle.textColor,
+                };
+              }
+              if (selectedQuestion.updateState) {
+                res = await dispatch(updateVideoProcess(values));
+              } else {
+                res = await dispatch(createVideoProcess(values));
+              }
             } catch (error) {
               console.error("Erreur lors de la sauvegarde du clip :", error);
             } finally {
               if (res.meta.requestStatus === "fulfilled") {
                 setCreatedVideoId(res.payload.id);
-                setCreatedVideoPath(res.payload.video);
+                getLastVideo(res.payload.id);
                 dispatch(changeStatus(""));
               }
             }
@@ -224,6 +249,24 @@ export default function Film() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
         mediaRecorder.stop();
         clearInterval(timerIntervalId);
+      }
+    }
+  };
+
+  const getLastVideo = async (videoId) => {
+    let data;
+    try {
+      data = await dispatch(
+        getVideoProcess({
+          token: token,
+          id: videoId,
+        })
+      );
+    } catch (error) {
+      console.error("Error :", error);
+    } finally {
+      if (data && data.meta.requestStatus === "fulfilled") {
+        setCreatedVideoPath(data.payload.video);
       }
     }
   };

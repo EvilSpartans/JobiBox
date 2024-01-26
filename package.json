@@ -1,6 +1,6 @@
 {
   "name": "jobibox",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "La cabine accoustique pour créer un cv vidéo",
   "repository": "https://github.com/EvilSpartans/JobiBox",
   "main": "main.js",
@@ -31,7 +31,9 @@
     "publish": {
       "provider": "github",
       "owner": "EvilSpartans",
-      "repo": "JobiBox"
+      "repo": "JobiBox",
+      "private": true,
+      "token": "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"
     },
     "files": [
       "build/**/*",
@@ -67,7 +69,9 @@
       "publish": {
         "provider": "github",
         "owner": "EvilSpartans",
-        "repo": "JobiBox"
+        "repo": "JobiBox",
+        "private": true,
+        "token": "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"
       },
       "icon": "assets/images/logowin.png",
       "target": [
