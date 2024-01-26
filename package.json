@@ -31,9 +31,7 @@
     "publish": {
       "provider": "github",
       "owner": "EvilSpartans",
-      "repo": "JobiBox",
-      "private": true,
-      "token": "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"
+      "repo": "JobiBox"
     },
     "files": [
       "build/**/*",
@@ -69,9 +67,7 @@
       "publish": {
         "provider": "github",
         "owner": "EvilSpartans",
-        "repo": "JobiBox",
-        "private": true,
-        "token": "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"
+        "repo": "JobiBox"
       },
       "icon": "assets/images/logowin.png",
       "target": [
