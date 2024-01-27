@@ -467,6 +467,7 @@ export default function Film() {
           {videoBase64 && (
             <video
               src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+              // src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
               controlsList="nodownload"

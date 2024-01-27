@@ -198,6 +198,16 @@ export default function PostForm() {
     });
   };
 
+  // Mettre en pause la vidéo lorsque le composant est démonté
+  const videoElement = document.querySelector('video');
+  useEffect(() => {
+    return () => {
+      if (videoElement) {
+        videoElement.pause();
+      }
+    };
+  }, []);
+
   // Submit Form
   const onSubmit = async (data) => {
     dispatch(changeStatus("loading"));
@@ -248,17 +258,9 @@ export default function PostForm() {
       localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
       dispatch(changeStatus(""));
+      videoElement.pause();
     }
   };
-
-  // Nettoie la vidéo lorsque le composant est démonté
-  useEffect(() => {
-    return () => {
-      if (selectedVideo) {
-        URL.revokeObjectURL(selectedVideo.src);
-      }
-    };
-  }, [selectedVideo]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
