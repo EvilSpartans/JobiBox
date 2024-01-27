@@ -251,6 +251,15 @@ export default function PostForm() {
     }
   };
 
+  // Nettoie la vidéo lorsque le composant est démonté
+  useEffect(() => {
+    return () => {
+      if (selectedVideo) {
+        URL.revokeObjectURL(selectedVideo.src);
+      }
+    };
+  }, [selectedVideo]);
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Container */}
@@ -264,6 +273,7 @@ export default function PostForm() {
         {/* Video */}
         {videoPath && (
           <video
+            key={videoPath}
             controls
             disablePictureInPicture
             controlsList="nodownload"
