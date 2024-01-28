@@ -43,7 +43,7 @@ export default function Film() {
   const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
   const textStyle = JSON.parse(localStorage.getItem("textStyle"));
   const [createdVideoId, setCreatedVideoId] = useState(null);
-  const [createdVideoPath, setCreatedVideoPath] = useState(null);
+  // const [createdVideoPath, setCreatedVideoPath] = useState(null);
   const [greenFilters, setGreenFilters] = useState([]);
   const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,9 +91,9 @@ export default function Film() {
     setIsModalOpen(false);
   };
 
-  const handleNewGreenFilter = () => {
-    setModalAddOpen(true);
-  };
+  // const handleNewGreenFilter = () => {
+  //   setModalAddOpen(true);
+  // };
 
   useEffect(() => {
     const selectedQuestions = JSON.parse(
@@ -185,7 +185,7 @@ export default function Film() {
             type: "video/mp4",
           });
 
-          setVideoBase64(blob);
+          setVideoBase64(videoFile);
           stream.getTracks().forEach((track) => track.stop());
           setRecording(false);
           setTimer(0);
@@ -227,8 +227,9 @@ export default function Film() {
             } finally {
               if (res.meta.requestStatus === "fulfilled") {
                 setCreatedVideoId(res.payload.id);
-                getLastVideo(res.payload.id);
+                // getLastVideo(res.payload.id);
                 dispatch(changeStatus(""));
+                handleNextQuestion();
               }
             }
           };
@@ -253,23 +254,23 @@ export default function Film() {
     }
   };
 
-  const getLastVideo = async (videoId) => {
-    let data;
-    try {
-      data = await dispatch(
-        getVideoProcess({
-          token: token,
-          id: videoId,
-        })
-      );
-    } catch (error) {
-      console.error("Error :", error);
-    } finally {
-      if (data && data.meta.requestStatus === "fulfilled") {
-        setCreatedVideoPath(data.payload.video);
-      }
-    }
-  };
+  // const getLastVideo = async (videoId) => {
+  //   let data;
+  //   try {
+  //     data = await dispatch(
+  //       getVideoProcess({
+  //         token: token,
+  //         id: videoId,
+  //       })
+  //     );
+  //   } catch (error) {
+  //     console.error("Error :", error);
+  //   } finally {
+  //     if (data && data.meta.requestStatus === "fulfilled") {
+  //       setCreatedVideoPath(data.payload.video);
+  //     }
+  //   }
+  // };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -464,17 +465,18 @@ export default function Film() {
         ) : null}
 
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
-          {videoBase64 && (
+          
+          {/* {videoBase64 && (
             <video
-              src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
-              // src={URL.createObjectURL(videoBase64)}
+              // src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+              src={URL.createObjectURL(videoBase64)}
               preload={'auto'}
               controls
               disablePictureInPicture
               controlsList="nodownload"
               className="w-full h-full object-contain tall:object-cover"
             />
-          )}
+          )} */}
 
           <video
             ref={videoCameraRef}
@@ -526,15 +528,16 @@ export default function Film() {
 
         <div className="mt-4 flex items-center justify-center">
           {videoBase64 ? (
-            <button
-              onClick={handleRedoRecording}
-              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
-                status === "loading" ? "opacity-50 pointer-events-none" : ""
-              }`}
-              disabled={status === "loading"}
-            >
-              Recommencer
-            </button>
+            // <button
+            //   onClick={handleRedoRecording}
+            //   className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+            //     status === "loading" ? "opacity-50 pointer-events-none" : ""
+            //   }`}
+            //   disabled={status === "loading"}
+            // >
+            //   Recommencer
+            // </button>
+            ""
           ) : (
             <button
               onClick={toggleRecording}
