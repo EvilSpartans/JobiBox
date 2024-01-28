@@ -224,16 +224,19 @@ export default function Clip() {
         <p className="mt-2 text-sm">Passez en revue vos différents clips</p>
       </div>
       <div className="dark:text-dark_text_1">
-        <div className="mb-2 flex items-center justify-center">
-          <div className="mb-4">
-            <button
-              onClick={handleAdd}
-              className="addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
-            >
-              + Ajouter une question
-            </button>
+
+        {status !== "loading" &&
+          <div className="mb-2 flex items-center justify-center">
+            <div className="mb-4">
+              <button
+                onClick={handleAdd}
+                className="addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+              >
+                + Ajouter une question
+              </button>
+            </div>
           </div>
-        </div>
+        }
 
         {status === "loading" && (
           <div className="text-center mt-8">
@@ -434,13 +437,15 @@ export default function Clip() {
       </div>
 
       {/* Buttons */}
-      <button
-        className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
-                font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
-        onClick={assembleAndStoreVideo}
-      >
-        Continuer
-      </button>
+        {status !== "loading" &&
+        <button
+          className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
+                  font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
+          onClick={assembleAndStoreVideo}
+        >
+          Continuer
+        </button>
+      }
 
       <Tuto
         steps={[

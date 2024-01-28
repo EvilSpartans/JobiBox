@@ -4,16 +4,6 @@ import LogoutBtn from "../components/LogoutBtn";
 
 export default function Review() {
 
-  // Mettre en pause la vidéo lorsque le composant est démonté
-  const videoElement = document.querySelector('video');
-  useEffect(() => {
-    return () => {
-      if (videoElement) {
-        videoElement.pause();
-      }
-    };
-  }, []);
-
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       <LogoutBtn />

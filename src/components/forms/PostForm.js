@@ -32,6 +32,7 @@ export default function PostForm() {
   const BASE_URL = "https://jobibox.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
+  const [videoFetched, setVideoFetched] = useState(false);
   
   const handleSelectContracts = (selectedValues) => {
     setContracts(selectedValues);
@@ -143,13 +144,16 @@ export default function PostForm() {
   );
 
   const fetchVideoAndSetSelected = async () => {
-    const newSelectedVideo = videoPath
-      ? await fetchVideoAndCreateFile(
+    if (!videoFetched) {
+      const newSelectedVideo = videoPath
+        ? await fetchVideoAndCreateFile(
           `https://jobibox.jobissim.com/${videoPath}`,
           "video.mp4"
         )
-      : null;
-    setSelectedVideo(newSelectedVideo);
+        : null;
+      setSelectedVideo(newSelectedVideo);
+      setVideoFetched(true);
+    }
   };
 
   useEffect(() => {
@@ -192,21 +196,10 @@ export default function PostForm() {
       videoElement.addEventListener('loadedmetadata', onLoadedMetadata);
       videoElement.addEventListener('seeked', onSeeked);
       videoElement.addEventListener('canplaythrough', () => {
-        videoElement.play();
       });
       videoElement.load();
     });
   };
-
-  // Mettre en pause la vidéo lorsque le composant est démonté
-  const videoElement = document.querySelector('video');
-  useEffect(() => {
-    return () => {
-      if (videoElement) {
-        videoElement.pause();
-      }
-    };
-  }, []);
 
   // Submit Form
   const onSubmit = async (data) => {
@@ -258,6 +251,7 @@ export default function PostForm() {
       localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
       dispatch(changeStatus(""));
+      setVideoFetched(false);
       videoElement.pause();
     }
   };
@@ -282,6 +276,7 @@ export default function PostForm() {
             width="100%"
             className="h-48 md:h-64 lg:h-96 xl:h-120"
             poster={thumbnail}
+            preload={'auto'}
             onLoadedMetadata={handleMetadata}
           >
             <source src={`${BASE_URL}/${videoPath}`} type="video/mp4" />
@@ -395,10 +390,9 @@ export default function PostForm() {
             </div>
           ) : null}
           {/*Submit button*/}
-          <button
-            className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
-          font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300
-          "
+          <button 
+            className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
+            font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${ status ? "opacity-50 pointer-events-none" : "" }`}
             type="submit"
             disabled={status}
           >

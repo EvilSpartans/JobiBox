@@ -468,6 +468,7 @@ export default function Film() {
             <video
               src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
               // src={URL.createObjectURL(videoBase64)}
+              preload={'auto'}
               controls
               disablePictureInPicture
               controlsList="nodownload"
