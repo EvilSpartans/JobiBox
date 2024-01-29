@@ -12,7 +12,7 @@ import { getGreenFilters } from "../../store/features/greenFilterSlice";
 import ModalGreenFilter from "../modals/ModalGreenFilter";
 import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
 
 export default function Film() {
@@ -49,6 +49,7 @@ export default function Film() {
   const [modalAddOpen, setModalAddOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [cameraLoading, setCameraLoading] = useState(true);
+  const [showModalOpen, setShowModalOpen] = useState(false);
 
   const refVideoRecord = useRef();
   const canvasRef = useRef();
@@ -424,6 +425,14 @@ export default function Film() {
     }
   }
 
+  const openShowModal = () => {
+    setShowModalOpen(true);
+  };
+
+  const closeShowModal = () => {
+    setShowModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
@@ -456,15 +465,18 @@ export default function Film() {
             //   controlsList="nodownload"
             //   className="w-full h-full object-contain tall:object-cover"
             // />
-
-                <video
-                  src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
-                  controls
-                  disablePictureInPicture
-                  controlsList="nodownload"
-                  autoPlay
-                  className="w-full h-full object-cover"
-                ></video>
+            <div className="flex items-center justify-center w-full h-full object-contain tall:object-cover bg-black bg-opacity-75">
+              <div className="text-center">
+                  <button
+                    onClick={() => openShowModal()}
+                    className={`text-white ${status === "loading" ? "opacity-50 pointer-events-none" : ""
+                      }`}
+                    disabled={status === "loading"}
+                  > Voir la video &nbsp;
+                    <FontAwesomeIcon icon={faPlay} className="" />
+                  </button>
+              </div>
+            </div>
           )}
 
           <video
@@ -650,6 +662,31 @@ export default function Film() {
         </div>
       )}
       {/* ---- */}
+
+      {/* Show */}
+      {showModalOpen && videoBase64 !== null && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div
+            className="absolute inset-0 bg-gray-900 opacity-75"
+            onClick={closeShowModal}
+          ></div>
+          <div className="relative flex items-center justify-center">
+            <div
+              style={{ height: "80vh" }}
+              className="modal-content bg-white p-4 rounded-lg h-screen max-h-screen overflow-hidden"
+            >
+              <video
+                src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+                controls
+                disablePictureInPicture
+                controlsList="nodownload"
+                autoPlay
+                className="w-full h-full object-cover"
+              ></video>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ModalGreenFilter
         isOpen={modalAddOpen}
