@@ -59,6 +59,7 @@ export default function Question() {
         );
       } else {
         setSelectedQuestionsCandidat([...selectedQuestionsCandidat, question]);
+        setSelectedQuestionsRecruteur([]);
       }
     } else if (currentTab === "Recruteur") {
       if (selectedQuestionsRecruteur.includes(question)) {
@@ -70,9 +71,11 @@ export default function Question() {
           ...selectedQuestionsRecruteur,
           question,
         ]);
+        setSelectedQuestionsCandidat([]);
       }
     }
   };
+
 
   // Determine the selected questions based on the current tab
   const selectedQuestions =
@@ -172,6 +175,8 @@ export default function Question() {
           onClose={closeModal}
           fetchQuestions={fetchQuestions}
           currentTab={currentTab}
+          setSelectedQuestionsCandidat={setSelectedQuestionsCandidat}
+          setSelectedQuestionsRecruteur={setSelectedQuestionsRecruteur}
         />
       </div>
       <button

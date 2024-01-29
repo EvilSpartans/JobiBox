@@ -14,8 +14,6 @@ import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
-import 'video-react/dist/video-react.css';
-import { Player } from "video-react";
 
 export default function Film() {
   const BASE_URL = "https://jobibox.jobissim.com";
@@ -448,22 +446,16 @@ export default function Film() {
 
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           
-          {videoBase64 && status === "loading" ? (
-              <PulseLoader color="#fff" size={16} />
-          ) : (
-              // <video
-              //   // src={videoBase64 ? URL.createObjectURL(videoBase64) : null}
-              //   src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
-              //   preload={'auto'}
-              //   controls
-              //   disablePictureInPicture
-              //   controlsList="nodownload"
-              //   className="w-full h-full object-contain tall:object-cover"
-              // />
-              <Player
-                src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
-                className="w-full h-full object-contain tall:object-cover"
-              />
+          {videoBase64 && (
+            <video
+              // src={videoBase64 ? URL.createObjectURL(videoBase64) : null}
+              src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+              preload={'auto'}
+              controls
+              disablePictureInPicture
+              controlsList="nodownload"
+              className="w-full h-full object-contain tall:object-cover"
+            />
           )}
 
           <video

@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createQuestion } from "../../store/features/questionSlice";
 
-export default function ModalQuestion({ isOpen, onClose, fetchQuestions, currentTab }) {
+export default function ModalQuestion
+({ 
+    isOpen, 
+    onClose, 
+    fetchQuestions, 
+    currentTab, 
+    setSelectedQuestionsCandidat,
+    setSelectedQuestionsRecruteur, 
+}) {
     const user = useSelector((state) => state.user.user);
     const { token } = user;
     const [newQuestionTitle, setNewQuestionTitle] = useState("");
@@ -25,6 +33,14 @@ export default function ModalQuestion({ isOpen, onClose, fetchQuestions, current
                 fetchQuestions();
                 onClose();
                 setNewQuestionTitle("");
+
+                // Réinitialise les questions sélectionnées
+                if (currentTab === "Candidat") {
+                    setSelectedQuestionsCandidat([]);
+                } else if (currentTab === "Recruteur") {
+                    setSelectedQuestionsRecruteur([]);
+                }
+                
             } catch (error) {
                 console.error("Erreur lors de la création de la question :", error);
             }
