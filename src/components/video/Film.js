@@ -447,15 +447,24 @@ export default function Film() {
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           
           {videoBase64 && (
-            <video
-              // src={videoBase64 ? URL.createObjectURL(videoBase64) : null}
-              src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
-              preload={'auto'}
-              controls
-              disablePictureInPicture
-              controlsList="nodownload"
-              className="w-full h-full object-contain tall:object-cover"
-            />
+            // <video
+            //   // src={videoBase64 ? URL.createObjectURL(videoBase64) : null}
+            //   src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+            //   preload={'auto'}
+            //   controls
+            //   disablePictureInPicture
+            //   controlsList="nodownload"
+            //   className="w-full h-full object-contain tall:object-cover"
+            // />
+
+                <video
+                  src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+                  controls
+                  disablePictureInPicture
+                  controlsList="nodownload"
+                  autoPlay
+                  className="w-full h-full object-cover"
+                ></video>
           )}
 
           <video
