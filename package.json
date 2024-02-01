@@ -1,6 +1,6 @@
 {
   "name": "jobibox",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "La cabine accoustique pour créer un cv vidéo",
   "repository": "https://github.com/EvilSpartans/JobiBox",
   "main": "main.js",
@@ -124,6 +124,7 @@
     "react-slick": "^0.29.0",
     "react-slider": "^2.0.6",
     "react-spinners": "^0.13.8",
+    "react-webcam": "^7.2.0",
     "redux-persist": "^6.0.0",
     "redux-persist-transform-filter": "^0.0.22",
     "sass": "^1.66.1",

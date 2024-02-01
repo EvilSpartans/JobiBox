@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
 
-export default function Film() {
+export default function OldFilm() {
   const BASE_URL = "https://jobibox.jobissim.com";
 
   const selfieSegmentation = new SelfieSegmentation({
@@ -28,6 +28,10 @@ export default function Film() {
   const { status, error } = useSelector((state) => state.videoProcess);
   const { token } = user;
   const dispatch = useDispatch();
+  const selectedTheme = JSON.parse(localStorage.getItem("selectedTheme"));
+  const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
+  const textStyle = JSON.parse(localStorage.getItem("textStyle"));
+
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const selectedQuestionRef = useRef(null);
@@ -38,9 +42,6 @@ export default function Film() {
   const videoCameraRef = useRef(null);
   const [mediaStream, setMediaStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const selectedTheme = JSON.parse(localStorage.getItem("selectedTheme"));
-  const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
-  const textStyle = JSON.parse(localStorage.getItem("textStyle"));
   const [createdVideoId, setCreatedVideoId] = useState(null);
   const [createdVideoPath, setCreatedVideoPath] = useState(null);
   const [greenFilters, setGreenFilters] = useState([]);
@@ -49,26 +50,12 @@ export default function Film() {
   const [modalAddOpen, setModalAddOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [cameraLoading, setCameraLoading] = useState(true);
+  const [isFilterApplied, setIsFilterApplied] = useState(false);
 
   const refVideoRecord = useRef();
   const canvasRef = useRef();
   const contextRef = useRef();
   const currentQuestionIdRef = useRef();
-  const [isFilterApplied, setIsFilterApplied] = useState(false);
-
-  useEffect(() => {
-    currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
-    selectedQuestionRef.current = questions[currentQuestionIndex];
-  }, [currentQuestionIndex, questions]);
-
-  // Make Pad working
-  const handleKeyPress = (event) => {
-    if (event.key === "é" || event.key === "è" || event.key === "&") {
-      if (!videoBase64) {
-        toggleRecording();
-      }
-    }
-  };
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -79,7 +66,34 @@ export default function Film() {
 
   useEffect(() => {
     currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
+    selectedQuestionRef.current = questions[currentQuestionIndex];
   }, [currentQuestionIndex, questions]);
+
+  useEffect(() => {
+    const selectedQuestions = JSON.parse(
+      localStorage.getItem("selectedQuestions")
+    );
+    if (selectedQuestions) {
+      setQuestions(selectedQuestions);
+    }
+
+    contextRef.current = canvasRef.current.getContext("2d");
+  }, []);
+
+  useEffect(() => {
+    if (!mediaStream) {
+      initializeCamera();
+    }
+  }, [mediaStream]);
+
+  // Make Pad working
+  const handleKeyPress = (event) => {
+    if (event.key === "é" || event.key === "è" || event.key === "&") {
+      if (!videoBase64) {
+        toggleRecording();
+      }
+    }
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -91,21 +105,8 @@ export default function Film() {
   };
 
   // const handleNewGreenFilter = () => {
-  //   setModalAddOpen(true);
+  //     setModalAddOpen(true);
   // };
-
-  useEffect(() => {
-    const selectedQuestions = JSON.parse(
-      localStorage.getItem("selectedQuestions")
-    );
-    if (selectedQuestions) {
-      setQuestions(selectedQuestions);
-    }
-
-    contextRef.current = canvasRef.current.getContext("2d");
-
-    initializeCamera();
-  }, []);
 
   const initializeCamera = async () => {
     try {
@@ -120,19 +121,6 @@ export default function Film() {
           audio: true,
         })
         .then((stream) => (videoCameraRef.current.srcObject = stream));
-
-      canvasRef.current.width = videoCameraRef.current.clientWidth;
-      canvasRef.current.height = videoCameraRef.current.clientHeight;
-
-      selfieSegmentation.setOptions({
-        modelSelection: 1,
-        selfieMode: true,
-      });
-      selfieSegmentation.onResults(onResultsNotFilter);
-
-      sendToMediaPipe();
-      setIsFilterApplied(false);
-
       setMediaStream(stream);
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
@@ -144,7 +132,8 @@ export default function Film() {
       };
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
-    } finally {
+    }
+    finally {
       setCameraLoading(false);
     }
   };
@@ -161,7 +150,15 @@ export default function Film() {
           audio: true,
         });
 
-        const stream = canvasRef.current.captureStream();
+        const stream = isFilterApplied
+          ? canvasRef.current.captureStream()
+          : await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: "portrait",
+              width: { ideal: 640 }, // Largeur souhaitée
+              height: { ideal: 1136 }, // Hauteur souhaitée
+            },
+          });
 
         audioStream.getTracks().map((track) => stream.addTrack(track));
 
@@ -184,7 +181,7 @@ export default function Film() {
             type: "video/mp4",
           });
 
-          setVideoBase64(videoFile);
+          setVideoBase64(blob);
           stream.getTracks().forEach((track) => track.stop());
           setRecording(false);
           setTimer(0);
@@ -256,8 +253,8 @@ export default function Film() {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setVideoBase64(null);
+      setCreatedVideoPath(null);
       setRecording(false);
-      initializeCamera();
     } else {
       localStorage.removeItem("selectedQuestions");
       navigate("/review");
@@ -281,6 +278,7 @@ export default function Film() {
   const handleRedoRecording = () => {
     deleteLastVideo();
     setVideoBase64(null);
+    setCreatedVideoPath(null);
     setTimer(0);
     clearInterval(timerIntervalId);
     initializeCamera();
@@ -297,7 +295,7 @@ export default function Film() {
     return `${hours}:${minutes}:${remainingSeconds}`;
   };
 
-  // GREEN FILTER
+  // GreenFilter
   const fetchGreenFilters = async () => {
     try {
       const response = await dispatch(getGreenFilters(token));
@@ -310,6 +308,7 @@ export default function Film() {
     }
   };
 
+  // GREEN FILTER
   let backgroundImage;
 
   const handleApplyBackground = async () => {
@@ -326,7 +325,7 @@ export default function Film() {
 
         selfieSegmentation.setOptions({
           modelSelection: 1,
-          selfieMode: true,
+          selfieMode: false,
         });
         selfieSegmentation.onResults(onResults);
 
@@ -391,25 +390,6 @@ export default function Film() {
     contextRef.current.restore();
   };
 
-  const onResultsNotFilter = (results) => {
-    contextRef.current.save();
-    contextRef.current.clearRect(
-      0,
-      0,
-      canvasRef.current.width,
-      canvasRef.current.height
-    );
-
-    contextRef.current.drawImage(
-      results.image,
-      0,
-      0,
-      canvasRef.current.width,
-      canvasRef.current.height
-    );
-    contextRef.current.restore();
-  };
-
   const handleRemoveBackground = () => {
     setIsFilterApplied(false);
     initializeCamera();
@@ -429,13 +409,14 @@ export default function Film() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Enregistrement</h2>
         {currentQuestionIndex < questions.length && (
-          <div className="mt-2 text-lg">
+          <div className="mt-2 text-sm">
             <p>{questions[currentQuestionIndex].title}</p>
           </div>
         )}
       </div>
 
       <div className="dark:text-dark_text_1">
+
         {cameraLoading ? (
           <div className="flex items-center justify-center h-screen w-screen fixed top-0 left-0 bg-black bg-opacity-75">
             <div className="text-center">
@@ -445,24 +426,21 @@ export default function Film() {
         ) : null}
 
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
-          
           {videoBase64 && (
             <video
-              // src={videoBase64 ? URL.createObjectURL(videoBase64) : null}
               src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
-              preload={'auto'}
               controls
               disablePictureInPicture
               controlsList="nodownload"
+              preload="true"
               className="w-full h-full object-contain tall:object-cover"
             />
           )}
 
           <video
             ref={videoCameraRef}
-            className={`w-full h-full object-contain tall:object-cover ${
-              videoBase64 ? "hidden" : ""
-            }`}
+            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+              }`}
             style={{ transform: "scaleX(-1)" }}
             autoPlay
             disablePictureInPicture
@@ -472,21 +450,26 @@ export default function Film() {
 
           <canvas
             ref={canvasRef}
-            className={`w-full h-full object-contain tall:object-cover ${
-              videoBase64 ? "hidden" : ""
-            } ${isFilterApplied ? "" : ""}`}
-            style={{ 
-              position: "absolute"
+            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+              } ${isFilterApplied ? "" : "hidden"}`}
+            style={{
+              left: 0,
+              position: "absolute",
+              top: 0,
+              transform: "scaleX(-1)",
             }}
           />
           <video
             ref={refVideoRecord}
-            className={`w-full h-full object-contain tall:object-cover ${
-              videoBase64 ? "hidden" : ""
-            } ${recording ? "" : "hidden"}`}
+            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+              } ${recording ? "" : "hidden"}`}
             style={{
-              position: "absolute"
+              left: 0,
+              position: "absolute",
+              top: 0,
+              transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
             }}
+            autoPlay
             disablePictureInPicture
             controlsList="nodownload"
             muted
@@ -506,9 +489,8 @@ export default function Film() {
           {videoBase64 ? (
             <button
               onClick={handleRedoRecording}
-              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
-                status === "loading" ? "opacity-50 pointer-events-none" : ""
-              }`}
+              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${status === "loading" ? "opacity-50 pointer-events-none" : ""
+                }`}
               disabled={status === "loading"}
             >
               Recommencer
@@ -516,11 +498,10 @@ export default function Film() {
           ) : (
             <button
               onClick={toggleRecording}
-              className={`${
-                recording
-                  ? "bg-red-500 hover.bg-red-700"
-                  : "bg-green_2 hover:bg-green_1"
-              } text-white px-4 py-2 rounded-lg actionBtn`}
+              className={`${recording
+                ? "bg-red-500 hover.bg-red-700"
+                : "bg-green_2 hover:bg-green_1"
+                } text-white px-4 py-2 rounded-lg actionBtn`}
             >
               {recording
                 ? "Arrêter l'enregistrement"
@@ -530,9 +511,8 @@ export default function Film() {
           {isFilterApplied ? (
             <button
               onClick={handleRemoveBackground}
-              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
-                status === "loading" ? "opacity-50 pointer-events-none" : ""
-              }`}
+              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${status === "loading" ? "opacity-50 pointer-events-none" : ""
+                }`}
               disabled={status === "loading"}
             >
               <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
@@ -541,9 +521,8 @@ export default function Film() {
             !videoBase64 && (
               <button
                 onClick={openModal}
-                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
-                  status === "loading" ? "opacity-50 pointer-events-none" : ""
-                }`}
+                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${status === "loading" ? "opacity-50 pointer-events-none" : ""
+                  }`}
                 disabled={status === "loading"}
               >
                 Ecran vert
@@ -554,11 +533,10 @@ export default function Film() {
       </div>
 
       <button
-        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
-          !videoBase64 || status === "loading"
-            ? "opacity-50 pointer-events-none"
-            : ""
-        }`}
+        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${!videoBase64 || status === "loading"
+          ? "opacity-50 pointer-events-none"
+          : ""
+          }`}
         onClick={handleNextQuestion}
         disabled={!videoBase64 || status === "loading"}
         style={{ marginTop: 20 }}
@@ -604,11 +582,10 @@ export default function Film() {
                 {greenFilters.map((filter, index) => (
                   <div
                     key={filter.id}
-                    className={`card cursor-pointer mb-2 mx-2 relative ${
-                      selectedGreenFilterIndex === index
-                        ? "filter-selected"
-                        : ""
-                    }`}
+                    className={`card cursor-pointer mb-2 mx-2 relative ${selectedGreenFilterIndex === index
+                      ? "filter-selected"
+                      : ""
+                      }`}
                     onClick={() => setSelectedGreenFilterIndex(index)}
                   >
                     <img
