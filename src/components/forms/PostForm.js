@@ -32,7 +32,6 @@ export default function PostForm() {
   const BASE_URL = "https://jobibox.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
-  const [videoFetched, setVideoFetched] = useState(false);
   
   const handleSelectContracts = (selectedValues) => {
     setContracts(selectedValues);
@@ -121,81 +120,30 @@ export default function PostForm() {
 
   // Video properties
   const videoPath = localStorage.getItem("videoPath");
-  const [thumbnail, setThumbnail] = useState(null);
   const handleMetadata = (e) => {
     e.preventDefault();
     e.target.currentTime = 0;
   };
 
-  const fetchVideoAndCreateFile = async (url, fileName) => {
-    const response = await fetch(url);
-    const videoBuffer = await response.arrayBuffer();
-    const videoBlob = new Blob([videoBuffer], { type: "video/mp4" });
-    return new File([videoBlob], fileName, { type: "video/mp4" });
-  };
-
-  const [selectedVideo, setSelectedVideo] = useState(
-    videoPath
-      ? fetchVideoAndCreateFile(
-          `https://jobibox.jobissim.com/${videoPath}`,
-          "video.mp4"
-        )
-      : null
-  );
-
-  const fetchVideoAndSetSelected = async () => {
-    if (!videoFetched) {
-      const newSelectedVideo = videoPath
-        ? await fetchVideoAndCreateFile(
-          `https://jobibox.jobissim.com/${videoPath}`,
-          "video.mp4"
-        )
-        : null;
-      setSelectedVideo(newSelectedVideo);
-      setVideoFetched(true);
-    }
-  };
-
-  useEffect(() => {
-    fetchVideoAndSetSelected();
-  }, [videoPath]);
-
   const generateImageFromVideo = async () => {
     const videoElement = document.createElement('video');
-    videoElement.src = URL.createObjectURL(selectedVideo);
+    videoElement.src = `${BASE_URL}/${videoPath}`;
+    videoElement.currentTime = 4;
 
     return new Promise((resolve) => {
-      let seekedEventFired = false;
-
-      const setupCanvas = () => {
+      videoElement.addEventListener('loadeddata', () => {
         const canvas = document.createElement('canvas');
         canvas.width = videoElement.videoWidth;
         canvas.height = videoElement.videoHeight;
         const ctx = canvas.getContext('2d');
-        return { canvas, ctx };
-      };
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          resolve(blob);
 
-      const onLoadedMetadata = () => {
-        if (!seekedEventFired) {
-          const { ctx } = setupCanvas();
-          videoElement.currentTime = 4;
-        }
-      };
-
-      const onSeeked = () => {
-        if (!seekedEventFired) {
-          const { ctx, canvas } = setupCanvas();
-          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob((blob) => {
-            resolve(blob);
-          }, 'image/jpeg');
-          seekedEventFired = true;
-        }
-      };
-
-      videoElement.addEventListener('loadedmetadata', onLoadedMetadata);
-      videoElement.addEventListener('seeked', onSeeked);
-      videoElement.addEventListener('canplaythrough', () => {
+          URL.revokeObjectURL(videoElement.src); 
+          videoElement.remove(); 
+          canvas.remove();
+        }, 'image/jpeg');
       });
       videoElement.load();
     });
@@ -228,7 +176,7 @@ export default function PostForm() {
       remote: data.remote,
       date: formattedDate,
       contracts: selectedContracts,
-      video: selectedVideo,
+      video: videoPath,
       image: imageFile,
       businessId,
       portal: data.portal ? 1 : 0
@@ -251,8 +199,6 @@ export default function PostForm() {
       localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
       dispatch(changeStatus(""));
-      setVideoFetched(false);
-      videoElement.pause();
     }
   };
 
@@ -275,7 +221,6 @@ export default function PostForm() {
             controlsList="nodownload"
             width="100%"
             className="h-48 md:h-64 lg:h-96 xl:h-120"
-            poster={thumbnail}
             preload={'auto'}
             onLoadedMetadata={handleMetadata}
           >
