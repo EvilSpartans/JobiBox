@@ -453,9 +453,9 @@ export default function OldFilm() {
             className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
               } ${isFilterApplied ? "" : "hidden"}`}
             style={{
-              left: 0,
+              // left: 0,
               position: "absolute",
-              top: 0,
+              // top: 0,
               transform: "scaleX(-1)",
             }}
           />
@@ -464,9 +464,9 @@ export default function OldFilm() {
             className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
               } ${recording ? "" : "hidden"}`}
             style={{
-              left: 0,
+              // left: 0,
               position: "absolute",
-              top: 0,
+              // top: 0,
               transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
             }}
             autoPlay
