@@ -450,6 +450,7 @@ export default function OldFilm() {
           {!recording && timer > 0 && (
             <div className="countdown-overlay">
               {timer}
+              <p className="text-sm mt-3 text-center text-white">Souriez et regardez la caméra 😉 ! </p>
             </div>
           )}
 
@@ -483,7 +484,7 @@ export default function OldFilm() {
               // left: 0,
               position: "absolute",
               // top: 0,
-              filter: "blur(3px)",
+              // filter: "blur(3px)",
               transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
             }}
             autoPlay
