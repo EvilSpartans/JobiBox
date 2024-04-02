@@ -138,6 +138,13 @@ export default function OldFilm() {
     }
   };
 
+  const startCountdown = async () => {
+    for (let count = 3; count > 0; count--) {
+      setTimer(count);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  };
+
   const toggleRecording = async () => {
     const questionId = currentQuestionIdRef.current;
     const selectedQuestion = selectedQuestionRef.current;
@@ -145,6 +152,9 @@ export default function OldFilm() {
     if (!recording) {
       try {
         dispatch(changeStatus("loading"));
+
+        // Début du décompte
+        await startCountdown();
 
         const audioStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
@@ -437,6 +447,12 @@ export default function OldFilm() {
             />
           )}
 
+          {!recording && timer > 0 && (
+            <div className="countdown-overlay">
+              {timer}
+            </div>
+          )}
+
           <video
             ref={videoCameraRef}
             className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
@@ -467,6 +483,7 @@ export default function OldFilm() {
               // left: 0,
               position: "absolute",
               // top: 0,
+              filter: "blur(3px)",
               transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
             }}
             autoPlay
@@ -501,7 +518,8 @@ export default function OldFilm() {
               className={`${recording
                 ? "bg-red-500 hover.bg-red-700"
                 : "bg-green_2 hover:bg-green_1"
-                } text-white px-4 py-2 rounded-lg actionBtn`}
+              } text-white px-4 py-2 rounded-lg actionBtn ${timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""}`}
+              disabled={timer > 0 && !recording}
             >
               {recording
                 ? "Arrêter l'enregistrement"
