@@ -38,6 +38,7 @@ export default function OldFilm() {
   const [videoBase64, setVideoBase64] = useState(null);
   const [recording, setRecording] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [coutDown, setCountdown] = useState(0);
   const [timerIntervalId, setTimerIntervalId] = useState(null);
   const videoCameraRef = useRef(null);
   const [mediaStream, setMediaStream] = useState(null);
@@ -62,7 +63,7 @@ export default function OldFilm() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [recording, videoBase64]);
+  }, [recording, videoBase64, coutDown]);
 
   useEffect(() => {
     currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
@@ -89,7 +90,7 @@ export default function OldFilm() {
   // Make Pad working
   const handleKeyPress = (event) => {
     if (event.key === "é" || event.key === "è" || event.key === "&") {
-      if (!videoBase64) {
+      if (!videoBase64 && !coutDown) {
         toggleRecording();
       }
     }
@@ -141,6 +142,7 @@ export default function OldFilm() {
   const startCountdown = async () => {
     for (let count = 3; count > 0; count--) {
       setTimer(count);
+      setCountdown(count);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   };
@@ -155,6 +157,7 @@ export default function OldFilm() {
 
         // Début du décompte
         await startCountdown();
+        setCountdown(0)
 
         const audioStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
