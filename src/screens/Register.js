@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import RegisterForm from "../components/forms/RegisterForm";
-import Tuto from "../components/Tuto";
+// import Tuto from "../components/Tuto";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
@@ -21,7 +21,7 @@ export default function Register() {
         {/*Register form */}
         <RegisterForm />
       </div>
-      <Tuto
+      {/* <Tuto
         steps={[
           {
             intro:
@@ -29,7 +29,7 @@ export default function Register() {
           },
         ]}
         tutorialKey="registerTuto"
-      />
+      /> */}
     </div>
   );
 }

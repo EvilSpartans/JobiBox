@@ -4,7 +4,7 @@ import { getMusics } from "../../store/features/musicSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 import ModalMusic from "../modals/ModalMusic";
 import { useNavigate } from "react-router-dom";
-import Tuto from "../Tuto";
+// import Tuto from "../Tuto";
 
 export default function Music() {
   const user = useSelector((state) => state.user.user);
@@ -77,7 +77,7 @@ export default function Music() {
       {/*Heading*/}
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des musiques</h2>
-        <p className="mt-6 text-sm">Choisis une des musiques</p>
+        <p className="mt-6 text-sm">Tu peux maintenant <span className="text-blue-400">sélectionner une musique</span> qui correspond le plus à ta personnalité.</p>
       </div>
       <div className="dark:text-dark_text_1">
         <div className="audio-player mt-4">
@@ -177,12 +177,8 @@ font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transi
         Continuer
       </button>
 
-      <Tuto
+      {/* <Tuto
         steps={[
-          // {
-          //     element: '.addButton',
-          //     intro: 'Ici vous pouvez ajouter une musique personnalisée.',
-          // },
           {
             element: ".theme-selected",
             intro:
@@ -190,7 +186,7 @@ font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transi
           },
         ]}
         tutorialKey="musicTuto"
-      />
+      /> */}
     </div>
   );
 }

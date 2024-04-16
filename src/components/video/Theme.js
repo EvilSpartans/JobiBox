@@ -7,7 +7,6 @@ import { getThemes } from "../../store/features/themeSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 import ModalTheme from "../modals/ModalTheme";
 import { useNavigate } from "react-router-dom";
-import Tuto from "../Tuto";
 
 export default function Theme() {
   const user = useSelector((state) => state.user.user);
@@ -73,7 +72,7 @@ export default function Theme() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des thèmes</h2>
         <p className="mt-6 text-sm">
-          Sélectionne le thème qui te correspond
+        Tu as sélectionné tes questions, tu peux maintenant <span className="text-blue-400">choisir un fond</span> de couleur (ou Template) sur lequel elles seront notées.
         </p>
       </div>
       <div className="dark:text-dark_text_1">
@@ -148,7 +147,7 @@ font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transi
         Continuer
       </button>
 
-      <Tuto
+      {/* <Tuto
         steps={[
           {
             element: ".slick-active",
@@ -157,7 +156,7 @@ font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transi
           },
         ]}
         tutorialKey="themeTuto"
-      />
+      /> */}
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { getQuestions } from "../../store/features/questionSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 import ModalQuestion from "../modals/ModalQuestion";
 import { useNavigate } from "react-router-dom";
-import Tuto from "../Tuto";
 
 export default function Question() {
   const user = useSelector((state) => state.user.user);
@@ -76,7 +75,6 @@ export default function Question() {
     }
   };
 
-
   // Determine the selected questions based on the current tab
   const selectedQuestions =
     currentTab === "Candidat"
@@ -102,11 +100,15 @@ export default function Question() {
 
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
+
       {/* Heading */}
       <div className="text-center dark:text-dark_text_1">
-        <h2 className="mt-6 text-3xl font-bold">Liste des questions</h2>
+        <h2 className="text-3xl font-bold">Liste des questions</h2>
         <p className="mt-6 text-sm">
-          Sélectionne les questions auxquelles tu souhaites répondre
+        Tu vas pouvoir <span className="text-blue-400">sélectionner</span> les questions auxquelles tu vas répondre
+          dans un format de type question / réponse en vidéo. Si tu le
+          souhaites, tu pourras également <span className="text-blue-400">créer</span> des questions afin de
+          personnaliser ton CV vidéo du mieux possible.
         </p>
       </div>
       <div className="dark:text-dark_text_1">
@@ -189,7 +191,7 @@ export default function Question() {
         Continuer
       </button>
 
-      <Tuto
+      {/* <Tuto
         steps={[
           {
             element: ".form-checkbox",
@@ -200,10 +202,10 @@ export default function Question() {
             element: ".addButton",
             intro:
               "Si tu le souhaites, tu pourras également créer des questions afin de personnaliser ton CV vidéo du mieux possible.",
-          }
+          },
         ]}
         tutorialKey="questionTuto"
-      />
+      /> */}
     </div>
   );
 }

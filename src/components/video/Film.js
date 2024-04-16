@@ -453,7 +453,7 @@ export default function OldFilm() {
           {!recording && timer > 0 && (
             <div className="countdown-overlay">
               {timer}
-              <p className="text-sm mt-3 text-center text-white">Souriez et regardez la caméra 😉 ! </p>
+              <p className="text-sm mt-3 text-center text-white">Souris et regarde la caméra 😉 ! </p>
             </div>
           )}
 

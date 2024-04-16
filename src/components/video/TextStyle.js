@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import Wheel from '@uiw/react-color-wheel';
-import Tuto from "../Tuto";
+// import Tuto from "../Tuto";
 
 export default function TextStyle() {
   const BASE_URL = "https://jobibox.jobissim.com/uploads/themes";
@@ -46,7 +46,7 @@ export default function TextStyle() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Style des questions</h2>
         <p className="mt-6 text-sm">
-          Ajuste la taille et la couleur de tes questions
+        Tu peux <span className="text-blue-400">ajuster la taille</span> de tes questions en faisant glisser le curseur, Tu as aussi la possibilité d'en définir la <span className="text-blue-400">couleur</span>.
         </p>
       </div>
       <div className="dark:text-dark_text_1">
@@ -93,7 +93,7 @@ export default function TextStyle() {
         Continuer
       </button>
 
-      <Tuto
+      {/* <Tuto
         steps={[
           {
             element: ".rc-slider-handle",
@@ -106,7 +106,7 @@ export default function TextStyle() {
           },
         ]}
         tutorialKey="textStyleTuto"
-      />
+      /> */}
     </div>
   );
 }

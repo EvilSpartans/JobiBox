@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import LoginForm from "../components/forms/LoginForm";
-import Tuto from "../components/Tuto";
+// import Tuto from "../components/Tuto";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -22,7 +22,7 @@ export default function Login() {
         {/*Login Form */}
         <LoginForm />
       </div>
-      <Tuto
+      {/* <Tuto
         steps={[
           {
             intro: "Bonjour à toi et bienvenue dans la Jobibox. Nous allons créer ensemble ton CV vidéo afin que tu te démarques dans ta recherche de stage, d’alternance ou d’emploi.",
@@ -33,7 +33,7 @@ export default function Login() {
           }
         ]}
         tutorialKey="loginTuto"
-      />
+      /> */}
     </div>
   );
 }

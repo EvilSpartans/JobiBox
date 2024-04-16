@@ -39,8 +39,8 @@ export default function RegisterForm() {
       <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
-          <h2 className="mt-6 text-3xl font-bold">Bienvenue</h2>
-          <p className="mt-2 text-sm">Inscription</p>
+          <h2 className="mt-6 text-3xl font-bold">Inscription</h2>
+          <p className="mt-10 text-sm">L'inscription te permettra de bénéficier d’un <span className="text-blue-400">référencement sur Jobissim</span> pour être visible auprès des recruteurs et te permettra de <span className="text-blue-400">recevoir ta vidéo par mail</span> après l’enregistrement.</p>
         </div>
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">

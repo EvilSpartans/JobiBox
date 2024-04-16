@@ -22,16 +22,16 @@ export default function LogoutBtn() {
         localStorage.removeItem('selectedMusic');
         localStorage.removeItem('videoPath');
         localStorage.removeItem("videoId");
-        localStorage.removeItem('questionTuto');
-        localStorage.removeItem('themeTuto');
-        localStorage.removeItem('musicTuto');
+        // localStorage.removeItem('questionTuto');
+        // localStorage.removeItem('themeTuto');
+        // localStorage.removeItem('musicTuto');
         localStorage.removeItem('filmTuto');
         localStorage.removeItem('clipTuto');
-        localStorage.removeItem('textStyleTuto');
+        // localStorage.removeItem('textStyleTuto');
         localStorage.removeItem('textStyle');
         localStorage.removeItem('transcriptionTuto');
-        localStorage.removeItem('loginTuto');
-        localStorage.removeItem('registerTuto');
+        // localStorage.removeItem('loginTuto');
+        // localStorage.removeItem('registerTuto');
         setShowModal(false);
 
         if (videoId != null) {
