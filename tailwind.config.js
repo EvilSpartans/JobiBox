@@ -21,7 +21,7 @@ module.exports = {
         dark_svg_2: "#8696A0",
         blue_1: "#53BDEB",
         blue_2: "#3E7B96",
-        blue_3: "#5287ef",
+        blue_3: "#e296f2",
         blue_4: "#878af0",
         dark_text_1: "#E9EDEF",
         dark_text_2: "#8696A0",

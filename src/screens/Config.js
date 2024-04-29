@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/modals/Modal";
-import LogoutBtn from "../components/LogoutBtn";
 
 export default function Config() {
 
@@ -28,7 +27,7 @@ export default function Config() {
   useEffect(() => {
     const existingBusiness = localStorage.getItem("businessId");
     if (existingBusiness) {
-      navigate("/login");
+      navigate("/welcome");
     }
   }, []);
 
@@ -36,7 +35,7 @@ export default function Config() {
     if (type === "public") {
         localStorage.setItem("businessId", null);
         setPublicModalOpen(false);
-        navigate("/login");
+        navigate("/welcome");
       } else if (type === "private") {
         setPrivateModalOpen(false);
         navigate("/portal");
@@ -46,7 +45,6 @@ export default function Config() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/*Container*/}
-      <LogoutBtn />
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
@@ -55,7 +53,7 @@ export default function Config() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-3xl font-bold">Configuration</h2>
-              <p className="mt-2 text-sm">
+              <p className="mt-6 text-base">
                 Définir si la JobiBox doit être publique ou privée
               </p>
             </div>
@@ -69,12 +67,11 @@ export default function Config() {
               Ouvert à tout le monde
             </button>
             <button
-              className="w-full flex justify-center bg-blue_2 text-gray-100 p-4 rounded-full tracking-wide
-          font-semibold focus:outline-none hover:bg-blue_1 shadow-lg cursor-pointer transition ease-in duration-300
-          "
-              onClick={() => openModal("private")}
+                className="w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
+                    font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
+                    onClick={() => openModal("private")}
             >
-              Reliée à une entreprise
+                Reliée à une entreprise
             </button>
           </div>
         </div>

@@ -17,7 +17,7 @@ export default function Offline() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-3xl font-bold">Pas de connexion</h2>
-              <p className="mt-2 text-sm">Il semble que tu n'es pas connecté à internet.</p>
+              <p className="mt-6 text-base">Il semble que tu n'es pas connecté à internet.</p>
             </div>
             {/*Buttons*/}
             <button className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"

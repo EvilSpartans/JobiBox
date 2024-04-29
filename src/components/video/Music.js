@@ -77,7 +77,7 @@ export default function Music() {
       {/*Heading*/}
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des musiques</h2>
-        <p className="mt-6 text-sm">Tu peux maintenant <span className="text-blue-400">sélectionner une musique</span> qui correspond le plus à ta personnalité.</p>
+        <p className="mt-6 text-base">Tu peux maintenant <span className="text-blue-400">sélectionner une musique</span> qui correspond le plus à ta personnalité.</p>
       </div>
       <div className="dark:text-dark_text_1">
         <div className="audio-player mt-4">

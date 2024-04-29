@@ -39,8 +39,9 @@ export default function LoginForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Connexion</h2>
-          <p className="mt-10 text-sm">Bonjour à toi et bienvenue dans la Jobibox. Nous allons créer ensemble <span className="text-blue-400">ton CV vidéo</span> afin que tu te démarques dans ta recherche de stage, d’alternance ou d’emploi.</p>
-          <p className="mt-6 text-sm">Ton CV vidéo sera ensuite <span className="text-blue-400">référencé sur la plateforme d’emploi Jobissim</span> afin que de nombreux recruteurs le voient et te contactent. Il te sera également envoyé par mail pour que tu le diffuses où tu le souhaites.</p>
+          <p className="mt-6 text-base">
+              Tu peux te connecter avec tes identifiants Jobissim.
+          </p>
         </div>
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">

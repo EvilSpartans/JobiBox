@@ -104,7 +104,7 @@ export default function Question() {
       {/* Heading */}
       <div className="text-center dark:text-dark_text_1">
         <h2 className="text-3xl font-bold">Liste des questions</h2>
-        <p className="mt-6 text-sm">
+        <p className="mt-6 text-base">
         Tu vas pouvoir <span className="text-blue-400">sélectionner</span> les questions auxquelles tu vas répondre
           dans un format de type question / réponse en vidéo. Si tu le
           souhaites, tu pourras également <span className="text-blue-400">créer</span> des questions afin de

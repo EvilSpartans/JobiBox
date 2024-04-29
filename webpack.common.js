@@ -4,7 +4,6 @@ const Dotenv = require('dotenv-webpack');
 module.exports = {
     mode: 'development',
     entry: './src/index.js',
-    // TODO: Explain Source Map
     devtool: 'inline-source-map',
     target: 'electron-renderer',
     module: {
@@ -15,29 +14,35 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: [[
-                            '@babel/preset-env', {
-                                targets: {
-                                    esmodules: true
-                                }
-                            }],
-                            '@babel/preset-react']
+                        presets: [['@babel/preset-env', {
+                            targets: {
+                                esmodules: true
+                            }
+                        }], '@babel/preset-react']
                     }
                 }
             },
             {
                 test: [/\.s[ac]ss$/i, /\.css$/i],
                 use: [
-                    // Creates `style` nodes from JS strings
                     'style-loader',
-                    // Translates CSS into CommonJS
                     'css-loader',
-                    // Compiles Sass to CSS
                     'sass-loader',
-                    // Talwindcss
-                    "postcss-loader"
+                    'postcss-loader'
                 ],
-            }
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'images',
+                        },
+                    },
+                ],
+            },
         ]
     },
     plugins: [new Dotenv()],

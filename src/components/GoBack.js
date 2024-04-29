@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleLeft  } from '@fortawesome/free-solid-svg-icons';
 
 const GoBack = ({ itemToRemove }) => {
     const navigate = useNavigate();
@@ -17,10 +17,10 @@ const GoBack = ({ itemToRemove }) => {
     return (
         <div className="fixed top-4 left-4">
             <button
-                className="flex items-center text-blue-500 hover:text-blue-700 focus:outline-none text-lg font-bold p-2 blinking"
+                className="flex items-center hover:text-blue-700 focus:outline-none text-lg font-bold p-2 blinking"
                 onClick={handleBack}
             >
-                <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                <FontAwesomeIcon icon={faArrowCircleLeft } className="mr-2" />
                 Retour
             </button>
         </div>

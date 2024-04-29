@@ -209,7 +209,7 @@ export default function PostForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Publication</h2>
-          <p className="mt-2 text-sm"><span className="text-blue-400">Complète les champs</span> suivants pour mettre en ligne ta vidéo.</p>
+          <p className="mt-6 text-base"><span className="text-blue-400">Complète les champs</span> suivants pour mettre en ligne ta vidéo.</p>
         </div>
 
         {/* Video */}

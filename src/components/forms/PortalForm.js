@@ -76,7 +76,7 @@ export default function PortalForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Configuration</h2>
-          <p className="mt-2 text-sm">Connexion au portail</p>
+          <p className="mt-6 text-base">Connexion au portail</p>
         </div>
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">

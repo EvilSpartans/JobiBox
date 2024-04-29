@@ -92,7 +92,7 @@ export default function Transcription() {
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-3xl font-bold">Sous-titres</h2>
-              <p className="mt-2 text-sm">
+              <p className="mt-6 text-base">
                 Générer les sous-titres de la vidéo
               </p>
             </div>

@@ -45,7 +45,7 @@ export default function TextStyle() {
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Style des questions</h2>
-        <p className="mt-6 text-sm">
+        <p className="mt-6 text-base">
         Tu peux <span className="text-blue-400">ajuster la taille</span> de tes questions en faisant glisser le curseur, Tu as aussi la possibilité d'en définir la <span className="text-blue-400">couleur</span>.
         </p>
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback  } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Logout from "../components/Logout";
@@ -8,23 +8,6 @@ export default function Home() {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const existingBusiness = localStorage.getItem("businessId");
-
-  // Hidden cmd to reset config
-  const handleKeyDown = useCallback((e) => {
-    if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "b") {
-      localStorage.removeItem("businessId");
-      alert("Configuration réinitialisée");
-      navigate("/config");
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
-  // ----------------------------
 
   useEffect(() => {
     if (!existingBusiness) {
@@ -43,7 +26,7 @@ export default function Home() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-3xl font-bold">JobiBox</h2>
-              <p className="mt-2 text-sm">{user.username}</p>
+              <p className="mt-6 text-base">{user.username}</p>
             </div>
             {/*Buttons*/}
             <button

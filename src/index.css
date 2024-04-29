@@ -361,7 +361,7 @@ select, input, textarea {
         opacity: 1;
     }
     50% {
-        opacity: 0.12;
+        opacity: 0.5;
     }
     100% {
         opacity: 1;
@@ -370,6 +370,7 @@ select, input, textarea {
 
 .blinking {
     animation: blink 1.5s infinite;
+    color: #e296f2;
 }
 
 label[for=terms], label[for=portal]

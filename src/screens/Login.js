@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import LoginForm from "../components/forms/LoginForm";
 // import Tuto from "../components/Tuto";
 import { useNavigate } from "react-router-dom";
+import GoBack from "../components/GoBack";
 
 export default function Login() {
 
@@ -17,6 +18,7 @@ export default function Login() {
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
+      <GoBack />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
