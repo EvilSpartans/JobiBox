@@ -28,10 +28,10 @@ export default function Select({
                 {...register(name)}
                 defaultValue="Choisir"
             >
-                <option className="dark:text-dark_text_1" value="" disabled>Choisir</option>
+                <option className="dark:text-dark_text_1" value="" disabled></option>
                 <option value="" hidden>Choisir</option> 
                 {options.map((option, index) => (
-                    <option key={index} value={option.value}>
+                    <option key={index} value={option.value} style={{ fontSize: 'x-large' }}>
                         {option.label}
                     </option>
                 ))}

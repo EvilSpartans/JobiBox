@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../fields/Input";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
-import { portalSchema } from "../../utils/Validation";
+import { businessSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import {
-  changeStatus,
-  accessPortal,
-  getPortals,
-} from "../../store/features/portalSlice";
+import { getJobibox } from "../../store/features/jobiboxSlice";
 import Select from "../fields/Select";
 
-export default function PortalForm() {
+export default function JobiboxForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { status, error } = useSelector((state) => state.portal);
-  const [portalOptions, setPortalOptions] = useState([]);
+  const { status, error } = useSelector((state) => state.jobibox);
+  const [jobiboxOptions, setJobiboxOptions] = useState([]);
+  const [jobiboxData, setJobiboxData] = useState([]);
 
   useEffect(() => {
-    fetchPortals();
+    fetchJobibox();
   }, []);
 
   const {
@@ -28,19 +24,20 @@ export default function PortalForm() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(portalSchema),
+    resolver: yupResolver(businessSchema),
   });
 
   // Fetch portals
-  const fetchPortals = async () => {
+  const fetchJobibox = async () => {
     try {
-      const response = await dispatch(getPortals());
-      const portalsData = response.payload;
-      const updatedPortalOptions = portalsData.map((portal) => ({
-        value: portal.id,
-        label: portal.title,
+      const response = await dispatch(getJobibox());
+      const data = response.payload;
+      setJobiboxData(data);
+      const updatedJobiboxOptions = data.map((jobibox) => ({
+        value: jobibox.id,
+        label: jobibox.business.title,
       }));
-      setPortalOptions(updatedPortalOptions);
+      setJobiboxOptions(updatedJobiboxOptions);
     } catch (error) {
       console.error("Erreur lors de la récupération des portails :", error);
     }
@@ -48,25 +45,14 @@ export default function PortalForm() {
 
   // Submit Form
   const onSubmit = async (data) => {
-    dispatch(changeStatus("loading"));
-
-    const postData = {
-      password: data.password,
-      id: data.business,
-    };
-
-    try {
-      const response = await dispatch(accessPortal(postData));
-      const res = response.payload;
-        if (res?.message == "Authorized") {
-          localStorage.setItem("businessId", data.business);
-          navigate('/login');
-        }
-    } catch (error) {
-      console.error("Erreur lors de l'accès au portail' :", error);
-    } finally {
-      dispatch(changeStatus(""));
+    const selectedJobibox = jobiboxData.find((jobibox) => jobibox.id === parseInt(data.business));
+    if (!selectedJobibox) {
+      console.error("Erreur : Impossible de trouver la jobibox sélectionnée.");
+      return;
     }
+    localStorage.setItem("businessId", selectedJobibox.business.id);
+    localStorage.setItem("jobiboxId", selectedJobibox.id);
+    navigate('/login');
   };
 
   return (
@@ -76,23 +62,16 @@ export default function PortalForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Configuration</h2>
-          <p className="mt-6 text-base">Connexion au portail</p>
+          <p className="mt-6 text-base">Connexion à la page <span className="text-blue-400">entreprise.</span></p>
         </div>
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
           <Select
             name="business"
-            placeholder="Portail"
+            placeholder="Entreprise"
             register={register}
             error={errors?.business?.message}
-            options={portalOptions}
-          />
-          <Input
-            name="password"
-            type="password"
-            placeholder="Mot de passe"
-            register={register}
-            error={errors?.password?.message}
+            options={jobiboxOptions}
           />
           {/*if we have an error*/}
           {error ? (

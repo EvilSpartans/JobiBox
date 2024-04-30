@@ -41,7 +41,7 @@ export default function RegisterForm() {
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Inscription</h2>
           <p className="mt-6 text-base">
-            Complète tous les champs pour créer ton compte.
+            Complète tous les <span className="text-blue-400">champs</span> pour créer ton compte.
           </p>
         </div>
         {/*Form*/}

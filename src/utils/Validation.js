@@ -38,14 +38,14 @@ export const PostSchema = Yup.object().shape({
     title: Yup.string().required("Le titre est requis."),
     category: Yup.string().required("La catégorie est requise."),
     subCategory: Yup.string().when("portal", {
-        is: (portal) => !portal,
+        is: (portal) => !portal || portal.length === 0,
         then: () => Yup.string().required("La classification est requise."),
         otherwise: () => Yup.string().notRequired(),
       }),
-      portal: Yup.boolean().when("subCategory", {
-        is: (subCategory) => !subCategory,
-        then: () => Yup.boolean().oneOf([true], "Tu dois choisir une classification ou un portail."),
-        otherwise: () => Yup.boolean().notRequired(),
+      portal: Yup.string().when("subCategory", {
+        is: (subCategory) => !subCategory || subCategory.length === 0,
+        then: () => Yup.string().required("Tu dois choisir une classification ou un portail."),
+        otherwise: () => Yup.string().notRequired(),
       }),
     description: Yup.string(),
     city: Yup.string(),
@@ -66,7 +66,7 @@ export const PostSchema = Yup.object().shape({
     businessId: Yup.boolean()
 }, ['subCategory', 'portal']);
 
-export const portalSchema = Yup.object({
-    business: Yup.string().required("Le portail est requis."),
-    password: Yup.string().required("Le mot de passe est requis"),
+export const businessSchema = Yup.object({
+    business: Yup.string().required("L'entreprise est requise."),
+    // password: Yup.string().required("Le mot de passe est requis"),
 });

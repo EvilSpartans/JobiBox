@@ -8,7 +8,8 @@ export default function SelectMultiple({
     value,
     onChange,
     register,
-    error
+    error,
+    style
 }) {
     const customStyles = {
         control: (styles) => ({
@@ -42,7 +43,7 @@ export default function SelectMultiple({
     };
 
     return (
-        <div className="mt-8 content-center dark:text-dark_text_1 space-y-1">
+        <div className="mt-8 content-center dark:text-dark_text_1 space-y-1" style={style}>
             <label htmlFor={name} className="text-sm font-bold tracking-wide">
                 {placeholder}
             </label>

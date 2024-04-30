@@ -1,6 +1,5 @@
 import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import React from 'react';
-import Home from './screens/Home';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import { useSelector } from "react-redux";
@@ -30,7 +29,7 @@ export default function App() {
                     <div className={`dark ${isOnline ? '' : 'offline'}`}>
                         {!isOnline && <Navigate to="/offline" />}
                         <Routes>
-                            <Route path="/" element={token ? <Home /> : <Navigate to="/welcome" />} />
+                            <Route path="/" element={token ? <Questions /> : <Navigate to="/welcome" />} />
                             <Route path="/config" element={<Config />} />
                             <Route path="/portal" element={<Portal />} />
                             <Route path="/offline" element={<Offline />} />

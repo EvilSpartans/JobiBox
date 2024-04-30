@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { createPost, changeStatus } from "../../store/features/postSlice";
 import { getCategories } from "../../store/features/categorySlice";
 import { getSubCategories } from "../../store/features/subCategorySlice";
+import { getJobiboxPortals } from "../../store/features/jobiboxSlice";
 import { sendConfirmNotification } from "../Notification";
 
 import Input from "../fields/Input";
@@ -26,6 +27,8 @@ export default function PostForm() {
   const user = useSelector((state) => state.user.user);
   const { token } = user;
   const [contracts, setContracts] = useState([]);
+  const [portals, setPortals] = useState([]);
+  const [portalsOptions, setPortalsOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
@@ -36,6 +39,11 @@ export default function PostForm() {
   const handleSelectContracts = (selectedValues) => {
     setContracts(selectedValues);
   };
+
+  const handleSelectPortals = (val) => {
+    setPortals(val);
+  };
+
 
   // Form's options
   const {
@@ -86,20 +94,33 @@ export default function PostForm() {
     }
   };
 
+  const fetchPortals = async () => {
+    try {
+      const jobiboxId = localStorage.getItem('jobiboxId');
+      const response = await dispatch(getJobiboxPortals({id: jobiboxId}));
+      const portalsData = response.payload;
+      const portalsOptions = portalsData.portals.map((portal) => ({
+        value: portal.id,
+        label: portal.title,
+      }));
+      setPortalsOptions(portalsOptions);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des portails :",
+        error
+      );
+    }
+  }
+
   useEffect(() => {
     fetchCategories();
     fetchSubCategories();
+    fetchPortals();
   }, []);
 
   const commentOptions = [
     { value: "Oui", label: "Oui" },
     { value: "Non", label: "Non" },
-  ];
-
-  const hmyOptions = [
-    { value: "Heure", label: "Heure" },
-    { value: "Mois", label: "Mois" },
-    { value: "Année", label: "Année" },
   ];
 
   const contractOptions = [
@@ -171,7 +192,7 @@ export default function PostForm() {
       city: data.city,
       salary: data.salary,
       hmy: data.hmy,
-      activateComments: data.activateComments,
+      activateComments: true,
       formation: data.formation === "Oui",
       remote: data.remote,
       date: formattedDate,
@@ -179,12 +200,12 @@ export default function PostForm() {
       video: videoPath,
       image: imageFile,
       businessId,
-      portal: data.portal ? 1 : 0
+      portal: portals.map(portal => portal.value) || []
     };
 
     try {
       const res = await dispatch(createPost(postData));
-      // console.log(res);
+      console.log(res);
       if (res?.payload?.title) {
         navigate("/thanks");
         sendConfirmNotification();
@@ -234,32 +255,35 @@ export default function PostForm() {
           <Input
             name="title"
             type="text"
-            placeholder="Titre"
+            placeholder="Titre de la vidéo"
             register={register}
             error={errors?.title?.message}
           />
           <Select
             name="subCategory"
-            placeholder="Classification"
+            placeholder="Es-tu recruteur ou demandeur d'emploi ?"
             register={register}
-            error={showPortalCheckbox ? errors?.portal ? errors?.subCategory?.message : null : errors?.subCategory?.message}
+            error={showPortalCheckbox && !portals.length && errors.subCategory ? errors.subCategory.message : null}
             options={subCategoryOptions}
           />
           <Select
             name="category"
-            placeholder="Catégorie"
+            placeholder="Domaine d'activité"
             register={register}
             error={errors?.category?.message}
             options={categoryOptions}
           />
           {showPortalCheckbox && (
-          <Checkbox
+          <SelectMultiple
             name="portal"
-            label="Portail"
+            placeholder="Portail"
             register={register}
-            error={errors?.subCategory ? errors?.portal?.message : null}
+            error={errors.subCategory && !portals.length ? errors.portal?.message : null}
+            options={portalsOptions}
+            value={portals}
+            onChange={handleSelectPortals}
           />
-          )}
+          )}            
           <Input
             name="city"
             type="text"
@@ -267,52 +291,32 @@ export default function PostForm() {
             register={register}
             error={errors?.city?.message}
           />
-          <Textarea
-            name="description"
-            type="text"
-            placeholder="Description"
-            register={register}
-            error={errors?.description?.message}
-          />
-          <SelectMultiple
-            name="contracts"
-            placeholder="Contrats"
-            register={register}
-            error={errors?.contracts?.message}
-            options={contractOptions}
-            value={contracts}
-            onChange={handleSelectContracts}
-          />
-          <Select
-            name="activateComments"
-            placeholder="Autoriser les commentaires"
-            register={register}
-            error={errors?.activateComments?.message}
-            options={commentOptions}
-          />
+          <div className="flex justify-between space-x-2 !mt-0">
+            <SelectMultiple
+              name="contracts"
+              placeholder="Contrats"
+              register={register}
+              error={errors?.contracts?.message}
+              options={contractOptions}
+              value={contracts}
+              onChange={handleSelectContracts}
+              style={{ width: '300px' }}
+            />
+            <Checkbox
+              name="remote"
+              label="Télétravail"
+              register={register}
+              error={errors?.remote?.message}
+              style={{ marginTop: '3.5rem' }}
+            />
+          </div>
           <Select
             name="formation"
-            placeholder="Es-tu en formation ?"
+            placeholder="Es-tu à la recherche d'une formation ?"
             register={register}
             error={errors?.formation?.message}
             options={commentOptions}
           />
-          <div className="flex space-x-2 !mt-0">
-            <Input
-              name="salary"
-              type="text"
-              placeholder="Salaire"
-              register={register}
-              error={errors?.salary?.message}
-            />
-            <Select
-              name="hmy"
-              placeholder="Période"
-              register={register}
-              error={errors?.hmy?.message}
-              options={hmyOptions}
-            />
-          </div>
           <Input
             name="date"
             type="text"
@@ -322,11 +326,12 @@ export default function PostForm() {
             selected={startDate}
             onChange={(date) => setStartDate(date)}
           />
-          <Checkbox
-            name="remote"
-            label="Télétravail"
+          <Textarea
+            name="description"
+            type="text"
+            placeholder="Description"
             register={register}
-            error={errors?.remote?.message}
+            error={errors?.description?.message}
           />
           {/*if we have an error*/}
           {error ? (

@@ -420,12 +420,12 @@ export default function OldFilm() {
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
-      {currentQuestionIndex < questions.length && (
+        <div className="mt-6 text-base">
+          <p>C'est le moment de <span className="text-blue-400">filmer</span> ta séquence.</p>
+        </div>
+        {currentQuestionIndex < questions.length && (
         <h2 className="mt-6 text-3xl font-bold">{questions[currentQuestionIndex].title}</h2>
       )}
-        <div className="mt-6 text-base">
-          <p>C'est le moment <span className="text-blue-400">de filmer</span> ta séquence.</p>
-        </div>
       </div>
 
       <div className="dark:text-dark_text_1">

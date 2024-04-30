@@ -9,11 +9,11 @@ const initialState = {
     portals: []
 };
 
-export const getPortals = createAsyncThunk(
-    "api/portals",
+export const getJobibox = createAsyncThunk(
+    "api/jobibox",
     async ( rejectWithValue ) => {
         try {
-            const { data } = await axios.get(`${BASE_URL}/portals`, {});
+            const { data } = await axios.get(`${BASE_URL}/jobibox`, {});
             return data;
         } catch (error) {
             return rejectWithValue(error.response);
@@ -21,24 +21,11 @@ export const getPortals = createAsyncThunk(
     }
 );
 
-export const accessPortal = createAsyncThunk(
-    "portal/access",
-    async (values, { rejectWithValue }) => {
-        const { password, id } = values;
+export const getJobiboxPortals = createAsyncThunk(
+    "jobibox/getPortals",
+    async ({ id }, { rejectWithValue }) => {
         try {
-            const formData = new FormData();
-            formData.append("password", password);
-            formData.append("id", id);
-
-            const { data } = await axios.post(
-                `${BASE_URL}/portal/access`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            const { data } = await axios.get(`${BASE_URL}/jobibox/${id}`, {});
             return data;
         } catch (error) {
             return rejectWithValue(error.response);
@@ -46,8 +33,8 @@ export const accessPortal = createAsyncThunk(
     }
 );
 
-export const portalSlice = createSlice({
-    name: "question",
+export const jobiboxSlice = createSlice({
+    name: "jobibox",
     initialState,
     reducers: {
         changeStatus: (state, action) => {
@@ -56,30 +43,30 @@ export const portalSlice = createSlice({
     },
     extraReducers(builder) {
         builder
-            .addCase(getPortals.pending, (state) => {
+            .addCase(getJobibox.pending, (state) => {
                 state.status = "loading";
             })
-            .addCase(getPortals.fulfilled, (state, action) => {
+            .addCase(getJobibox.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 state.portals = action.payload;
             })
-            .addCase(getPortals.rejected, (state, action) => {
+            .addCase(getJobibox.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload.data.message;
             })
-            .addCase(accessPortal.pending, (state) => {
+            .addCase(getJobiboxPortals.pending, (state) => {
                 state.status = "loading";
             })
-            .addCase(accessPortal.fulfilled, (state, action) => {
+            .addCase(getJobiboxPortals.fulfilled, (state, action) => {
                 state.status = "succeeded";
                 state.portals = action.payload;
             })
-            .addCase(accessPortal.rejected, (state, action) => {
+            .addCase(getJobiboxPortals.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload.data.message;
             });
     },
 });
 
-export const { changeStatus } = portalSlice.actions;
-export default portalSlice.reducer;
+export const { changeStatus } = jobiboxSlice.actions;
+export default jobiboxSlice.reducer;

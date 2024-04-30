@@ -5,9 +5,10 @@ export default function Checkbox({
     label,
     register,
     error,
+    style
 }) {
     return (
-        <div className="mt-8 flex items-center dark:text-dark_text_1">
+        <div className="mt-8 flex items-center dark:text-dark_text_1" style={style}>
             <input
                 type="checkbox"
                 id={name}

@@ -18,7 +18,7 @@ export default function Thanks() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="text-3xl font-bold">Remerciements</h2>
-              <p className="mt-12 text-sm">
+              <p className="mt-12 text-base">
                 Nous te remercions d’avoir utilisé la Jobibox. <span className="text-blue-400">L’équipe de
                 JOBISSIM</span> espère que cette expérience t’a plu et te souhaite
                 bonne chance dans tes recherches.

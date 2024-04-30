@@ -1,5 +1,5 @@
 import React from "react";
-import PortalForm from "../components/forms/PortalForm";
+import JobiboxForm from "../components/forms/JobiboxForm";
 import GoBack from "../components/GoBack";
 import LogoutBtn from "../components/LogoutBtn";
 
@@ -12,7 +12,7 @@ export default function Portal() {
     {/*Container*/}
     <div className="flex w-full mx-auto h-full">
       {/*Form */}
-      <PortalForm />
+      <JobiboxForm />
     </div>
   </div>
   );
