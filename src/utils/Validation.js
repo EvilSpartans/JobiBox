@@ -42,10 +42,10 @@ export const PostSchema = Yup.object().shape({
         then: () => Yup.string().required("La classification est requise."),
         otherwise: () => Yup.string().notRequired(),
       }),
-      portal: Yup.string().when("subCategory", {
+      portal: Yup.array().when("subCategory", {
         is: (subCategory) => !subCategory || subCategory.length === 0,
-        then: () => Yup.string().required("Tu dois choisir une classification ou un portail."),
-        otherwise: () => Yup.string().notRequired(),
+        then: () => Yup.array().required("Tu dois choisir une classification ou un portail."),
+        otherwise: () => Yup.array().notRequired(),
       }),
     description: Yup.string(),
     city: Yup.string(),

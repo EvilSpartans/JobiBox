@@ -57,10 +57,16 @@ export default function SelectMultiple({
                 styles={customStyles}
                 placeholder={placeholder}
             />
-            <input
-                type="hidden"
-                {...register(name)}
-            />
+            {/* Hidden fields for each selected value */}
+            {value.map((selectedOption, index) => (
+                <input
+                    key={index}
+                    type="hidden"
+                    {...register(`${name}.${index}`)}
+                    value={selectedOption.value}
+                />
+            ))}
+            {/* Display error message */}
             {error && <p className="text-red-400">{error}</p>}
         </div>
     );

@@ -35,15 +35,6 @@ export default function PostForm() {
   const BASE_URL = "https://jobibox.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
-  
-  const handleSelectContracts = (selectedValues) => {
-    setContracts(selectedValues);
-  };
-
-  const handleSelectPortals = (val) => {
-    setPortals(val);
-  };
-
 
   // Form's options
   const {
@@ -264,6 +255,7 @@ export default function PostForm() {
             placeholder="Es-tu recruteur ou demandeur d'emploi ?"
             register={register}
             error={showPortalCheckbox && !portals.length && errors.subCategory ? errors.subCategory.message : null}
+            // error={showPortalCheckbox ? errors?.portal ? errors?.subCategory?.message : null : errors?.subCategory?.message}
             options={subCategoryOptions}
           />
           <Select
@@ -281,7 +273,7 @@ export default function PostForm() {
             error={errors.subCategory && !portals.length ? errors.portal?.message : null}
             options={portalsOptions}
             value={portals}
-            onChange={handleSelectPortals}
+            onChange={setPortals}
           />
           )}            
           <Input
@@ -299,7 +291,7 @@ export default function PostForm() {
               error={errors?.contracts?.message}
               options={contractOptions}
               value={contracts}
-              onChange={handleSelectContracts}
+              onChange={setContracts}
               style={{ width: '300px' }}
             />
             <Checkbox
