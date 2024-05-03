@@ -188,7 +188,7 @@ export default function OldFilm() {
           }
         };
 
-        recorder.onstop = () => {
+        recorder.onstop = async () => {
           const blob = new Blob(chunks, { type: "video/webm" });
           const videoFile = new File([blob], "video.mp4", {
             type: "video/mp4",
@@ -200,47 +200,7 @@ export default function OldFilm() {
           setTimer(0);
           clearInterval(timerIntervalId);
 
-          // Convertir la vidéo en base64
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onload = async function () {
-            let res;
-            try {
-              let values;
-              if (selectedQuestion.updateState) {
-                values = {
-                  token,
-                  video: videoFile,
-                  startValue: null,
-                  endValue: null,
-                  id: selectedQuestion.id,
-                };
-              } else {
-                values = {
-                  token,
-                  video: videoFile,
-                  questionId: questionId,
-                  themeId: selectedTheme.id,
-                  musicId: selectedMusic.id,
-                  fontSize: textStyle.fontSize,
-                  fontColor: textStyle.textColor,
-                };
-              }
-              if (selectedQuestion.updateState) {
-                res = await dispatch(updateVideoProcess(values));
-              } else {
-                res = await dispatch(createVideoProcess(values));
-              }
-            } catch (error) {
-              console.error("Erreur lors de la sauvegarde du clip :", error);
-            } finally {
-              if (res.meta.requestStatus === "fulfilled") {
-                setCreatedVideoId(res.payload.id);
-                setCreatedVideoPath(res.payload.video);
-                dispatch(changeStatus(""));
-              }
-            }
-          };
+          await saveVideoToDatabase(videoFile, questionId, selectedQuestion, token);
         };
 
         recorder.start();
@@ -262,6 +222,45 @@ export default function OldFilm() {
     }
   };
 
+  const saveVideoToDatabase = async (videoFile, questionId, selectedQuestion, token) => {
+    let res;
+    try {
+      let values;
+      if (selectedQuestion.updateState) {
+        values = {
+          token,
+          video: videoFile,
+          startValue: null,
+          endValue: null,
+          id: selectedQuestion.id,
+        };
+      } else {
+        values = {
+          token,
+          video: videoFile,
+          questionId: questionId,
+          themeId: selectedTheme.id,
+          musicId: selectedMusic.id,
+          fontSize: textStyle.fontSize,
+          fontColor: textStyle.textColor,
+        };
+      }
+      if (selectedQuestion.updateState) {
+        res = await dispatch(updateVideoProcess(values));
+      } else {
+        res = await dispatch(createVideoProcess(values));
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde du clip :", error);
+    } finally {
+      if (res.meta.requestStatus === "fulfilled") {
+        setCreatedVideoId(res.payload.id);
+        setCreatedVideoPath(res.payload.video);
+        dispatch(changeStatus(""));
+      }
+    }
+  };
+  
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -360,14 +359,14 @@ export default function OldFilm() {
       canvasRef.current.width,
       canvasRef.current.height
     );
-
+  
     const wRatio = canvasRef.current.width / results.image.width;
     const hRatio = canvasRef.current.height / results.image.height;
     const ratio = Math.max(wRatio, hRatio);
     const offsetX = (canvasRef.current.width - results.image.width * ratio) / 2;
     const offsetY =
       (canvasRef.current.height - results.image.height * ratio) / 2;
-
+  
     contextRef.current.drawImage(
       results.segmentationMask,
       offsetX,
@@ -375,22 +374,26 @@ export default function OldFilm() {
       results.image.width * ratio,
       results.image.height * ratio
     );
-
+  
     contextRef.current.globalCompositeOperation = "source-out";
-
+  
     if (
       selectedGreenFilterIndex >= 0 &&
       greenFilters[selectedGreenFilterIndex]
     ) {
+      // Inverser l'image sur l'axe X
+      contextRef.current.save();
+      contextRef.current.scale(-1, 1);
       contextRef.current.drawImage(
         backgroundImage,
-        0,
+        -canvasRef.current.width, // Notez le signe négatif ici
         0,
         canvasRef.current.width,
         canvasRef.current.height
       );
+      contextRef.current.restore();
     }
-
+  
     contextRef.current.globalCompositeOperation = "destination-atop";
     contextRef.current.drawImage(
       results.image,
@@ -399,7 +402,7 @@ export default function OldFilm() {
       results.image.width * ratio,
       results.image.height * ratio
     );
-
+  
     contextRef.current.restore();
   };
 
@@ -442,6 +445,7 @@ export default function OldFilm() {
           {videoBase64 && (
             <video
               src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+              // src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
               controlsList="nodownload"
