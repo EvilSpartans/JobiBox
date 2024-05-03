@@ -30,9 +30,9 @@ export const createPost = createAsyncThunk(
             image,
             date,
             businessId,
-            portal
-            // cpf,
-            // compagny
+            portal,
+            km,
+            diploma
         } = values;
 
         try {
@@ -42,9 +42,8 @@ export const createPost = createAsyncThunk(
             formData.append("category", category);
             formData.append("subCategory", subCategory);
             formData.append("city", city);
-            formData.append("salary", salary);
             formData.append("contracts", contracts);
-            formData.append("hmy", hmy);
+            formData.append("km", km);
             formData.append("activateComments", activateComments);
             formData.append("formation", formation);
             formData.append("remote", remote);
@@ -53,8 +52,7 @@ export const createPost = createAsyncThunk(
             formData.append("date", date);
             formData.append("businessId", businessId);
             formData.append("portal", portal);
-            // formData.append("cpf", cpf);
-            // formData.append("compagny", compagny);
+            formData.append("diploma", diploma);
 
             const { data } = await axios.post(
                 `${BASE_URL}/post/create`,

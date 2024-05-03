@@ -26,7 +26,9 @@ export default function PostForm() {
   const { status, error } = useSelector((state) => state.post);
   const user = useSelector((state) => state.user.user);
   const { token } = user;
+  const [videotheque, setVideotheque] = useState([]);
   const [contracts, setContracts] = useState([]);
+  const [hidePortal, setHidePortal] = useState([]);
   const [portals, setPortals] = useState([]);
   const [portalsOptions, setPortalsOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
@@ -90,11 +92,25 @@ export default function PostForm() {
       const jobiboxId = localStorage.getItem('jobiboxId');
       const response = await dispatch(getJobiboxPortals({id: jobiboxId}));
       const portalsData = response.payload;
+
       const portalsOptions = portalsData.portals.map((portal) => ({
         value: portal.id,
         label: portal.title,
       }));
+
+      if (portalsData.videotheque === false) {
+        setVideotheque(false);
+      }
+
+      if (portalsData.videotheque === false && portalsData.portals.length === 1) {
+        setPortals([portalsData.portals[0]])
+        setHidePortal(true)
+      } else {
+        setHidePortal(false);
+      }
+
       setPortalsOptions(portalsOptions);
+
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des portails :",
@@ -129,6 +145,25 @@ export default function PostForm() {
     { value: "Volontaire", label: "Volontaire" },
     { value: "Formation", label: "Formation" },
   ];
+
+  const studiesOptions = [
+    { value: "Brevet", label: "Brevet" },
+    { value: "CAP, BEP", label: "CAP, BEP" },
+    { value: "Baccalauréat", label: "Baccalauréat" },
+    { value: "DEUG, BTS, DUT, DEUST", label: "DEUG, BTS, DUT, DEUST" },
+    { value: "Licence, licence professionnelle, BUT", label: "Licence, licence professionnelle, BUT" },
+    { value: "Maîtrise", label: "Maîtrise" },
+    { value: "Master, diplôme d'ingénieur", label: "Master, diplôme d'ingénieur" },
+    { value: "Doctorat", label: "Doctorat" }
+  ];
+
+  const kmOptions = [
+    { value: "5", label: "5" },
+    { value: "20", label: "20" },
+    { value: "50", label: "50" },
+    { value: "100", label: "100" },
+    { value: "200", label: "200" }
+  ]
 
   // Video properties
   const videoPath = localStorage.getItem("videoPath");
@@ -181,17 +216,17 @@ export default function PostForm() {
       category: data.category,
       subCategory: data.subCategory || "Portail",
       city: data.city,
-      salary: data.salary,
-      hmy: data.hmy,
       activateComments: true,
       formation: data.formation === "Oui",
       remote: data.remote,
       date: formattedDate,
+      diploma: data.diploma,
+      km: data.km,
       contracts: selectedContracts,
       video: videoPath,
       image: imageFile,
       businessId,
-      portal: portals.map(portal => portal.value) || []
+      portal: portals.map(portal => portal.value || portal.id) || []
     };
 
     try {
@@ -250,14 +285,15 @@ export default function PostForm() {
             register={register}
             error={errors?.title?.message}
           />
+          {videotheque && (
           <Select
             name="subCategory"
             placeholder="Es-tu recruteur ou demandeur d'emploi ?"
             register={register}
             error={showPortalCheckbox && !portals.length && errors.subCategory ? errors.subCategory.message : null}
-            // error={showPortalCheckbox ? errors?.portal ? errors?.subCategory?.message : null : errors?.subCategory?.message}
             options={subCategoryOptions}
           />
+          )}
           <Select
             name="category"
             placeholder="Domaine d'activité"
@@ -268,20 +304,37 @@ export default function PostForm() {
           {showPortalCheckbox && (
           <SelectMultiple
             name="portal"
-            placeholder="Portail"
+            placeholder="Référencement"
             register={register}
             error={errors.subCategory && !portals.length ? errors.portal?.message : null}
             options={portalsOptions}
             value={portals}
             onChange={setPortals}
+            style={{ display: !hidePortal ? 'block' : 'none' }}            
           />
-          )}            
-          <Input
-            name="city"
-            type="text"
-            placeholder="Ville"
+          )}
+          <div className="flex justify-between space-x-2 !mt-0">           
+            <Input
+              name="city"
+              type="text"
+              placeholder="Ville"
+              register={register}
+              error={errors?.city?.message}
+            />
+            <Select
+              name="km"
+              placeholder="Rayon de Km"
+              register={register}
+              error={errors?.km?.message}
+              options={kmOptions}
+            />
+          </div>
+          <Select
+            name="diploma"
+            placeholder="Niveau d'études"
             register={register}
-            error={errors?.city?.message}
+            error={errors?.diploma?.message}
+            options={studiesOptions}
           />
           <div className="flex justify-between space-x-2 !mt-0">
             <SelectMultiple

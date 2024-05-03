@@ -54,7 +54,7 @@ export const PostSchema = Yup.object().shape({
         /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/,
         "La date doit être au format jj/mm/aaaa"
     ),
-    contracts: Yup.string(),
+    contracts: Yup.array(),
     hmy: Yup.string(),
     activateComments: Yup.string(),
     remote: Yup.boolean(),
@@ -63,7 +63,9 @@ export const PostSchema = Yup.object().shape({
     cpf: Yup.boolean(),
     compagny: Yup.string(),
     formation: Yup.string(),
-    businessId: Yup.boolean()
+    businessId: Yup.boolean(),
+    diploma: Yup.string(),
+    km: Yup.string()
 }, ['subCategory', 'portal']);
 
 export const businessSchema = Yup.object({
