@@ -9,7 +9,8 @@ export default function Input({
   register,
   error,
   selected,
-  onChange
+  onChange,
+  style
 }) {
 
   if (name === "date") {
@@ -32,7 +33,7 @@ export default function Input({
     );
   } else {
     return (
-      <div className="mt-8 content-center dark:text-dark_text_1 space-y-1">
+      <div className="mt-8 content-center dark:text-dark_text_1 space-y-1" style={style}>
         <label htmlFor={name} className="text-sm font-bold tracking-wide">
           {placeholder}
         </label>

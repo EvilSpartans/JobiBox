@@ -290,7 +290,7 @@ export default function PostForm() {
             name="subCategory"
             placeholder="Es-tu recruteur ou demandeur d'emploi ?"
             register={register}
-            error={showPortalCheckbox && !portals.length && errors.subCategory ? errors.subCategory.message : null}
+            error={showPortalCheckbox ? (!portals.length && errors.subCategory ? errors.subCategory.message : null) : errors?.subCategory?.message}
             options={subCategoryOptions}
           />
           )}
@@ -320,6 +320,7 @@ export default function PostForm() {
               placeholder="Ville"
               register={register}
               error={errors?.city?.message}
+              style={{ minWidth: '380px' }}
             />
             <Select
               name="km"
@@ -345,7 +346,7 @@ export default function PostForm() {
               options={contractOptions}
               value={contracts}
               onChange={setContracts}
-              style={{ width: '300px' }}
+              style={{ minWidth: '430px' }}
             />
             <Checkbox
               name="remote"

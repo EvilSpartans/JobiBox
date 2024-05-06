@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import LogoutBtn from "../components/LogoutBtn";
 import Logout from "../components/Logout";
 
 export default function Thanks() {
@@ -9,7 +8,6 @@ export default function Thanks() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/*Container*/}
-      <LogoutBtn />
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
