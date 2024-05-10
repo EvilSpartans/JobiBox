@@ -89,7 +89,7 @@ export default function OldFilm() {
 
   // Make Pad working
   const handleKeyPress = (event) => {
-    if (event.key === "é" || event.key === "è" || event.key === "&") {
+    if (/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
       if (!videoBase64 && !coutDown) {
         toggleRecording();
       }
