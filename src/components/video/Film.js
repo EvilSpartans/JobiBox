@@ -15,7 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
 
-export default function OldFilm() {
+export default function Film() {
   const BASE_URL = "https://jobibox.jobissim.com";
 
   const selfieSegmentation = new SelfieSegmentation({

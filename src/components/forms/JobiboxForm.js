@@ -52,7 +52,7 @@ export default function JobiboxForm() {
     }
     localStorage.setItem("businessId", selectedJobibox.business.id);
     localStorage.setItem("jobiboxId", selectedJobibox.id);
-    navigate('/login');
+    navigate('/welcome');
   };
 
   return (
