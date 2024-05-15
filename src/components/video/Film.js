@@ -77,8 +77,6 @@ export default function OldFilm() {
     if (selectedQuestions) {
       setQuestions(selectedQuestions);
     }
-
-    contextRef.current = canvasRef.current.getContext("2d");
   }, []);
 
   useEffect(() => {
@@ -89,7 +87,7 @@ export default function OldFilm() {
 
   // Make Pad working
   const handleKeyPress = (event) => {
-    if (event.key === "é" || event.key === "è" || event.key === "&") {
+    if (/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
       if (!videoBase64 && !coutDown) {
         toggleRecording();
       }
@@ -257,6 +255,12 @@ export default function OldFilm() {
         setCreatedVideoId(res.payload.id);
         setCreatedVideoPath(res.payload.video);
         dispatch(changeStatus(""));
+
+        if (canvasRef.current) {
+          const context = canvasRef.current.getContext('2d');
+          context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        }
+
       }
     }
   };
@@ -352,6 +356,7 @@ export default function OldFilm() {
   };
 
   const onResults = (results) => {
+    contextRef.current = canvasRef.current.getContext("2d");
     contextRef.current.save();
     contextRef.current.clearRect(
       0,
