@@ -479,49 +479,44 @@ export default function Film() {
             </div>
           )}
 
-          {!videoBase64 && (
-            <>
-              <video
-                ref={videoCameraRef}
-                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-                  }`}
-                style={{ transform: "scaleX(-1)" }}
-                autoPlay
-                disablePictureInPicture
-                controlsList="nodownload"
-                muted
-              />
+          <video
+            ref={videoCameraRef}
+            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+              }`}
+            style={{ transform: "scaleX(-1)" }}
+            autoPlay
+            disablePictureInPicture
+            controlsList="nodownload"
+            muted
+          />
 
-              <canvas
-                ref={canvasRef}
-                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-                  } ${isFilterApplied ? "" : "hidden"}`}
-                style={{
-                  // left: 0,
-                  position: "absolute",
-                  // top: 0,
-                  transform: "scaleX(-1)",
-                }}
-              />
-
-              <video
-                ref={refVideoRecord}
-                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-                  } ${recording ? "" : "hidden"}`}
-                style={{
-                  // left: 0,
-                  position: "absolute",
-                  // top: 0,
-                  // filter: "blur(3px)",
-                  transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
-                }}
-                autoPlay
-                disablePictureInPicture
-                controlsList="nodownload"
-                muted
-              />
-            </>
-          )}
+          <canvas
+            ref={canvasRef}
+            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+              } ${isFilterApplied ? "" : "hidden"}`}
+            style={{
+              // left: 0,
+              position: "absolute",
+              // top: 0,
+              transform: "scaleX(-1)",
+            }}
+          />
+          <video
+            ref={refVideoRecord}
+            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+              } ${recording ? "" : "hidden"}`}
+            style={{
+              // left: 0,
+              position: "absolute",
+              // top: 0,
+              // filter: "blur(3px)",
+              transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
+            }}
+            autoPlay
+            disablePictureInPicture
+            controlsList="nodownload"
+            muted
+          />
 
           {recording && (
             <div
