@@ -42,7 +42,7 @@ export default function Clip() {
       const payload = response.payload;
       setQuestions(payload);
 
-      if (payload.length === 0) {
+      if (payload && payload.length === 0) {
         navigate("/questions");
       }
       
@@ -245,7 +245,7 @@ export default function Clip() {
         )}
 
         <div className="max-h-56 tall:max-h-96 overflow-y-auto">
-        {status !== "loading" &&
+        {status !== "loading" && questions && questions.length > 0 &&
           questions.map((question, index) => (
             <div key={index} className="mb-3 flex items-center allIcons">
               <span className="flex-grow">{question.questionTitle}</span>

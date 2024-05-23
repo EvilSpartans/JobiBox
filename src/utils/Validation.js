@@ -16,10 +16,7 @@ export const signUpSchema = Yup.object({
         .email("Adresse e-mail non valide."),
     password: Yup.string()
         .required("Le mot de passe est requis")
-        .matches(
-            /^[A-Za-z\d@!$%*?&]{4,}$/,
-            "Le mot de passe doit contenir au moins 4 caractères."
-        ),
+        .min(4, "Le mot de passe doit contenir au moins 4 caractères."),
     confirmPassword: Yup.string()
         .oneOf([Yup.ref('password'), null], 'Les mots de passe ne correspondent pas.')
         .required('La confirmation du mot de passe est requise'),

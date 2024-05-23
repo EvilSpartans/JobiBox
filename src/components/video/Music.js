@@ -25,7 +25,7 @@ export default function Music() {
       const response = await dispatch(getMusics(token));
       const musicsData = response.payload;
       setMusics(musicsData);
-      if (musicsData.length > 0) {
+      if (musicsData && musicsData.length > 0) {
         setSelectedMusic(musicsData[0]);
         setSelectedLabel(0);
       }
@@ -46,7 +46,7 @@ export default function Music() {
   }, [dispatch, token]);
 
   useEffect(() => {
-    if (musics.length > 0) {
+    if (musics && musics.length > 0) {
       handleSelectMusic(musics[0], 0);
     }
   }, [musics]);
@@ -127,7 +127,7 @@ export default function Music() {
             {/* ------- */}
 
             {/* Music list */}
-            {musics.map((music, index) => (
+            {musics && musics.map((music, index) => (
               <div key={index} className="w-1/3 mb-4 p-2">
                 <label
                   className={`block relative border-2 p-3 rounded-lg ${

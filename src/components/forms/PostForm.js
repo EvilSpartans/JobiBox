@@ -98,8 +98,8 @@ export default function PostForm() {
   }, []);
 
   const subCategoryOptions = [
-    { value: "CV", label: "demandeur d'emploi" },
     { value: "Emploi", label: "Recruteur" },
+    { value: "CV", label: "demandeur d'emploi" }
   ];
 
   const commentOptions = [

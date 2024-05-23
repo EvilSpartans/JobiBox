@@ -82,7 +82,7 @@ export default function Theme() {
           </div>
         ) : (
           <div className="mb-8">
-            {themes[selectedThemeIndex] && (
+            {themes && themes[selectedThemeIndex] && (
               <div className="relative mb-4">
                 <img
                   src={`${BASE_URL}/${themes[selectedThemeIndex].image}`}
@@ -110,7 +110,7 @@ export default function Theme() {
                             />
                         </div>
                     )} */}
-          {themes.map((theme, index) => (
+          {themes && themes.map((theme, index) => (
             <div
               key={index}
               className={`relative rounded-lg cursor-pointer mb-2 mx-2 ${

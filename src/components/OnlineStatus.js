@@ -7,7 +7,7 @@ const OnlineStatus = ({ children }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (location.pathname !== '/record' && location.pathname !== '/post') {
+      if (location.pathname !== '/record') {
         fetch('https://www.google.com/', {
           mode: 'no-cors',
         })
