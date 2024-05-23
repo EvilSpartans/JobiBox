@@ -8,7 +8,6 @@ import { format } from "date-fns";
 
 import { createPost, changeStatus } from "../../store/features/postSlice";
 import { getCategories } from "../../store/features/categorySlice";
-import { getSubCategories } from "../../store/features/subCategorySlice";
 import { getJobiboxPortals } from "../../store/features/jobiboxSlice";
 import { sendConfirmNotification } from "../Notification";
 
@@ -32,7 +31,6 @@ export default function PostForm() {
   const [portals, setPortals] = useState([]);
   const [portalsOptions, setPortalsOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
-  const [subCategoryOptions, setSubCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const BASE_URL = "https://jobibox.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
@@ -47,7 +45,7 @@ export default function PostForm() {
     resolver: yupResolver(PostSchema),
   });
 
-  // Fetch categories & subCategories
+  // Fetch categories
   const fetchCategories = async () => {
     try {
       const response = await dispatch(getCategories(token));
@@ -59,31 +57,6 @@ export default function PostForm() {
       setCategoryOptions(updatedCategoryOptions);
     } catch (error) {
       console.error("Erreur lors de la récupération des catégories :", error);
-    }
-  };
-
-  const fetchSubCategories = async () => {
-    try {
-      const response = await dispatch(getSubCategories(token));
-      const subCategoriesData = response.payload;
-      const updatedSubCategoryOptions = subCategoriesData.map(
-        (subCategory) => ({
-          value: subCategory.name,
-          label: subCategory.name,
-        })
-      );
-
-      const filteredSubCategoryOptions = updatedSubCategoryOptions.filter(
-        (subCategory) =>
-          subCategory.value !== "Actualité" && subCategory.value !== "Portail"
-      );
-
-      setSubCategoryOptions(filteredSubCategoryOptions);
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des sous-catégories :",
-        error
-      );
     }
   };
 
@@ -121,9 +94,13 @@ export default function PostForm() {
 
   useEffect(() => {
     fetchCategories();
-    fetchSubCategories();
     fetchPortals();
   }, []);
+
+  const subCategoryOptions = [
+    { value: "CV", label: "demandeur d'emploi" },
+    { value: "Emploi", label: "Recruteur" },
+  ];
 
   const commentOptions = [
     { value: "Oui", label: "Oui" },
