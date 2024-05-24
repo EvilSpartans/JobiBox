@@ -236,6 +236,12 @@ export default function Film() {
   const saveVideoToDatabase = async (videoFile, questionId, selectedQuestion, token) => {
     let res;
     try {
+
+      if (!navigator.onLine) {
+        navigate("/offline");
+        return;
+      }
+
       let values;
       if (selectedQuestion.updateState) {
         values = {
@@ -256,14 +262,24 @@ export default function Film() {
           fontColor: textStyle.textColor,
         };
       }
+
       if (selectedQuestion.updateState) {
         res = await dispatch(updateVideoProcess(values));
       } else {
         res = await dispatch(createVideoProcess(values));
       }
+
+      if (res.meta.requestStatus !== "fulfilled") {
+        throw new Error("La requête a échoué");
+      }
+
     } catch (error) {
-      console.error("Erreur lors de la sauvegarde du clip :", error);
+        console.error("Erreur lors de la sauvegarde du clip :", error);
+        if (error.message === "Failed to fetch" || error.message === "La requête a échoué") {
+          navigate("/offline");
+        }
     } finally {
+
       if (res.meta.requestStatus === "fulfilled") {
         setCreatedVideoId(res.payload.id);
         setCreatedVideoPath(res.payload.video);

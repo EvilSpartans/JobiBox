@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+
 
 export default function Input({
   name,
@@ -10,7 +13,9 @@ export default function Input({
   error,
   selected,
   onChange,
-  style
+  style,
+  toggleVisibility,
+  isPasswordVisible
 }) {
 
   if (name === "date") {
@@ -37,12 +42,23 @@ export default function Input({
         <label htmlFor={name} className="text-sm font-bold tracking-wide">
           {placeholder}
         </label>
-        <input
-          className="w-full dark:bg-dark_bg_3 text-base py-2 px-4 rounded-lg outline-none"
-          type={type}
-          placeholder={placeholder}
-          {...register(name)}
-        />
+        <div className="relative">
+          <input
+            className="w-full dark:bg-dark_bg_3 text-base py-2 px-4 rounded-lg outline-none"
+            type={isPasswordVisible ? "text" : type}
+            placeholder={placeholder}
+            {...register(name)}
+          />
+          {toggleVisibility && (
+            <button
+              type="button"
+              onClick={toggleVisibility}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            >
+              <FontAwesomeIcon icon={isPasswordVisible ? faEyeSlash : faEye} />
+            </button>
+          )}          
+        </div>
         {error && <p className="text-red-400">{error}</p>}
       </div>
     );

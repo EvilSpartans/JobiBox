@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../fields/Input";
 import Checkbox from "../fields/Checkbox";
@@ -14,6 +14,7 @@ export default function RegisterForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.user);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const {
     register,
@@ -31,6 +32,10 @@ export default function RegisterForm() {
       navigate("/");
       sendWelcomeNotification();
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((prevState) => !prevState);
   };
 
   return (
@@ -73,6 +78,8 @@ export default function RegisterForm() {
             placeholder="Mot de passe"
             register={register}
             error={errors?.password?.message}
+            toggleVisibility={togglePasswordVisibility}
+            isPasswordVisible={passwordVisible}
           />
           <Input
             name="confirmPassword"
@@ -80,6 +87,8 @@ export default function RegisterForm() {
             placeholder="Confirmer mot de passe"
             register={register}
             error={errors?.confirmPassword?.message}
+            toggleVisibility={togglePasswordVisibility}
+            isPasswordVisible={passwordVisible}
           />
           <Checkbox 
             name="terms"
