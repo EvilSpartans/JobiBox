@@ -38,7 +38,7 @@ export default function Film() {
   const [videoBase64, setVideoBase64] = useState(null);
   const [recording, setRecording] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [coutDown, setCountdown] = useState(0);
+  const [countDown, setCountdown] = useState(0);
   const [timerIntervalId, setTimerIntervalId] = useState(null);
   const videoCameraRef = useRef(null);
   const [mediaStream, setMediaStream] = useState(null);
@@ -57,13 +57,17 @@ export default function Film() {
   const canvasRef = useRef();
   const contextRef = useRef();
   const currentQuestionIdRef = useRef();
+  const isKeyPressed = useRef(false);
+  const isCountdownActive = useRef(false);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
+    window.addEventListener("keyup", handleKeyRelease);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
+      window.removeEventListener("keyup", handleKeyRelease);
     };
-  }, [recording, videoBase64, coutDown]);
+  }, [recording, videoBase64, countDown, isFilterApplied]);
 
   useEffect(() => {
     currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
@@ -87,11 +91,16 @@ export default function Film() {
 
   // Make Pad working
   const handleKeyPress = (event) => {
-    if (/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
-      if (!videoBase64 && !coutDown) {
+    if (!isKeyPressed.current && /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
+      isKeyPressed.current = true;
+      if (!videoBase64 && !countDown && !isCountdownActive.current) {
         toggleRecording();
       }
     }
+  };
+
+  const handleKeyRelease = () => {
+    isKeyPressed.current = false;
   };
 
   const openModal = () => {
@@ -138,12 +147,15 @@ export default function Film() {
   };
 
   const startCountdown = async () => {
+    isCountdownActive.current = true;
     for (let count = 3; count > 0; count--) {
       setTimer(count);
       setCountdown(count);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-  };
+    setCountdown(0);
+    isCountdownActive.current = false;
+  }
 
   const toggleRecording = async () => {
     const questionId = currentQuestionIdRef.current;
@@ -211,6 +223,7 @@ export default function Film() {
         setTimerIntervalId(intervalId);
       } catch (error) {
         console.error("Erreur lors de l'accès à la caméra : ", error);
+        navigate("/malfunction")
       }
     } else {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
@@ -417,19 +430,16 @@ export default function Film() {
     initializeCamera();
   };
 
-  // async function sendToMediaPipe() {
-  //   if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
-  //     requestAnimationFrame(sendToMediaPipe);
-  //   } else {
-  //     await selfieSegmentation.send({ image: videoCameraRef.current });
-  //     requestAnimationFrame(sendToMediaPipe);
-  //   }
-  // }
-
-  const INTERVAL = 70;
+  const INTERVAL = 33;
   let lastCallTime = 0;
   
   async function sendToMediaPipe() {
+    //   if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
+    //     requestAnimationFrame(sendToMediaPipe);
+    //   } else {
+    //     await selfieSegmentation.send({ image: videoCameraRef.current });
+    //     requestAnimationFrame(sendToMediaPipe);
+    //   }
     const now = Date.now();
     if (now - lastCallTime >= INTERVAL && selfieSegmentation && videoCameraRef.current.videoWidth) {
       lastCallTime = now;

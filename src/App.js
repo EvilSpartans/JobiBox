@@ -17,6 +17,7 @@ import Offline from "./screens/Offline";
 import Config from "./screens/Config";
 import Portal from "./screens/Portal";
 import Welcome from "./screens/Welcome";
+import Malfunction from "./screens/Malfunction";
 
 export default function App() {
     const user = useSelector((state) => state.user.user);
@@ -33,6 +34,7 @@ export default function App() {
                             <Route path="/config" element={<Config />} />
                             <Route path="/portal" element={<Portal />} />
                             <Route path="/offline" element={<Offline />} />
+                            <Route path="/malfunction" element={<Malfunction />} />
                             <Route path="/questions" element={token ? <Questions /> : <Navigate to="/welcome" />} />
                             <Route path="/themes" element={token ? <Themes /> : <Navigate to="/welcome" />} />
                             <Route path="/textStyles" element={token ? <TextStyles /> : <Navigate to="/welcome" />} />

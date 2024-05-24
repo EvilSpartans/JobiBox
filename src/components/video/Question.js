@@ -105,7 +105,7 @@ export default function Question() {
         <h2 className="text-3xl font-bold">Liste des questions</h2>
         <p className="mt-6 text-base">
           Tu vas pouvoir <span className="text-blue-400">sélectionner</span> les
-          questions auxquelles tu vas répondre dans un format de type question /
+          questions auxquelles tu vas répondre (entre 2 et 4 maximum) dans un format de type question /
           réponse en vidéo. Si tu le souhaites, tu pourras également{" "}
           <span className="text-blue-400">créer</span> des questions afin de
           personnaliser ton CV vidéo du mieux possible.
