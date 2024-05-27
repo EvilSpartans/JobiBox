@@ -18,6 +18,7 @@ import Select from "../fields/Select";
 import SelectMultiple from "../fields/SelectMultiple";
 
 import { PostSchema } from "../../utils/Validation";
+import Photo from "../Photo";
 
 export default function PostForm() {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ export default function PostForm() {
   const [portalsOptions, setPortalsOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
+  const [photoFile, setPhotoFile] = useState(null);
   const BASE_URL = "https://jobibox.jobissim.com";
   const businessId = localStorage.getItem('businessId') | null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
@@ -183,7 +185,7 @@ export default function PostForm() {
       formattedDate = format(startDate, "yyyy-MM-dd HH:mm:ss");
     }
 
-    const imageBlob = await generateImageFromVideo();
+    const imageBlob = photoFile || await generateImageFromVideo();
     const imageFile = new File([imageBlob], 'thumbnail.jpg', { type: 'image/jpeg' });
 
     const postData = {
@@ -255,6 +257,9 @@ export default function PostForm() {
 
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+          {/* <Photo onPhotoTaken={setPhotoFile} /> */}
+
           <Input
             name="title"
             type="text"

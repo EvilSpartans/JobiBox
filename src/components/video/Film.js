@@ -330,7 +330,6 @@ export default function Film() {
     setTimer(0);
     clearInterval(timerIntervalId);
     setMediaStream(null);
-    // initializeCamera();
   };
 
   const formatTime = (seconds) => {
@@ -424,7 +423,7 @@ export default function Film() {
       contextRef.current.scale(-1, 1);
       contextRef.current.drawImage(
         backgroundImage,
-        -canvasRef.current.width, // Notez le signe négatif ici
+        -canvasRef.current.width,
         0,
         canvasRef.current.width,
         canvasRef.current.height
