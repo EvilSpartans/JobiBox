@@ -178,8 +178,8 @@ export default function Film() {
           : await navigator.mediaDevices.getUserMedia({
             video: {
               facingMode: "portrait",
-              width: { ideal: 640 }, // Largeur souhaitée
-              height: { ideal: 1136 }, // Hauteur souhaitée
+              width: { ideal: 320 }, // Largeur souhaitée
+              height: { ideal: 568 }, // Hauteur souhaitée
             },
           });
 
@@ -300,6 +300,8 @@ export default function Film() {
       setVideoBase64(null);
       setCreatedVideoPath(null);
       setRecording(false);
+      setMediaStream(null);
+      setIsFilterApplied(false);
     } else {
       localStorage.removeItem("selectedQuestions");
       navigate("/review");
@@ -327,7 +329,8 @@ export default function Film() {
     setCreatedVideoPath(null);
     setTimer(0);
     clearInterval(timerIntervalId);
-    initializeCamera();
+    setMediaStream(null);
+    // initializeCamera();
   };
 
   const formatTime = (seconds) => {
@@ -505,44 +508,48 @@ export default function Film() {
             </div>
           )}
 
-          <video
-            ref={videoCameraRef}
-            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-              }`}
-            style={{ transform: "scaleX(-1)" }}
-            autoPlay
-            disablePictureInPicture
-            controlsList="nodownload"
-            muted
-          />
+          {!videoBase64 && (
+            <>
+              <video
+                ref={videoCameraRef}
+                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+                  }`}
+                style={{ transform: "scaleX(-1)" }}
+                autoPlay
+                disablePictureInPicture
+                controlsList="nodownload"
+                muted
+              />
 
-          <canvas
-            ref={canvasRef}
-            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-              } ${isFilterApplied ? "" : "hidden"}`}
-            style={{
-              // left: 0,
-              position: "absolute",
-              // top: 0,
-              transform: "scaleX(-1)",
-            }}
-          />
-          <video
-            ref={refVideoRecord}
-            className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-              } ${recording ? "" : "hidden"}`}
-            style={{
-              // left: 0,
-              position: "absolute",
-              // top: 0,
-              // filter: "blur(3px)",
-              transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
-            }}
-            autoPlay
-            disablePictureInPicture
-            controlsList="nodownload"
-            muted
-          />
+              <canvas
+                ref={canvasRef}
+                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+                  } ${isFilterApplied ? "" : "hidden"}`}
+                style={{
+                  // left: 0,
+                  position: "absolute",
+                  // top: 0,
+                  transform: "scaleX(-1)",
+                }}
+              />
+              <video
+                ref={refVideoRecord}
+                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
+                  } ${recording ? "" : "hidden"}`}
+                style={{
+                  // left: 0,
+                  position: "absolute",
+                  // top: 0,
+                  // filter: "blur(3px)",
+                  transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
+                }}
+                autoPlay
+                disablePictureInPicture
+                controlsList="nodownload"
+                muted
+              />
+            </>
+          )}
 
           {recording && (
             <div

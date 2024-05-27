@@ -23,7 +23,7 @@ export default function Malfunction() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="mt-6 text-3xl font-bold">Disfonctionnement</h2>
+              <h2 className="mt-6 text-3xl font-bold">Dysfonctionnement</h2>
               <p className="mt-6 text-base">Ton matériel semble défectueux, demande à un responsable de vérifier les branchements.</p>
             </div>
             {/*Buttons*/}
