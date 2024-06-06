@@ -17,21 +17,7 @@ export default function Logout() {
 
     const confirmLogout = () => {
         dispatch(logout());
-        localStorage.removeItem('selectedQuestions');
-        localStorage.removeItem('selectedTheme');
-        localStorage.removeItem('selectedMusic');
-        localStorage.removeItem('videoPath');
-        localStorage.removeItem("videoId");
-        // localStorage.removeItem('questionTuto');
-        // localStorage.removeItem('themeTuto');
-        // localStorage.removeItem('musicTuto');
-        localStorage.removeItem('filmTuto');
-        localStorage.removeItem('clipTuto');
-        // localStorage.removeItem('textStyleTuto');
-        localStorage.removeItem('textStyle');
-        localStorage.removeItem('transcriptionTuto');
-        // localStorage.removeItem('loginTuto');
-        // localStorage.removeItem('registerTuto');
+        clearLocalStorage();
         setShowModal(false);
 
         if (videoId != null) {
@@ -57,15 +43,20 @@ export default function Logout() {
         }
     };
 
+    const clearLocalStorage = () => {
+        const keysToRemove = [
+            'selectedQuestions', 'selectedTheme', 'selectedMusic', 'videoPath', 'videoId',
+            'filmTuto', 'clipTuto', 'textStyle'
+        ];
+
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+            console.log(`${key} removed`);
+        });
+    };
+
     return (
         <div>
-            {/* <div className="border-t-2 border-dark_border_2 mb-4"></div>
-            <button
-                className="w-full flex justify-center text-gray-500 p-2 font-semibold focus:outline-none hover:text-gray-300 hover:underline cursor-pointer transition ease-in duration-300"
-                onClick={handleLogout}
-            >
-                Déconnexion
-            </button> */}
             <button
                 className="w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
                     font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"

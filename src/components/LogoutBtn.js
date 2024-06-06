@@ -17,21 +17,7 @@ export default function LogoutBtn() {
 
     const confirmLogout = () => {
         dispatch(logout());
-        localStorage.removeItem('selectedQuestions');
-        localStorage.removeItem('selectedTheme');
-        localStorage.removeItem('selectedMusic');
-        localStorage.removeItem('videoPath');
-        localStorage.removeItem("videoId");
-        // localStorage.removeItem('questionTuto');
-        // localStorage.removeItem('themeTuto');
-        // localStorage.removeItem('musicTuto');
-        localStorage.removeItem('filmTuto');
-        localStorage.removeItem('clipTuto');
-        // localStorage.removeItem('textStyleTuto');
-        localStorage.removeItem('textStyle');
-        localStorage.removeItem('transcriptionTuto');
-        // localStorage.removeItem('loginTuto');
-        // localStorage.removeItem('registerTuto');
+        clearLocalStorage();
         setShowModal(false);
 
         if (videoId != null) {
@@ -55,6 +41,18 @@ export default function LogoutBtn() {
             console.error("Error :", error);
         } finally {
         }
+    };
+
+    const clearLocalStorage = () => {
+        const keysToRemove = [
+            'selectedQuestions', 'selectedTheme', 'selectedMusic', 'videoPath', 'videoId',
+            'filmTuto', 'clipTuto', 'textStyle'
+        ];
+
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+            console.log(`${key} removed`);
+        });
     };
 
     return (
