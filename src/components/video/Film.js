@@ -398,7 +398,7 @@ export default function Film() {
     tempContext.drawImage(mask, 0, 0, width, height);
 
     // Apply a blur to the temp canvas
-    tempContext.filter = "blur(4px)";
+    tempContext.filter = "blur(20px)";
     tempContext.drawImage(tempCanvas, 0, 0, width, height);
 
     return tempCanvas;
@@ -472,26 +472,26 @@ export default function Film() {
     initializeCamera();
   };
 
-  const INTERVAL = 33;
-  let lastCallTime = 0;
+  // const INTERVAL = 33;
+  // let lastCallTime = 0;
 
   async function sendToMediaPipe() {
-    //   if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
-    //     requestAnimationFrame(sendToMediaPipe);
-    //   } else {
-    //     await selfieSegmentation.send({ image: videoCameraRef.current });
-    //     requestAnimationFrame(sendToMediaPipe);
-    //   }
-    const now = Date.now();
-    if (
-      now - lastCallTime >= INTERVAL &&
-      selfieSegmentation &&
-      videoCameraRef.current.videoWidth
-    ) {
-      lastCallTime = now;
-      await selfieSegmentation.send({ image: videoCameraRef.current });
-    }
-    requestAnimationFrame(sendToMediaPipe);
+      if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
+        requestAnimationFrame(sendToMediaPipe);
+      } else {
+        await selfieSegmentation.send({ image: videoCameraRef.current });
+        requestAnimationFrame(sendToMediaPipe);
+      }
+    // const now = Date.now();
+    // if (
+    //   now - lastCallTime >= INTERVAL &&
+    //   selfieSegmentation &&
+    //   videoCameraRef.current.videoWidth
+    // ) {
+    //   lastCallTime = now;
+    //   await selfieSegmentation.send({ image: videoCameraRef.current });
+    // }
+    // requestAnimationFrame(sendToMediaPipe);
   }
 
   return (
