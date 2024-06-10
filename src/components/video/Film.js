@@ -91,7 +91,10 @@ export default function Film() {
 
   // Make Pad working
   const handleKeyPress = (event) => {
-    if (!isKeyPressed.current && /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
+    if (
+      !isKeyPressed.current &&
+      /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)
+    ) {
       isKeyPressed.current = true;
       if (!videoBase64 && !countDown && !isCountdownActive.current) {
         toggleRecording();
@@ -140,8 +143,7 @@ export default function Film() {
       };
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
-    }
-    finally {
+    } finally {
       setCameraLoading(false);
     }
   };
@@ -155,7 +157,7 @@ export default function Film() {
     }
     setCountdown(0);
     isCountdownActive.current = false;
-  }
+  };
 
   const toggleRecording = async () => {
     const questionId = currentQuestionIdRef.current;
@@ -167,7 +169,7 @@ export default function Film() {
 
         // Début du décompte
         await startCountdown();
-        setCountdown(0)
+        setCountdown(0);
 
         const audioStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
@@ -176,12 +178,12 @@ export default function Film() {
         const stream = isFilterApplied
           ? canvasRef.current.captureStream()
           : await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: "portrait",
-              width: { ideal: 320 }, // Largeur souhaitée
-              height: { ideal: 568 }, // Hauteur souhaitée
-            },
-          });
+              video: {
+                facingMode: "portrait",
+                width: { ideal: 640 }, // Largeur souhaitée
+                height: { ideal: 1136 }, // Hauteur souhaitée
+              },
+            });
 
         audioStream.getTracks().map((track) => stream.addTrack(track));
 
@@ -210,7 +212,12 @@ export default function Film() {
           setTimer(0);
           clearInterval(timerIntervalId);
 
-          await saveVideoToDatabase(videoFile, questionId, selectedQuestion, token);
+          await saveVideoToDatabase(
+            videoFile,
+            questionId,
+            selectedQuestion,
+            token
+          );
         };
 
         recorder.start();
@@ -223,7 +230,7 @@ export default function Film() {
         setTimerIntervalId(intervalId);
       } catch (error) {
         console.error("Erreur lors de l'accès à la caméra : ", error);
-        navigate("/malfunction")
+        navigate("/malfunction");
       }
     } else {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
@@ -233,7 +240,12 @@ export default function Film() {
     }
   };
 
-  const saveVideoToDatabase = async (videoFile, questionId, selectedQuestion, token) => {
+  const saveVideoToDatabase = async (
+    videoFile,
+    questionId,
+    selectedQuestion,
+    token
+  ) => {
     let res;
     try {
       let values;
@@ -262,25 +274,27 @@ export default function Film() {
       } else {
         res = await dispatch(createVideoProcess(values));
       }
-
     } catch (error) {
-        console.error("Erreur lors de la sauvegarde du clip :", error);
+      console.error("Erreur lors de la sauvegarde du clip :", error);
     } finally {
-
       if (res.meta.requestStatus === "fulfilled") {
         setCreatedVideoId(res.payload.id);
         setCreatedVideoPath(res.payload.video);
         dispatch(changeStatus(""));
 
         if (canvasRef.current) {
-          const context = canvasRef.current.getContext('2d');
-          context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          const context = canvasRef.current.getContext("2d");
+          context.clearRect(
+            0,
+            0,
+            canvasRef.current.width,
+            canvasRef.current.height
+          );
         }
-
       }
     }
   };
-  
+
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -374,6 +388,22 @@ export default function Film() {
     }
   };
 
+  const applyBlurToMask = (mask, width, height) => {
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempContext = tempCanvas.getContext("2d");
+
+    // Draw the original mask on the temp canvas
+    tempContext.drawImage(mask, 0, 0, width, height);
+
+    // Apply a blur to the temp canvas
+    tempContext.filter = "blur(4px)";
+    tempContext.drawImage(tempCanvas, 0, 0, width, height);
+
+    return tempCanvas;
+  };
+
   const onResults = (results) => {
     contextRef.current = canvasRef.current.getContext("2d");
     contextRef.current.save();
@@ -383,24 +413,31 @@ export default function Film() {
       canvasRef.current.width,
       canvasRef.current.height
     );
-  
+
     const wRatio = canvasRef.current.width / results.image.width;
     const hRatio = canvasRef.current.height / results.image.height;
     const ratio = Math.max(wRatio, hRatio);
     const offsetX = (canvasRef.current.width - results.image.width * ratio) / 2;
     const offsetY =
       (canvasRef.current.height - results.image.height * ratio) / 2;
-  
-    contextRef.current.drawImage(
+
+    const blurredMask = applyBlurToMask(
       results.segmentationMask,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+
+    contextRef.current.drawImage(
+      // results.segmentationMask,
+      blurredMask,
       offsetX,
       offsetY,
       results.image.width * ratio,
       results.image.height * ratio
     );
-  
+
     contextRef.current.globalCompositeOperation = "source-out";
-  
+
     if (
       selectedGreenFilterIndex >= 0 &&
       greenFilters[selectedGreenFilterIndex]
@@ -417,7 +454,7 @@ export default function Film() {
       );
       contextRef.current.restore();
     }
-  
+
     contextRef.current.globalCompositeOperation = "destination-atop";
     contextRef.current.drawImage(
       results.image,
@@ -426,7 +463,7 @@ export default function Film() {
       results.image.width * ratio,
       results.image.height * ratio
     );
-  
+
     contextRef.current.restore();
   };
 
@@ -437,7 +474,7 @@ export default function Film() {
 
   const INTERVAL = 33;
   let lastCallTime = 0;
-  
+
   async function sendToMediaPipe() {
     //   if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
     //     requestAnimationFrame(sendToMediaPipe);
@@ -446,7 +483,11 @@ export default function Film() {
     //     requestAnimationFrame(sendToMediaPipe);
     //   }
     const now = Date.now();
-    if (now - lastCallTime >= INTERVAL && selfieSegmentation && videoCameraRef.current.videoWidth) {
+    if (
+      now - lastCallTime >= INTERVAL &&
+      selfieSegmentation &&
+      videoCameraRef.current.videoWidth
+    ) {
       lastCallTime = now;
       await selfieSegmentation.send({ image: videoCameraRef.current });
     }
@@ -457,15 +498,19 @@ export default function Film() {
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
         <div className="mt-6 text-base">
-          <p>C'est le moment de <span className="text-blue-400">filmer</span> ta séquence.</p>
+          <p>
+            C'est le moment de <span className="text-blue-400">filmer</span> ta
+            séquence.
+          </p>
         </div>
         {currentQuestionIndex < questions.length && (
-        <h2 className="mt-6 text-3xl font-bold">{questions[currentQuestionIndex].title}</h2>
-      )}
+          <h2 className="mt-6 text-3xl font-bold">
+            {questions[currentQuestionIndex].title}
+          </h2>
+        )}
       </div>
 
       <div className="dark:text-dark_text_1">
-
         {cameraLoading ? (
           <div className="flex items-center justify-center h-screen w-screen fixed top-0 left-0 bg-black bg-opacity-75">
             <div className="text-center">
@@ -477,7 +522,11 @@ export default function Film() {
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
-              src={createdVideoPath ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}` : null}
+              src={
+                createdVideoPath
+                  ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}`
+                  : null
+              }
               // src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
@@ -490,7 +539,9 @@ export default function Film() {
           {!recording && timer > 0 && (
             <div className="countdown-overlay">
               {timer}
-              <p className="text-sm mt-3 text-center text-white">Souris et regarde la caméra 😉 ! </p>
+              <p className="text-sm mt-3 text-center text-white">
+                Souris et regarde la caméra 😉 !{" "}
+              </p>
             </div>
           )}
 
@@ -498,8 +549,9 @@ export default function Film() {
             <>
               <video
                 ref={videoCameraRef}
-                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-                  }`}
+                className={`w-full h-full object-contain tall:object-cover ${
+                  videoBase64 ? "hidden" : ""
+                }`}
                 style={{ transform: "scaleX(-1)" }}
                 autoPlay
                 disablePictureInPicture
@@ -509,8 +561,9 @@ export default function Film() {
 
               <canvas
                 ref={canvasRef}
-                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-                  } ${isFilterApplied ? "" : "hidden"}`}
+                className={`w-full h-full object-contain tall:object-cover ${
+                  videoBase64 ? "hidden" : ""
+                } ${isFilterApplied ? "" : "hidden"}`}
                 style={{
                   // left: 0,
                   position: "absolute",
@@ -520,8 +573,9 @@ export default function Film() {
               />
               <video
                 ref={refVideoRecord}
-                className={`w-full h-full object-contain tall:object-cover ${videoBase64 ? "hidden" : ""
-                  } ${recording ? "" : "hidden"}`}
+                className={`w-full h-full object-contain tall:object-cover ${
+                  videoBase64 ? "hidden" : ""
+                } ${recording ? "" : "hidden"}`}
                 style={{
                   // left: 0,
                   position: "absolute",
@@ -551,8 +605,9 @@ export default function Film() {
           {videoBase64 ? (
             <button
               onClick={handleRedoRecording}
-              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${status === "loading" ? "opacity-50 pointer-events-none" : ""
-                }`}
+              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+                status === "loading" ? "opacity-50 pointer-events-none" : ""
+              }`}
               disabled={status === "loading"}
             >
               Recommencer
@@ -560,10 +615,13 @@ export default function Film() {
           ) : (
             <button
               onClick={toggleRecording}
-              className={`${recording
-                ? "bg-red-500 hover.bg-red-700"
-                : "bg-green_2 hover:bg-green_1"
-              } text-white px-4 py-2 rounded-lg actionBtn ${timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""}`}
+              className={`${
+                recording
+                  ? "bg-red-500 hover.bg-red-700"
+                  : "bg-green_2 hover:bg-green_1"
+              } text-white px-4 py-2 rounded-lg actionBtn ${
+                timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""
+              }`}
               disabled={timer > 0 && !recording}
             >
               {recording
@@ -574,8 +632,9 @@ export default function Film() {
           {isFilterApplied ? (
             <button
               onClick={handleRemoveBackground}
-              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${status === "loading" ? "opacity-50 pointer-events-none" : ""
-                }`}
+              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
+                status === "loading" ? "opacity-50 pointer-events-none" : ""
+              }`}
               disabled={status === "loading"}
             >
               <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
@@ -584,8 +643,9 @@ export default function Film() {
             !videoBase64 && (
               <button
                 onClick={openModal}
-                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${status === "loading" ? "opacity-50 pointer-events-none" : ""
-                  }`}
+                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
+                  status === "loading" ? "opacity-50 pointer-events-none" : ""
+                }`}
                 disabled={status === "loading"}
               >
                 Ecran vert
@@ -596,10 +656,11 @@ export default function Film() {
       </div>
 
       <button
-        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${!videoBase64 || status === "loading"
-          ? "opacity-50 pointer-events-none"
-          : ""
-          }`}
+        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+          !videoBase64 || status === "loading"
+            ? "opacity-50 pointer-events-none"
+            : ""
+        }`}
         onClick={handleNextQuestion}
         disabled={!videoBase64 || status === "loading"}
         style={{ marginTop: 20 }}
@@ -645,10 +706,11 @@ export default function Film() {
                 {greenFilters.map((filter, index) => (
                   <div
                     key={filter.id}
-                    className={`card cursor-pointer mb-2 mx-2 relative ${selectedGreenFilterIndex === index
-                      ? "filter-selected"
-                      : ""
-                      }`}
+                    className={`card cursor-pointer mb-2 mx-2 relative ${
+                      selectedGreenFilterIndex === index
+                        ? "filter-selected"
+                        : ""
+                    }`}
                     onClick={() => setSelectedGreenFilterIndex(index)}
                   >
                     <img
