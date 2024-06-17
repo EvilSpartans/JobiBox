@@ -143,6 +143,7 @@ export default function Film() {
       };
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
+      navigate("/malfunction");
     } finally {
       setCameraLoading(false);
     }
@@ -247,51 +248,70 @@ export default function Film() {
     token
   ) => {
     let res;
-    try {
-      let values;
-      if (selectedQuestion.updateState) {
-        values = {
-          token,
-          video: videoFile,
-          startValue: null,
-          endValue: null,
-          id: selectedQuestion.id,
-        };
-      } else {
-        values = {
-          token,
-          video: videoFile,
-          questionId: questionId,
-          themeId: selectedTheme.id,
-          musicId: selectedMusic.id,
-          fontSize: textStyle.fontSize,
-          fontColor: textStyle.textColor,
-        };
-      }
-
-      if (selectedQuestion.updateState) {
-        res = await dispatch(updateVideoProcess(values));
-      } else {
-        res = await dispatch(createVideoProcess(values));
-      }
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde du clip :", error);
-    } finally {
-      if (res.meta.requestStatus === "fulfilled") {
-        setCreatedVideoId(res.payload.id);
-        setCreatedVideoPath(res.payload.video);
-        dispatch(changeStatus(""));
-
-        if (canvasRef.current) {
-          const context = canvasRef.current.getContext("2d");
-          context.clearRect(
-            0,
-            0,
-            canvasRef.current.width,
-            canvasRef.current.height
-          );
+    let success = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+    const retryDelay = 2000;
+  
+    while (attempts < maxAttempts) {
+      try {
+        let values;
+        if (selectedQuestion.updateState) {
+          values = {
+            token,
+            video: videoFile,
+            startValue: null,
+            endValue: null,
+            id: selectedQuestion.id,
+          };
+        } else {
+          values = {
+            token,
+            video: videoFile,
+            questionId: questionId,
+            themeId: selectedTheme.id,
+            musicId: selectedMusic.id,
+            fontSize: textStyle.fontSize,
+            fontColor: textStyle.textColor,
+          };
         }
+  
+        if (selectedQuestion.updateState) {
+          res = await dispatch(updateVideoProcess(values));
+        } else {
+          res = await dispatch(createVideoProcess(values));
+        }
+  
+        if (res.meta.requestStatus === "fulfilled") {
+          success = true;
+          setCreatedVideoId(res.payload.id);
+          setCreatedVideoPath(res.payload.video);
+          dispatch(changeStatus(""));
+  
+          if (canvasRef.current) {
+            const context = canvasRef.current.getContext("2d");
+            context.clearRect(
+              0,
+              0,
+              canvasRef.current.width,
+              canvasRef.current.height
+            );
+          }
+          break;
+        }
+      } catch (error) {
+        console.error("Erreur lors de la sauvegarde du clip, réessayer...", error);
       }
+  
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+      }
+    }
+  
+    if (!success) {
+      console.error("Échec de la sauvegarde du clip après plusieurs tentatives.");
+      alert("Échec de la sauvegarde du clip après plusieurs tentatives.")
     }
   };
 

@@ -178,13 +178,7 @@ export default function Clip() {
   const handleDelete = async (index) => {
     closeConfirmationModal();
     try {
-
-      if (!navigator.onLine) {
-        navigate("/offline");
-        return;
-      }
-
-      const response = await dispatch(
+      await dispatch(
         deleteVideoProcess({
           token: token,
           id: questions[index].id,
@@ -195,18 +189,8 @@ export default function Clip() {
       } else {
         fetchQuestions();
       }
-
-      if (response.meta.requestStatus !== "fulfilled") {
-        throw new Error("La requête a échoué");
-      }
-
     } catch (error) {
       console.error("Erreur lors de la suppression de la question :", error);
-
-      if (error.message === "Failed to fetch" || error.message === "La requête a échoué") {
-        navigate("/offline");
-      }
-
     } finally {
     }
   };
@@ -214,26 +198,10 @@ export default function Clip() {
   const assembleAndStoreVideo = async () => {
     let res;
     try {
-
-      if (!navigator.onLine) {
-        navigate("/offline");
-        return;
-      }
-
       dispatch(changeStatus("loading"));
       res = await dispatch(compileVideoProcess(token));
-
-      if (res.meta.requestStatus !== "fulfilled") {
-        throw new Error("La requête a échoué");
-      }
-
     } catch (error) {
       console.error("Erreur lors de la compilation du clip :", error);
-
-      if (error.message === "Failed to fetch" || error.message === "La requête a échoué") {
-        navigate("/offline");
-      }
-      
     } finally {
       if (res.meta.requestStatus === "fulfilled") {
         if (localStorage.getItem('videoPath')) {
@@ -242,7 +210,6 @@ export default function Clip() {
         localStorage.setItem("videoPath", res.payload.video);
         localStorage.setItem("videoId", res.payload.id);
         navigate("/post");
-        // navigate("/transcription");
         dispatch(changeStatus(""));
       }
     }
