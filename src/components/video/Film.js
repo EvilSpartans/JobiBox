@@ -89,6 +89,12 @@ export default function Film() {
     }
   }, [mediaStream]);
 
+  //   useEffect(() => {
+  //     if (shouldReapplyGreenFilter) {
+  //         handleApplyBackground().then(() => setShouldReapplyGreenFilter(false));
+  //     }
+  // }, [shouldReapplyGreenFilter]);
+
   // Make Pad working
   const handleKeyPress = (event) => {
     if (
@@ -141,6 +147,11 @@ export default function Film() {
           setVideoBase64(chunks);
         }
       };
+
+      if (isFilterApplied) {
+        handleApplyBackground();
+      }
+
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
       navigate("/malfunction");
@@ -322,7 +333,12 @@ export default function Film() {
       setCreatedVideoPath(null);
       setRecording(false);
       setMediaStream(null);
-      setIsFilterApplied(false);
+
+      // if (isFilterApplied) {
+      //   setShouldReapplyGreenFilter(true);
+      // } else {
+      //     initializeCamera();
+      // }
 
     } else {
       localStorage.removeItem("selectedQuestions");
@@ -351,7 +367,13 @@ export default function Film() {
     setTimer(0);
     clearInterval(timerIntervalId);
     setMediaStream(null);
-    setIsFilterApplied(false);
+
+      // if (isFilterApplied) {
+      //   setShouldReapplyGreenFilter(true);
+      // } else {
+      //     initializeCamera();
+      // }
+
   };
 
   const formatTime = (seconds) => {
@@ -386,23 +408,35 @@ export default function Film() {
       selectedGreenFilterIndex >= 0 &&
       greenFilters[selectedGreenFilterIndex]
     ) {
-      if (canvasRef.current) {
+      if (canvasRef.current && videoCameraRef.current) {
         backgroundImage = new Image();
         backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[selectedGreenFilterIndex].image}`;
-
-        canvasRef.current.width = videoCameraRef.current.clientWidth;
-        canvasRef.current.height = videoCameraRef.current.clientHeight;
-
-        selfieSegmentation.setOptions({
-          modelSelection: 1,
-          selfieMode: false,
-        });
-        selfieSegmentation.onResults(onResults);
-
-        sendToMediaPipe();
-
-        setIsFilterApplied(true);
-        closeModal();
+  
+        const checkVideoDimensions = () => {
+          const videoWidth = videoCameraRef.current.videoWidth;
+          const videoHeight = videoCameraRef.current.videoHeight;
+  
+          if (videoWidth > 0 && videoHeight > 0) {
+            canvasRef.current.width = videoWidth;
+            canvasRef.current.height = videoHeight;
+            
+            selfieSegmentation.setOptions({
+              modelSelection: 1,
+              selfieMode: false,
+            });
+            selfieSegmentation.onResults(onResults);
+  
+            sendToMediaPipe();
+  
+            setIsFilterApplied(true);
+            closeModal();
+          } else {
+            console.error("Video dimensions are not valid. Retrying...");
+            setTimeout(checkVideoDimensions, 100); // Réessayer après 100 ms
+          }
+        };
+  
+        checkVideoDimensions(); // Démarrer la vérification des dimensions de la vidéo
       } else {
         console.error("canvasRef is not defined.");
       }
@@ -485,7 +519,7 @@ export default function Film() {
 
   const handleRemoveBackground = () => {
     setIsFilterApplied(false);
-    initializeCamera();
+    setMediaStream(null);
   };
 
   async function sendToMediaPipe() {
@@ -628,18 +662,19 @@ export default function Film() {
                 : "Démarrer l'enregistrement"}
             </button>
           )}
-          {isFilterApplied ? (
-            <button
-              onClick={handleRemoveBackground}
-              className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
-                status === "loading" ? "opacity-50 pointer-events-none" : ""
-              }`}
-              disabled={status === "loading"}
-            >
-              <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
-            </button>
-          ) : (
-            !videoBase64 && (
+
+          {!videoBase64 && (
+            isFilterApplied ? (
+              <button
+                onClick={handleRemoveBackground}
+                className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
+                  status === "loading" ? "opacity-50 pointer-events-none" : ""
+                }`}
+                disabled={status === "loading"}
+              >
+                <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
+              </button>
+            ) : (
               <button
                 onClick={openModal}
                 className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
@@ -651,6 +686,7 @@ export default function Film() {
               </button>
             )
           )}
+
         </div>
       </div>
 

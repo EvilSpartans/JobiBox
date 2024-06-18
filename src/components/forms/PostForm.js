@@ -101,7 +101,7 @@ export default function PostForm() {
 
   const subCategoryOptions = [
     { value: "Emploi", label: "Recruteur" },
-    { value: "CV", label: "demandeur d'emploi" }
+    { value: "CV", label: "En recherche d'emploi" }
   ];
 
   const commentOptions = [
@@ -270,7 +270,7 @@ export default function PostForm() {
           {videotheque && (
           <Select
             name="subCategory"
-            placeholder="Es-tu recruteur ou demandeur d'emploi ?"
+            placeholder="Es-tu recruteur ou en recherche d'emploi ?"
             register={register}
             error={showPortalCheckbox ? (!portals.length && errors.subCategory ? errors.subCategory.message : null) : errors?.subCategory?.message}
             options={subCategoryOptions}
