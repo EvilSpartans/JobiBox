@@ -250,7 +250,7 @@ export default function Film() {
     let res;
     let success = false;
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 5;
     const retryDelay = 2000;
   
     while (attempts < maxAttempts) {
@@ -323,6 +323,7 @@ export default function Film() {
       setRecording(false);
       setMediaStream(null);
       setIsFilterApplied(false);
+
     } else {
       localStorage.removeItem("selectedQuestions");
       navigate("/review");
@@ -346,11 +347,11 @@ export default function Film() {
   const handleRedoRecording = () => {
     deleteLastVideo();
     setVideoBase64(null);
-    setIsFilterApplied(false);
     setCreatedVideoPath(null);
     setTimer(0);
     clearInterval(timerIntervalId);
     setMediaStream(null);
+    setIsFilterApplied(false);
   };
 
   const formatTime = (seconds) => {
@@ -413,14 +414,9 @@ export default function Film() {
     tempCanvas.width = width;
     tempCanvas.height = height;
     const tempContext = tempCanvas.getContext("2d");
-
-    // Draw the original mask on the temp canvas
     tempContext.drawImage(mask, 0, 0, width, height);
-
-    // Apply a blur to the temp canvas
     tempContext.filter = "blur(20px)";
     tempContext.drawImage(tempCanvas, 0, 0, width, height);
-
     return tempCanvas;
   };
 
@@ -492,9 +488,6 @@ export default function Film() {
     initializeCamera();
   };
 
-  // const INTERVAL = 33;
-  // let lastCallTime = 0;
-
   async function sendToMediaPipe() {
       if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
         requestAnimationFrame(sendToMediaPipe);
@@ -502,16 +495,6 @@ export default function Film() {
         await selfieSegmentation.send({ image: videoCameraRef.current });
         requestAnimationFrame(sendToMediaPipe);
       }
-    // const now = Date.now();
-    // if (
-    //   now - lastCallTime >= INTERVAL &&
-    //   selfieSegmentation &&
-    //   videoCameraRef.current.videoWidth
-    // ) {
-    //   lastCallTime = now;
-    //   await selfieSegmentation.send({ image: videoCameraRef.current });
-    // }
-    // requestAnimationFrame(sendToMediaPipe);
   }
 
   return (
@@ -585,9 +568,7 @@ export default function Film() {
                   videoBase64 ? "hidden" : ""
                 } ${isFilterApplied ? "" : "hidden"}`}
                 style={{
-                  // left: 0,
                   position: "absolute",
-                  // top: 0,
                   transform: "scaleX(-1)",
                 }}
               />
@@ -597,9 +578,7 @@ export default function Film() {
                   videoBase64 ? "hidden" : ""
                 } ${recording ? "" : "hidden"}`}
                 style={{
-                  // left: 0,
                   position: "absolute",
-                  // top: 0,
                   // filter: "blur(3px)",
                   transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
                 }}
