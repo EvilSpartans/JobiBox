@@ -135,8 +135,8 @@ export default function Film() {
         .getUserMedia({
           video: {
             facingMode: "portrait",
-            width: { ideal: 720 }, // Largeur souhaitée
-            height: { ideal: 1280 }, // Hauteur souhaitée
+            width: { ideal: 640 }, // Largeur souhaitée
+            height: { ideal: 1136 }, // Hauteur souhaitée
           },
           audio: true,
         })
@@ -195,8 +195,8 @@ export default function Film() {
           : await navigator.mediaDevices.getUserMedia({
               video: {
                 facingMode: "portrait",
-                width: { ideal: 720 }, // Largeur souhaitée
-                height: { ideal: 1280 }, // Hauteur souhaitée
+                width: { ideal: 640 }, // Largeur souhaitée
+                height: { ideal: 1136 }, // Hauteur souhaitée
               },
             });
 
