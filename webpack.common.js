@@ -18,7 +18,8 @@ module.exports = {
                             targets: {
                                 esmodules: true
                             }
-                        }], '@babel/preset-react']
+                        }], '@babel/preset-react'],
+                        plugins: ['@babel/plugin-transform-modules-commonjs']
                     }
                 }
             },

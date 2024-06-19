@@ -14,9 +14,12 @@ import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../Tuto";
+// import { gzipSync } from 'fflate';
 
 export default function Film() {
-  const BASE_URL = "https://jobibox.jobissim.com";
+  
+    const BASE_URL = "https://jobibox.jobissim.com";
+    // const BASE_URL = "http://localhost:4200";
 
   const selfieSegmentation = new SelfieSegmentation({
     locateFile: (file) =>
@@ -132,8 +135,8 @@ export default function Film() {
         .getUserMedia({
           video: {
             facingMode: "portrait",
-            width: { ideal: 640 }, // Largeur souhaitée
-            height: { ideal: 1136 }, // Hauteur souhaitée
+            width: { ideal: 720 }, // Largeur souhaitée
+            height: { ideal: 1280 }, // Hauteur souhaitée
           },
           audio: true,
         })
@@ -192,8 +195,8 @@ export default function Film() {
           : await navigator.mediaDevices.getUserMedia({
               video: {
                 facingMode: "portrait",
-                width: { ideal: 640 }, // Largeur souhaitée
-                height: { ideal: 1136 }, // Hauteur souhaitée
+                width: { ideal: 720 }, // Largeur souhaitée
+                height: { ideal: 1280 }, // Hauteur souhaitée
               },
             });
 
@@ -263,6 +266,15 @@ export default function Film() {
     let attempts = 0;
     const maxAttempts = 5;
     const retryDelay = 2000;
+
+    // COMPRESS...
+    // const videoArrayBuffer = await videoFile.arrayBuffer();
+    // const videoUint8Array = new Uint8Array(videoArrayBuffer);
+    // console.log(`Original video size: ${videoUint8Array.byteLength} bytes`);
+
+    // const compressedVideo = gzipSync(videoUint8Array, { level: 9 });
+    // const compressedBlob = new Blob([compressedVideo], { type: "application/gzip" });
+    // console.log(`Compressed video size: ${compressedBlob.byteLength} bytes`);
   
     while (attempts < maxAttempts) {
       try {

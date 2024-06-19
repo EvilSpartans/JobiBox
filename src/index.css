@@ -384,8 +384,8 @@ label[for=portal] {
 
 video,
 canvas {
-    max-width: 640px !important;
-    max-height: 1136px !important;
+    max-width: 720px !important;
+    max-height: 1280px !important;
 }
 
 .countdown-overlay {
@@ -401,8 +401,8 @@ canvas {
     font-weight: bold;
     background-color: rgba(0, 0, 0, 0.75);
     z-index: 10;
-    max-width: 640px;
-    max-height: 1136px;
+    max-width: 720px;
+    max-height: 1280px;
 }
 
 .countdown-overlay p {
