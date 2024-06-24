@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createTheme } from "../../store/features/themeSlice";
+import { createTheme } from "../../store/slices/themeSlice";
 
 export default function ModalTheme({ isOpen, onClose, fetchThemes }) {
+    
     const user = useSelector((state) => state.user.user);
     const { token } = user;
     const [newThemeTitle, setNewThemeTitle] = useState("");

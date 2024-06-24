@@ -1,12 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
-import userSlice from "./features/userSlice";
 import { persistReducer, persistStore } from "redux-persist";
 import createFilter from "redux-persist-transform-filter";
-import postSlice from "./features/postSlice";
-import videoProcessSlice from "./features/videoProcessSlice";
-import transcriptSlice from "./features/transcriptSlice";
-import jobiboxSlice from "./features/jobiboxSlice";
+
+import userSlice from "./slices/userSlice";
+import postSlice from "./slices/postSlice";
+import videoProcessSlice from "./slices/videoProcessSlice";
+import transcriptSlice from "./slices/transcriptSlice";
+import jobiboxSlice from "./slices/jobiboxSlice";
 
 // saveUserOnlyFilter
 const saveUserOnlyFilter = createFilter("user", ["user"]);

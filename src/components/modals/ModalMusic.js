@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createMusic } from "../../store/features/musicSlice";
+import { createMusic } from "../../store/slices/musicSlice";
 
 export default function ModalMusic({ isOpen, onClose, fetchMusics }) {
+    
     const user = useSelector((state) => state.user.user);
     const { token } = user;
     const [newMusicTitle, setNewMusicTitle] = useState("");

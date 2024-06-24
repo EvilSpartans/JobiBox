@@ -5,10 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
 import { businessSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getJobibox } from "../../store/features/jobiboxSlice";
+import { getJobibox } from "../../store/slices/jobiboxSlice";
 import Select from "../fields/Select";
 
 export default function JobiboxForm() {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.jobibox);

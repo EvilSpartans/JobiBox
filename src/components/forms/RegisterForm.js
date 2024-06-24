@@ -7,10 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
 import { signUpSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import { changeStatus, registerUser } from "../../store/features/userSlice";
-import { sendWelcomeNotification } from "../Notification";
+import { changeStatus, registerUser } from "../../store/slices/userSlice";
+import { sendWelcomeNotification } from "../core/Notification";
 
 export default function RegisterForm() {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.user);

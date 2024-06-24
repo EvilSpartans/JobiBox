@@ -6,10 +6,10 @@ import { yupResolver } from "@hookForm/resolvers/yup";
 import PulseLoader from "react-spinners/PulseLoader";
 import { format } from "date-fns";
 
-import { createPost, changeStatus } from "../../store/features/postSlice";
-import { getCategories } from "../../store/features/categorySlice";
-import { getJobiboxPortals } from "../../store/features/jobiboxSlice";
-import { sendConfirmNotification } from "../Notification";
+import { createPost, changeStatus } from "../../store/slices/postSlice";
+import { getCategories } from "../../store/slices/categorySlice";
+import { getJobiboxPortals } from "../../store/slices/jobiboxSlice";
+import { sendConfirmNotification } from "../core/Notification";
 
 import Input from "../fields/Input";
 import Textarea from "../fields/Textarea";
@@ -18,9 +18,10 @@ import Select from "../fields/Select";
 import SelectMultiple from "../fields/SelectMultiple";
 
 import { PostSchema } from "../../utils/Validation";
-import Photo from "../Photo";
+import Photo from "../core/Photo";
 
 export default function PostForm() {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.post);
@@ -34,7 +35,7 @@ export default function PostForm() {
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
-  const BASE_URL = "https://jobibox.jobissim.com";
+  const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
   const businessId = localStorage.getItem('businessId') | null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
 

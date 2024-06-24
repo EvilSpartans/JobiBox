@@ -1,23 +1,11 @@
-import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter as Router, Routes, Navigate } from "react-router-dom";
 import React from 'react';
-import Login from './screens/Login';
-import Register from './screens/Register';
 import { useSelector } from "react-redux";
-import Questions from "./screens/Questions";
-import Themes from "./screens/Themes";
-import TextStyles from "./screens/TextStyles";
-import Musics from "./screens/Musics";
-import Record from "./screens/Record";
-import Review from "./screens/Review";
-import Post from "./screens/Post";
-import Thanks from "./screens/Thanks";
-import Transcription from "./screens/Transcription";
-import OnlineStatus from "./components/OnlineStatus";
-import Offline from "./screens/Offline";
-import Config from "./screens/Config";
-import Portal from "./screens/Portal";
-import Welcome from "./screens/Welcome";
-import Malfunction from "./screens/Malfunction";
+
+import OnlineStatus from "./components/core/OnlineStatus";
+import AuthRoutes from "./routes/AuthRoutes";
+import CvVideoRoutes from "./routes/CVVideoRoutes";
+import CoreRoutes from "./routes/CoreRoutes";
 
 export default function App() {
     const user = useSelector((state) => state.user.user);
@@ -30,23 +18,9 @@ export default function App() {
                     <div className={`dark ${isOnline ? '' : 'offline'}`}>
                         {!isOnline && <Navigate to="/offline" />}
                         <Routes>
-                            <Route path="/" element={token ? <Questions /> : <Navigate to="/welcome" />} />
-                            <Route path="/config" element={<Config />} />
-                            <Route path="/portal" element={<Portal />} />
-                            <Route path="/offline" element={<Offline />} />
-                            <Route path="/malfunction" element={<Malfunction />} />
-                            <Route path="/questions" element={token ? <Questions /> : <Navigate to="/welcome" />} />
-                            <Route path="/themes" element={token ? <Themes /> : <Navigate to="/welcome" />} />
-                            <Route path="/textStyles" element={token ? <TextStyles /> : <Navigate to="/welcome" />} />
-                            <Route path="/musics" element={token ? <Musics /> : <Navigate to="/welcome" />} />
-                            <Route path="/record" element={token ? <Record /> : <Navigate to="/welcome" />} />
-                            <Route path="/review" element={token ? <Review /> : <Navigate to="/welcome" />} />
-                            <Route path="/transcription" element={token ? <Transcription /> : <Navigate to="/welcome" />} />
-                            <Route path="/post" element={token ? <Post /> : <Navigate to="/welcome" />} />
-                            <Route path="/thanks" element={token ? <Thanks /> : <Navigate to="/welcome" />} />
-                            <Route path="/login" element={!token ? <Login /> : <Navigate to="/" />} />
-                            <Route path="/register" element={!token ? <Register /> : <Navigate to="/" />} />
-                            <Route path="/welcome" element={!token ? <Welcome /> : <Navigate to="/" />} />
+                            {AuthRoutes({ token })}
+                            {CvVideoRoutes({ token })}
+                            {CoreRoutes({ token })}
                         </Routes>
                     </div>
                 )}

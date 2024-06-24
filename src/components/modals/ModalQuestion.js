@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createQuestion } from "../../store/features/questionSlice";
+import { createQuestion } from "../../store/slices/questionSlice";
 
 export default function ModalQuestion
 ({ 

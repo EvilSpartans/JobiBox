@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createGreenFilter } from "../../store/features/greenFilterSlice";
+import { createGreenFilter } from "../../store/slices/greenFilterSlice";
 
 export default function ModalGreenFilter({ isOpen, onClose, fetchGreenFilters }) {
+    
     const user = useSelector((state) => state.user.user);
     const { token } = user;
     const [newGreenFilterTitle, setNewGreenFilterTitle] = useState("");
