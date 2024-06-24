@@ -32,7 +32,8 @@
       "provider": "github",
       "private": true,
       "owner": "EvilSpartans",
-      "repo": "JobiBox"
+      "repo": "JobiBox",
+      "token": "process.env.GITHUB_TOKEN"
     },
     "files": [
       "build/**/*",
