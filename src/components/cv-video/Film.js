@@ -465,6 +465,18 @@ export default function Film() {
     return tempCanvas;
   };
 
+  const applyErosionToMask = (mask, width, height) => {
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempContext = tempCanvas.getContext("2d");
+    tempContext.drawImage(mask, 0, 0, width, height);
+    tempContext.filter = "blur(2px)";
+    tempContext.drawImage(tempCanvas, 0, 0, width, height);
+    tempContext.filter = "none";
+    return tempCanvas;
+  };
+
   const onResults = (results) => {
     contextRef.current = canvasRef.current.getContext("2d");
     contextRef.current.save();
@@ -488,9 +500,15 @@ export default function Film() {
       canvasRef.current.height
     );
 
+    const erodedMask = applyErosionToMask(
+      blurredMask,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+
     contextRef.current.drawImage(
       // results.segmentationMask,
-      blurredMask,
+      erodedMask,
       offsetX,
       offsetY,
       results.image.width * ratio,
