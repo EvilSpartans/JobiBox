@@ -16,7 +16,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../core/Tuto";
 // import { gzipSync } from 'fflate';
 
-export default function Film() {
+export default function oldFilm() {
   
   const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
   const navigate = useNavigate();
@@ -417,7 +417,7 @@ export default function Film() {
             canvasRef.current.height = videoHeight;
             
             selfieSegmentation.setOptions({
-              modelSelection: 0,
+              modelSelection: 1,
               selfieMode: false,
               effect: 'mask',
             });
@@ -440,6 +440,29 @@ export default function Film() {
     }
   };
 
+  const applyBlurToMask = (mask, width, height) => {
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempContext = tempCanvas.getContext("2d");
+    tempContext.drawImage(mask, 0, 0, width, height);
+    tempContext.filter = "blur(20px)";
+    tempContext.drawImage(tempCanvas, 0, 0, width, height);
+    return tempCanvas;
+  };
+
+  const applyErosionToMask = (mask, width, height) => {
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tempContext = tempCanvas.getContext("2d");
+    tempContext.drawImage(mask, 0, 0, width, height);
+    tempContext.filter = "blur(2px)";
+    tempContext.drawImage(tempCanvas, 0, 0, width, height);
+    tempContext.filter = "none";
+    return tempCanvas;
+  };
+
   const onResults = (results) => {
     contextRef.current = canvasRef.current.getContext("2d");
     contextRef.current.save();
@@ -454,21 +477,24 @@ export default function Film() {
     const hRatio = canvasRef.current.height / results.image.height;
     const ratio = Math.max(wRatio, hRatio);
     const offsetX = (canvasRef.current.width - results.image.width * ratio) / 2;
-    const offsetY = (canvasRef.current.height - results.image.height * ratio) / 2;
+    const offsetY =
+      (canvasRef.current.height - results.image.height * ratio) / 2;
 
-    const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = results.image.width;
-    offscreenCanvas.height = results.image.height;
-    const offscreenContext = offscreenCanvas.getContext('2d');
-    offscreenContext.drawImage(results.segmentationMask, 0, 0);
+    const blurredMask = applyBlurToMask(
+      results.segmentationMask,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
 
-    // Apply a smoothing filter to the segmentation mask
-    offscreenContext.globalAlpha = 0.5;
-    offscreenContext.filter = 'blur(10px)';
-    offscreenContext.drawImage(offscreenCanvas, 0, 0);
-    
+    const erodedMask = applyErosionToMask(
+      blurredMask,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+
     contextRef.current.drawImage(
-      offscreenCanvas,
+      // results.segmentationMask,
+      erodedMask,
       offsetX,
       offsetY,
       results.image.width * ratio,
@@ -481,7 +507,7 @@ export default function Film() {
       selectedGreenFilterIndex >= 0 &&
       greenFilters[selectedGreenFilterIndex]
     ) {
-      // Flip background
+      // Inverser l'image sur l'axe X
       contextRef.current.save();
       contextRef.current.scale(-1, 1);
       contextRef.current.drawImage(
@@ -495,17 +521,6 @@ export default function Film() {
     }
 
     contextRef.current.globalCompositeOperation = "destination-atop";
-    contextRef.current.drawImage(
-      results.image,
-      offsetX,
-      offsetY,
-      results.image.width * ratio,
-      results.image.height * ratio
-    );
-
-    // Blend the original image with the segmentation mask
-    contextRef.current.globalAlpha = 0.4;
-    contextRef.current.globalCompositeOperation = "source-over";
     contextRef.current.drawImage(
       results.image,
       offsetX,
