@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCamera, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCamera, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function Photo({ onPhotoTaken }) {
+    const [photoConfirmed, setPhotoConfirmed] = useState(false); 
     const [showModal, setShowModal] = useState(false);
     const [photo, setPhoto] = useState(null);
     const videoRef = useRef(null);
@@ -58,11 +59,13 @@ export default function Photo({ onPhotoTaken }) {
 
     const confirmSubmit = () => {
         console.log('Photo confirmed:', photo);
+        setPhotoConfirmed(true);
         setShowModal(false);
     };
 
     const cancelSubmit = async () => {
         setPhoto(null);
+        setPhotoConfirmed(false);
         initializeCamera();
     };
 
@@ -81,6 +84,7 @@ export default function Photo({ onPhotoTaken }) {
                 onClick={handleSubmit}
             >
                 <FontAwesomeIcon icon={faCamera} size="lg" /> 
+                {photoConfirmed && <FontAwesomeIcon icon={faCheckCircle} size="lg" className="ml-2 text-green-500" />}
             </button>
 
             {showModal && (
@@ -91,7 +95,7 @@ export default function Photo({ onPhotoTaken }) {
                             <FontAwesomeIcon icon={faTimes} size="lg" /> 
                         </button>
                         <p className="text-gray-800 text-lg">
-                            {photo ? "Veux-tu utiliser cette photo ?" : "Fais ton plus grand sourire"}
+                            {photo ? "Veux-tu utiliser cette photo ? (Elle apparaîtra comme miniature pour ta vidéo)" : "Fais ton plus grand sourire"}
                         </p>
                         {photo ? (
                             <img src={photo} alt="Captured" className="mx-auto" />

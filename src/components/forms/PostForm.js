@@ -259,7 +259,7 @@ export default function PostForm() {
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
-          {/* <Photo onPhotoTaken={setPhotoFile} /> */}
+          <Photo onPhotoTaken={setPhotoFile} />
 
           <Input
             name="title"
