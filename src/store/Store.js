@@ -1,13 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import createFilter from "redux-persist-transform-filter";
+import storage from "redux-persist/lib/storage";
 
 import userSlice from "./slices/userSlice";
 import postSlice from "./slices/postSlice";
-import videoProcessSlice from "./slices/videoProcessSlice";
-import transcriptSlice from "./slices/transcriptSlice";
 import jobiboxSlice from "./slices/jobiboxSlice";
+import videoProcessSlice from "./slices/videoProcessSlice";
+import questionVideoSlice from "./slices/questionVideoSlice";
 
 // saveUserOnlyFilter
 const saveUserOnlyFilter = createFilter("user", ["user"]);
@@ -24,7 +24,7 @@ const rootReducer = combineReducers({
     user: userSlice,
     post: postSlice,
     videoProcess: videoProcessSlice,
-    transcription: transcriptSlice,
+    questionVideo: questionVideoSlice,
     jobibox: jobiboxSlice
 });
 
