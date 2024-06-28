@@ -477,24 +477,21 @@ export default function oldFilm() {
     const hRatio = canvasRef.current.height / results.image.height;
     const ratio = Math.max(wRatio, hRatio);
     const offsetX = (canvasRef.current.width - results.image.width * ratio) / 2;
-    const offsetY =
-      (canvasRef.current.height - results.image.height * ratio) / 2;
+    const offsetY = (canvasRef.current.height - results.image.height * ratio) / 2;
 
-    const blurredMask = applyBlurToMask(
-      results.segmentationMask,
-      canvasRef.current.width,
-      canvasRef.current.height
-    );
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = results.image.width;
+    offscreenCanvas.height = results.image.height;
+    const offscreenContext = offscreenCanvas.getContext('2d');
+    offscreenContext.drawImage(results.segmentationMask, 0, 0);
 
-    const erodedMask = applyErosionToMask(
-      blurredMask,
-      canvasRef.current.width,
-      canvasRef.current.height
-    );
+    // Apply a smoothing filter to the segmentation mask
+    offscreenContext.globalAlpha = 0.5;
+    offscreenContext.filter = 'blur(10px)';
+    offscreenContext.drawImage(offscreenCanvas, 0, 0);
 
     contextRef.current.drawImage(
-      // results.segmentationMask,
-      erodedMask,
+      offscreenCanvas,
       offsetX,
       offsetY,
       results.image.width * ratio,
@@ -507,7 +504,7 @@ export default function oldFilm() {
       selectedGreenFilterIndex >= 0 &&
       greenFilters[selectedGreenFilterIndex]
     ) {
-      // Inverser l'image sur l'axe X
+      // Flip background
       contextRef.current.save();
       contextRef.current.scale(-1, 1);
       contextRef.current.drawImage(
@@ -521,6 +518,17 @@ export default function oldFilm() {
     }
 
     contextRef.current.globalCompositeOperation = "destination-atop";
+    contextRef.current.drawImage(
+      results.image,
+      offsetX,
+      offsetY,
+      results.image.width * ratio,
+      results.image.height * ratio
+    );
+
+    // Blend the original image with the segmentation mask
+    contextRef.current.globalAlpha = 0.4;
+    contextRef.current.globalCompositeOperation = "source-over";
     contextRef.current.drawImage(
       results.image,
       offsetX,
