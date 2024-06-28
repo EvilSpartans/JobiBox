@@ -202,6 +202,7 @@ export default function PostForm() {
       date: formattedDate,
       diploma: data.diploma,
       km: data.km,
+      createdFrom: "jobibox",
       contracts: selectedContracts,
       video: videoPath,
       image: imageFile,
