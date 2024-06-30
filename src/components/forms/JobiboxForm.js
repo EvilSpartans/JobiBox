@@ -53,6 +53,8 @@ export default function JobiboxForm() {
     }
     localStorage.setItem("businessId", selectedJobibox.business.id);
     localStorage.setItem("jobiboxId", selectedJobibox.id);
+    localStorage.setItem("trainingActivated", selectedJobibox.training);
+    localStorage.setItem("examActivated", selectedJobibox.exam);
     navigate('/welcome');
   };
 

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Route, Navigate } from 'react-router-dom';
+
+import Transcription from "../screens/cv-video/Transcription";
+import TextStyles from "../screens/cv-video/TextStyles";
 import Questions from "../screens/cv-video/Questions";
 import Themes from "../screens/cv-video/Themes";
-import TextStyles from "../screens/cv-video/TextStyles";
 import Musics from "../screens/cv-video/Musics";
 import Record from "../screens/cv-video/Record";
 import Review from "../screens/cv-video/Review";
 import Post from "../screens/cv-video/Post";
-import Transcription from "../screens/cv-video/Transcription";
 
 const CvVideoRoutes = ({ token }) => [
     <Route key="questions" path="/questions" element={token ? <Questions /> : <Navigate to="/welcome" />} />,

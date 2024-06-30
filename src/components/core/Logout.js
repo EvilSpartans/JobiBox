@@ -51,7 +51,7 @@ export default function Logout() {
 
         keysToRemove.forEach(key => {
             localStorage.removeItem(key);
-            console.log(`${key} removed`);
+            // console.log(`${key} removed`);
         });
     };
 
