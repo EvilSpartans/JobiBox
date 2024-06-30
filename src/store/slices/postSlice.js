@@ -32,6 +32,7 @@ export const createPost = createAsyncThunk(
             businessId,
             portal,
             km,
+            createdFrom,
             diploma
         } = values;
 
@@ -53,6 +54,7 @@ export const createPost = createAsyncThunk(
             formData.append("businessId", businessId);
             formData.append("portal", portal);
             formData.append("diploma", diploma);
+            formData.append("createdFrom", createdFrom);
 
             const { data } = await axios.post(
                 `${BASE_URL}/post/create`,
