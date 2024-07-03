@@ -46,7 +46,7 @@ export default function Logout() {
     const clearLocalStorage = () => {
         const keysToRemove = [
             'selectedQuestions', 'selectedTheme', 'selectedMusic', 'videoPath', 'videoId',
-            'filmTuto', 'clipTuto', 'textStyle'
+            'filmTuto', 'clipTuto', 'textStyle', 'isTrainExam', 'examenInProgress'
         ];
 
         keysToRemove.forEach(key => {

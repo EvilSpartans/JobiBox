@@ -36,7 +36,8 @@ export default function PostForm() {
   const [startDate, setStartDate] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
   const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
-  const businessId = localStorage.getItem('businessId') | null;
+  const businessId = localStorage.getItem('businessId') || null;
+  const isTrainExam = localStorage.getItem('isTrainExam') || null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
 
   // Form's options
@@ -226,6 +227,8 @@ export default function PostForm() {
       localStorage.removeItem("videoPath");
       localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
+      localStorage.removeItem("examenInProgress");
+      localStorage.removeItem("isTrainExam");
       dispatch(changeStatus(""));
     }
   };
@@ -285,7 +288,7 @@ export default function PostForm() {
             error={errors?.category?.message}
             options={categoryOptions}
           />
-          {showPortalCheckbox && (
+          {showPortalCheckbox && portalsOptions.length > 0 && (
           <SelectMultiple
             name="portal"
             placeholder="Référencement"
@@ -297,72 +300,79 @@ export default function PostForm() {
             style={{ display: !hidePortal ? 'block' : 'none' }}            
           />
           )}
-          <div className="flex justify-between space-x-2 !mt-0">           
-            <Input
-              name="city"
-              type="text"
-              placeholder="Ville"
-              register={register}
-              error={errors?.city?.message}
-              style={{ minWidth: '380px' }}
-            />
-            <Select
-              name="km"
-              placeholder="Rayon de Km"
-              register={register}
-              error={errors?.km?.message}
-              options={kmOptions}
-            />
-          </div>
-          <Select
-            name="diploma"
-            placeholder="Niveau d'études"
-            register={register}
-            error={errors?.diploma?.message}
-            options={studiesOptions}
-          />
-          <div className="flex justify-between space-x-2 !mt-0">
-            <SelectMultiple
-              name="contracts"
-              placeholder="Contrats"
-              register={register}
-              error={errors?.contracts?.message}
-              options={contractOptions}
-              value={contracts}
-              onChange={setContracts}
-              style={{ minWidth: '430px' }}
-            />
-            <Checkbox
-              name="remote"
-              label="Télétravail"
-              register={register}
-              error={errors?.remote?.message}
-              style={{ marginTop: '3.5rem' }}
-            />
-          </div>
-          <Select
-            name="formation"
-            placeholder="Es-tu à la recherche d'une formation ?"
-            register={register}
-            error={errors?.formation?.message}
-            options={commentOptions}
-          />
-          <Input
-            name="date"
-            type="text"
-            placeholder="Date de début"
-            register={register}
-            error={errors?.date?.message}
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-          />
-          <Textarea
-            name="description"
-            type="text"
-            placeholder="Description"
-            register={register}
-            error={errors?.description?.message}
-          />
+
+          {/* Only for CV video */}
+          {isTrainExam !== 'true' && (
+            <>
+              <div className="flex justify-between space-x-2 !mt-0">           
+                <Input
+                  name="city"
+                  type="text"
+                  placeholder="Ville"
+                  register={register}
+                  error={errors?.city?.message}
+                  style={{ minWidth: '380px' }}
+                />
+                <Select
+                  name="km"
+                  placeholder="Rayon de Km"
+                  register={register}
+                  error={errors?.km?.message}
+                  options={kmOptions}
+                />
+              </div>
+              <Select
+                name="diploma"
+                placeholder="Niveau d'études"
+                register={register}
+                error={errors?.diploma?.message}
+                options={studiesOptions}
+              />
+              <div className="flex justify-between space-x-2 !mt-0">
+                <SelectMultiple
+                  name="contracts"
+                  placeholder="Contrats"
+                  register={register}
+                  error={errors?.contracts?.message}
+                  options={contractOptions}
+                  value={contracts}
+                  onChange={setContracts}
+                  style={{ minWidth: '430px' }}
+                />
+                <Checkbox
+                  name="remote"
+                  label="Télétravail"
+                  register={register}
+                  error={errors?.remote?.message}
+                  style={{ marginTop: '3.5rem' }}
+                />
+              </div>
+              <Select
+                name="formation"
+                placeholder="Es-tu à la recherche d'une formation ?"
+                register={register}
+                error={errors?.formation?.message}
+                options={commentOptions}
+              />
+              <Input
+                name="date"
+                type="text"
+                placeholder="Date de début"
+                register={register}
+                error={errors?.date?.message}
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+              />
+              <Textarea
+                name="description"
+                type="text"
+                placeholder="Description"
+                register={register}
+                error={errors?.description?.message}
+              />
+            </>
+          )}
+
           {/*if we have an error*/}
           {error ? (
             <div>

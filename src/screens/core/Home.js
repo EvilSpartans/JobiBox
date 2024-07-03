@@ -1,12 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LogoutBtn from "../../components/core/LogoutBtn";
+import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
 
 export default function Home() {
 
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
+  const { token } = user;
+  const dispatch = useDispatch();
+
+  const [questions, setQuestions] = useState([]);
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
 
@@ -15,6 +20,53 @@ export default function Home() {
       navigate("/questions");
     }
   }, [training, exam, navigate]);
+
+  useEffect(() => {
+    const isTrainExam = localStorage.getItem('isTrainExam');
+    const examenInProgress = localStorage.getItem('examenInProgress');
+
+    if (isTrainExam === 'true') {
+      localStorage.removeItem('isTrainExam');
+    }
+
+    if (examenInProgress === 'true') {
+      localStorage.removeItem('examenInProgress');
+    }
+  }, []);
+
+  // Random questions
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
+  const handleExamen = async () => {
+    const existingSelectedQuestions = localStorage.getItem("selectedQuestionsVideos");
+    if (existingSelectedQuestions) {
+      localStorage.removeItem("selectedQuestionsVideos");
+    }
+    const fetchedQuestions = await fetchQuestionVideos();
+    const examQuestions = fetchedQuestions.filter(question => question.exam);
+    const shuffledQuestions = shuffleArray([...examQuestions]);
+    localStorage.setItem('selectedQuestionsVideos', JSON.stringify(shuffledQuestions));
+    localStorage.setItem('examenInProgress', 'true');
+    navigate("/recordTE");
+  };
+
+  const fetchQuestionVideos = async () => {
+    try {
+      const response = await dispatch(getQuestionVideos(token));
+      const payload = response.payload;
+      setQuestions(payload);
+      return payload;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des questions :", error);
+      return [];
+    }
+  };
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
@@ -32,15 +84,15 @@ export default function Home() {
             </div>
             {/*Buttons*/}
             <button
-              className="w-full flex justify-center bg-blue_4 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_3 shadow-lg cursor-pointer transition ease-in duration-300"
+              className="w-full flex justify-center bg-blue_4 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-500 shadow-lg cursor-pointer transition ease-in duration-300"
               onClick={() => navigate("/questions")}
             >
               Création vidéo
             </button>
             {training === "true" && (
             <button
-              className="w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/questions")}
+              className="w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
+              onClick={() => navigate("/questionVideo")}
             >
               Entrainement
             </button>
@@ -48,7 +100,7 @@ export default function Home() {
             {exam === "true" && (
             <button
               className="w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/questions")}
+              onClick={handleExamen}
             >
               Examen
             </button>

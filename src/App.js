@@ -6,6 +6,7 @@ import OnlineStatus from "./components/core/OnlineStatus";
 import AuthRoutes from "./routes/AuthRoutes";
 import CvVideoRoutes from "./routes/CVVideoRoutes";
 import CoreRoutes from "./routes/CoreRoutes";
+import TrainExamRoutes from "./routes/TrainExamRoute";
 
 export default function App() {
     const user = useSelector((state) => state.user.user);
@@ -20,6 +21,7 @@ export default function App() {
                         <Routes>
                             {AuthRoutes({ token })}
                             {CvVideoRoutes({ token })}
+                            {TrainExamRoutes({ token })}
                             {CoreRoutes({ token })}
                         </Routes>
                     </div>

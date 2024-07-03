@@ -35,6 +35,7 @@ export default function Clip() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [isSliderMoved, setIsSliderMoved] = useState(false);
   const videoRef = useRef(null);
+  const examenInProgress = localStorage.getItem("examenInProgress");
 
   const fetchQuestions = async () => {
     try {
@@ -80,6 +81,15 @@ export default function Clip() {
     fetchQuestions();
   }, [dispatch, token]);
 
+  useEffect(() => {
+    const checkExamenInProgress = async () => {
+      if (examenInProgress === "true") {
+        await assembleAndStoreVideo();
+      }
+    };
+    checkExamenInProgress();
+  }, []);
+
   const openShowModal = (index) => {
     setSelectedQuestionIndex(index);
     setShowModalOpen(true);
@@ -121,7 +131,7 @@ export default function Clip() {
   };
 
   const handleAdd = () => {
-    navigate("/questions");
+    navigate("/questionVideo");
   };
 
   const handleSliderChange = (values) => {
@@ -170,10 +180,12 @@ export default function Clip() {
     const selectedQuestion = {
       id: questions[index].id,
       title: questions[index].questionTitle,
+      video: questions[index].questionVideo,
+      questionVideoId: questions[index].questionVideoId,
       updateState: true
     };
-    localStorage.setItem("selectedQuestions", JSON.stringify([selectedQuestion]));
-    navigate("/record");
+    localStorage.setItem("selectedQuestionsVideos", JSON.stringify([selectedQuestion]));
+    navigate("/recordTE");
   };
 
   const handleDelete = async (index) => {
@@ -210,11 +222,20 @@ export default function Clip() {
         }
         localStorage.setItem("videoPath", res.payload.video);
         localStorage.setItem("videoId", res.payload.id);
+        localStorage.setItem("isTrainExam", 'true');
         navigate("/post");
         dispatch(changeStatus(""));
       }
     }
   };
+
+  if (examenInProgress === "true") {
+    return (
+      <div className="text-center mt-8">
+        <PulseLoader color="#fff" size={16} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
