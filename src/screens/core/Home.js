@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     if (training !== "true" && exam !== "true") {
-      navigate("/questions");
+      navigate("/cvVideo");
     }
 
     if (isTrainExam === 'true') {
@@ -44,14 +44,14 @@ export default function Home() {
             {/*Buttons*/}
             <button
               className="w-full flex justify-center bg-blue_4 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-500 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/questions")}
+              onClick={() => navigate("/cvVideo")}
             >
-              Création vidéo
+              CV Vidéo
             </button>
             {training === "true" && (
             <button
               className="w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/questionVideo")}
+              onClick={() => navigate("/train")}
             >
               Entrainement
             </button>

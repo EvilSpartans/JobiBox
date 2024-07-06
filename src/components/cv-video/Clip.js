@@ -38,15 +38,17 @@ export default function Clip() {
 
   const fetchQuestions = async () => {
     try {
+
       dispatch(changeStatus("loading"));
       const response = await dispatch(getVideoProcesses(token));
       const payload = response.payload;
-      setQuestions(payload);
-
-      if (payload && payload.length === 0) {
+      const filteredQuestions = payload.filter(question => question.type !== "TrainExam");
+      setQuestions(filteredQuestions);
+  
+      if (filteredQuestions && filteredQuestions.length === 0) {
         navigate("/questions");
       }
-      
+  
     } catch (error) {
       console.error("Erreur lors de la récupération des questions :", error);
     } finally {
@@ -200,7 +202,8 @@ export default function Clip() {
     let res;
     try {
       dispatch(changeStatus("loading"));
-      res = await dispatch(compileVideoProcess(token));
+      const values = { token, type: "CvVideo" };
+      res = await dispatch(compileVideoProcess(values));
     } catch (error) {
       console.error("Erreur lors de la compilation du clip :", error);
     } finally {

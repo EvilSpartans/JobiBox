@@ -34,6 +34,8 @@ export default function Config() {
   const handleConfirm = (type) => {
     if (type === "public") {
         localStorage.setItem("businessId", null);
+        localStorage.setItem("trainingActivated", false);
+        localStorage.setItem("examActivated", false);
         setPublicModalOpen(false);
         navigate("/welcome");
       } else if (type === "private") {

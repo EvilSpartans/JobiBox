@@ -97,14 +97,12 @@ export default function RegisterForm() {
             register={register}
             error={errors?.terms?.message}
           />
-          <Link
-            to="https://jobissim.com/conditions" 
-            target="_blank" 
-            rel="noopener noreferrer"
+          <span
+            onClick={() => navigate("/conditions")}
             className="hover:underline cursor-pointer transition ease-in duration-300 text-blue_3"
           >
             Prendre connaissance
-          </Link>
+          </span>
           {/*if we have an error*/}
           {error ? (
             <div>

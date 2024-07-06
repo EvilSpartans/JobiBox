@@ -39,21 +39,24 @@ export default function Clip() {
 
   const fetchQuestions = async () => {
     try {
+
       dispatch(changeStatus("loading"));
       const response = await dispatch(getVideoProcesses(token));
       const payload = response.payload;
-      setQuestions(payload);
-
-      if (payload && payload.length === 0) {
-        navigate("/questions");
+      const filteredQuestions = payload.filter(question => question.type === "TrainExam");
+      setQuestions(filteredQuestions);
+  
+      if (filteredQuestions && filteredQuestions.length === 0) {
+        navigate("/questionVideo");
       }
-      
+  
     } catch (error) {
       console.error("Erreur lors de la récupération des questions :", error);
     } finally {
       dispatch(changeStatus(""));
     }
   };
+  
 
   useEffect(() => {
     const videoId = localStorage.getItem("videoId");
@@ -212,7 +215,8 @@ export default function Clip() {
     let res;
     try {
       dispatch(changeStatus("loading"));
-      res = await dispatch(compileVideoProcess(token));
+      const values = { token, type: "TrainExam" };
+      res = await dispatch(compileVideoProcess(values));
     } catch (error) {
       console.error("Erreur lors de la compilation du clip :", error);
     } finally {

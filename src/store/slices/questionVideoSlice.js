@@ -43,6 +43,34 @@ export const getQuestionVideo = createAsyncThunk(
     }
 );
 
+export const createQuestionVideo = createAsyncThunk(
+    "questionVideo/create",
+    async (values, { rejectWithValue }) => {
+        const { token, title, training, userId, businessId } = values;
+        try {
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("training", training);
+            formData.append("userId", userId);
+            formData.append("businessId", businessId);
+
+            const { data } = await axios.post(
+                `${BASE_URL}/questionVideo/create`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response);
+        }
+    }
+);
+
 export const questionVideoSlice = createSlice({
     name: "questionVideo",
     initialState,
@@ -74,6 +102,18 @@ export const questionVideoSlice = createSlice({
                 state.videoProcesses = action.payload;
             })
             .addCase(getQuestionVideo.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload;
+            })
+            /** Create */
+            .addCase(createQuestionVideo.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(createQuestionVideo.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.questionVideos.push(action.payload);
+            })
+            .addCase(createQuestionVideo.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload;
             });

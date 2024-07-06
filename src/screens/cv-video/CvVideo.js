@@ -3,15 +3,15 @@ import GoBack from "../../components/core/GoBack";
 import LogoutBtn from "../../components/core/LogoutBtn";
 import { useNavigate } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
-import TrainImage from "../../../assets/images/train.png";
+import CvVideoImage from "../../../assets/images/cvvideo.png";
 
-export default function Train() {
+export default function CvVideo() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleContinueClick = async () => {
     setLoading(true);
-    navigate("/questionVideo");
+    navigate("/questions");
   };
 
   return (
@@ -24,31 +24,45 @@ export default function Train() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Entraînement</h2>
+              <h2 className="text-3xl font-bold">CV Vidéo</h2>
 
               <img
-                src={TrainImage}
-                alt="Examen"
+                src={CvVideoImage}
+                alt="CVVideo"
                 className="mx-auto mt-10"
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
 
               <p className="mt-6 text-base">
-                Tu vas pouvoir simuler un entretien à l'oral en toute{" "}
-                <span className="text-blue-400">liberté.</span>
+                {" "}
+                Ton <span className="text-blue-400">CV Vidéo</span> va se
+                réaliser en plusieurs étapes :
               </p>
 
               <p className="mt-6 text-base">
                 Dans un premier temps, tu vas définir les questions qui te
-                seront adressées, puis tu devras y répondre, le tout en
-                <span className="text-blue-400"> format vidéo.</span>
+                serviront de{" "}
+                <span className="text-blue-400">fil conducteur.</span>
               </p>
 
               <p className="mt-6 text-base">
-                Tu auras ensuite{" "}
-                <span className="text-blue-400">une vue d'ensemble</span> de tes
-                différentes séquences et tu pourras envoyer ta vidéo à ton
-                référent.
+                Tu pourras ensuite choisir{" "}
+                <span className="text-blue-400">le thème et la musique</span>{" "}
+                qui te correspondent le mieux.
+              </p>
+
+              <p className="mt-6 text-base">
+                À la fin, une vue d'ensemble contenant l'ensemble de tes
+                séquences te sera proposée afin que tu puisses apporter des{" "}
+                <span className="text-blue-400">modifications</span> si tu le
+                souhaites.
+              </p>
+
+              <p className="mt-6 text-base">
+                La dernière étape te permettra de{" "}
+                <span className="text-blue-400">référencer</span> ta création,
+                afin de la diffuser auprès de tous nos partenaires. Tu recevras
+                également une copie dans ta boite mail.
               </p>
             </div>
             <button

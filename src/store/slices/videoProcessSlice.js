@@ -122,14 +122,22 @@ export const updateVideoProcess = createAsyncThunk(
 
 export const compileVideoProcess = createAsyncThunk(
     "videoProcess/compile",
-    async (token, { rejectWithValue }) => {
+
+    async (values, { rejectWithValue }) => {
+
+        const { token, type } = values;
+
         try {
+            const formData = new FormData();
+            formData.append("type", type);
+
             const { data } = await axios.post(
                 `${BASE_URL}/videoProcess/compile`,
-                {},
+                formData,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
                     },
                 }
             );

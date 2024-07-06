@@ -9,6 +9,7 @@ import Musics from "../screens/cv-video/Musics";
 import Record from "../screens/cv-video/Record";
 import Review from "../screens/cv-video/Review";
 import Post from "../screens/cv-video/Post";
+import CvVideo from '../screens/cv-video/CvVideo';
 
 const CvVideoRoutes = ({ token }) => [
     <Route key="questions" path="/questions" element={token ? <Questions /> : <Navigate to="/welcome" />} />,
@@ -19,6 +20,7 @@ const CvVideoRoutes = ({ token }) => [
     <Route key="review" path="/review" element={token ? <Review /> : <Navigate to="/welcome" />} />,
     <Route key="transcription" path="/transcription" element={token ? <Transcription /> : <Navigate to="/welcome" />} />,
     <Route key="post" path="/post" element={token ? <Post /> : <Navigate to="/welcome" />} />,
+    <Route key="cvVideo" path="/cvVideo" element={token ? <CvVideo /> : <Navigate to="/welcome" />} />
 ];
 
 export default CvVideoRoutes;
