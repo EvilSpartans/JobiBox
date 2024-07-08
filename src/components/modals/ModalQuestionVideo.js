@@ -12,6 +12,7 @@ export default function ModalQuestionVideo({
   const user = useSelector((state) => state.user.user);
   const { token } = user;
   const [newQuestionTitle, setNewQuestionTitle] = useState("");
+  const [selectedModel, setSelectedModel] = useState("model1");
   const dispatch = useDispatch();
   const businessId = localStorage.getItem("businessId");
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,7 @@ export default function ModalQuestionVideo({
         const values = {
           token,
           title: newQuestionTitle,
+          model: `${selectedModel}.mp4`,
           userId: user.id,
           training: true,
           businessId,
@@ -48,6 +50,66 @@ export default function ModalQuestionVideo({
       <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
       <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
         <p className="text-gray-800 text-lg">Ajouter une question</p>
+
+        <div className="mt-3">
+          <div className="flex justify-center mt-2">
+            <label className="mr-4">
+              <input
+                type="radio"
+                name="model"
+                value="model1"
+                checked={selectedModel === "model1"}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="hidden"
+              />
+              <img
+                src="https://jobissim.com/assets/images/model1.png"
+                alt="Model 1"
+                className={`cursor-pointer ${
+                  selectedModel === "model1" ? "border-2 border-blue-500" : ""
+                }`}
+                onClick={() => setSelectedModel("model1")}
+              />
+            </label>
+            <label className="mr-4">
+              <input
+                type="radio"
+                name="model"
+                value="model2"
+                checked={selectedModel === "model2"}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="hidden"
+              />
+              <img
+                src="https://jobissim.com/assets/images/model2.png"
+                alt="Model 2"
+                className={`cursor-pointer ${
+                  selectedModel === "model2" ? "border-2 border-blue-500" : ""
+                }`}
+                onClick={() => setSelectedModel("model2")}
+              />
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="model"
+                value="model3"
+                checked={selectedModel === "model3"}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="hidden"
+              />
+              <img
+                src="https://jobissim.com/assets/images/model3.png"
+                alt="Model 3"
+                className={`cursor-pointer ${
+                  selectedModel === "model3" ? "border-2 border-blue-500" : ""
+                }`}
+                onClick={() => setSelectedModel("model3")}
+              />
+            </label>
+          </div>
+        </div>
+
         <input
           className="border p-1 mt-3 text-gray-800 w-full md:w-4/5 sm:w-4/5"
           type="text"
