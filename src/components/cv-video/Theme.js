@@ -88,10 +88,13 @@ export default function Theme() {
                 <img
                   src={`${BASE_URL}/${themes[selectedThemeIndex].image}`}
                   alt={themes[selectedThemeIndex].title}
-                  className="rounded-lg h-64 w-96 mx-auto"
+                  className="rounded-lg mx-auto"
+                  style={{ height: '568px', width: '320px' }}
                 />
-                <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-lg whitespace-nowrap">
-                  Tes questions apparaîtront ici
+                <p 
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-lg whitespace-nowrap"
+                  style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
+                    Tes questions apparaîtront ici
                 </p>
               </div>
             )}

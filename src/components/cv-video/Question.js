@@ -154,26 +154,32 @@ export default function Question() {
             <PulseLoader color="#fff" size={16} />
           </div>
         ) : (
-          questions &&
-          questions.length > 0 && (
-            <div className="max-h-56 tall:max-h-96 overflow-y-auto">
-              {questions
-                .filter((question) => question.type === currentTab)
-                .map((question, index) => (
-                  <div key={index} className="mb-3">
-                    <label className="inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox text-primary border-primary"
-                        onChange={() => handleQuestionSelection(question)}
-                        checked={selectedQuestions.includes(question)}
-                      />
-                      <span className="ml-2"> &nbsp; {question.title}</span>
-                    </label>
-                  </div>
-                ))}
-            </div>
-          )
+          <>
+            {questions && questions.length > 0 ? (
+              <div className="max-h-56 tall:max-h-96 overflow-y-auto">
+                {questions
+                  .filter((question) => question.type === currentTab)
+                  .map((question, index) => (
+                    <div key={index} className="mb-3">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox text-primary border-primary"
+                          onChange={() => handleQuestionSelection(question)}
+                          checked={selectedQuestions.includes(question)}
+                        />
+                        <span className="ml-2"> &nbsp; {question.title}</span>
+                      </label>
+                    </div>
+                  ))}
+                {questions.filter((question) => question.type === currentTab).length === 0 && (
+                  <p className="text-center mt-4">Aucune question pour le moment</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-center mt-4">Aucune question pour le moment</p>
+            )}
+          </>
         )}
 
         <ModalQuestion

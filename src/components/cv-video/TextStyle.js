@@ -57,12 +57,14 @@ export default function TextStyle() {
               <img
                 src={`${BASE_URL}/${selectedTheme.image}`}
                 alt={selectedTheme.title}
-                className="rounded-lg h-56 tall:h-72 w-96 mx-auto"
+                className="rounded-lg mx-auto"
+                style={{ height: '568px', width: '320px' }}
               />
               <p
                 style={{
                   fontSize: `${textStyle.fontSize}px`,
                   color: textStyle.textColor,
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
                 }}
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm whitespace-nowrap"
               >
@@ -73,7 +75,7 @@ export default function TextStyle() {
           <div className="mt-8 text-center">
             <Slider
               min={14}
-              max={28}
+              max={25}
               step={1}
               value={textStyle.fontSize}
               onChange={handleFontSizeChange}

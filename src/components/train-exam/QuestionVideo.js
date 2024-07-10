@@ -107,25 +107,29 @@ export default function QuestionVideo() {
             <PulseLoader color="#fff" size={16} />
           </div>
         ) : (
-          questions &&
-          questions.length > 0 && (
-            <div className="max-h-56 tall:max-h-96 overflow-y-auto">
-              {questions.map((question, index) => (
-                <div key={index} className="mb-3">
-                  <label className="inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox text-primary border-primary"
-                      onChange={() => handleQuestionSelection(question)}
-                      checked={selectedQuestions.includes(question)}
-                    />
-                    <span className="ml-2"> &nbsp; {question.title}</span>
-                  </label>
-                </div>
-              ))}
-            </div>
-          )
+          <>
+            {questions && questions.length > 0 ? (
+              <div className="max-h-56 tall:max-h-96 overflow-y-auto">
+                {questions.map((question, index) => (
+                  <div key={index} className="mb-3">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox text-primary border-primary"
+                        onChange={() => handleQuestionSelection(question)}
+                        checked={selectedQuestions.includes(question)}
+                      />
+                      <span className="ml-2"> &nbsp; {question.title}</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center mt-4">Aucune question pour le moment</p>
+            )}
+          </>
         )}
+
         <ModalQuestionVideo
           isOpen={isModalOpen}
           onClose={closeModal}

@@ -215,6 +215,7 @@ export default function Film() {
             selectedQuestion,
             token
           );
+          handleNextQuestion();
         };
 
         recorder.start();
@@ -540,6 +541,7 @@ export default function Film() {
               controlsList="nodownload"
               preload="true"
               className="w-full h-full object-contain tall:object-cover"
+              onEnded={() => setShowIntro(false)}
             />
           )}
 
@@ -604,24 +606,14 @@ export default function Film() {
         </div>
 
         <div className="mt-4 flex items-center justify-center">
-          {!showIntro ? (
+          {!showIntro && (
             <>
-              {videoBase64 ? (
-                <button
-                  onClick={handleRedoRecording}
-                  className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
-                    status === "loading" ? "opacity-50 pointer-events-none" : ""
-                  }`}
-                  disabled={status === "loading"}
-                >
-                  Recommencer
-                </button>
-              ) : (
+              {videoBase64 ? null : (
                 <button
                   onClick={toggleRecording}
                   className={`${
                     recording
-                      ? "bg-red-500 hover.bg-red-700"
+                      ? "bg-red-500 hover:bg-red-700"
                       : "bg-green_2 hover:bg-green_1"
                   } text-white px-4 py-2 rounded-lg actionBtn ${
                     timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""
@@ -658,15 +650,9 @@ export default function Film() {
                 )
               )}
             </>
-          ) : (
-            <button
-              onClick={() => setShowIntro(false)}
-              className="bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1"
-            >
-              Je suis prêt
-            </button>
           )}
         </div>
+
       </div>
 
       {!showIntro && (
