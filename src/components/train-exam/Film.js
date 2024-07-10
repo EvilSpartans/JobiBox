@@ -62,7 +62,7 @@ export default function Film() {
       window.removeEventListener("keydown", handleKeyPress);
       window.removeEventListener("keyup", handleKeyRelease);
     };
-  }, [recording, videoBase64, countDown, isFilterApplied]);
+  }, [recording, videoBase64, countDown, isFilterApplied, showIntro]);
 
   useEffect(() => {
     currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
@@ -87,6 +87,7 @@ export default function Film() {
   // Make Pad working
   const handleKeyPress = (event) => {
     if (
+      !showIntro &&
       !isKeyPressed.current &&
       /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)
     ) {
