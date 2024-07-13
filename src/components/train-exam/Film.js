@@ -4,15 +4,10 @@ import { useNavigate } from "react-router-dom";
 import {
   createVideoProcess,
   changeStatus,
-  deleteVideoProcess,
   updateVideoProcess,
 } from "../../store/slices/videoProcessSlice";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getGreenFilters } from "../../store/slices/greenFilterSlice";
-import ModalGreenFilter from "../modals/ModalGreenFilter";
 import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../core/Tuto";
 
 export default function Film() {
@@ -39,11 +34,6 @@ export default function Film() {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [createdVideoId, setCreatedVideoId] = useState(null);
   const [createdVideoPath, setCreatedVideoPath] = useState(null);
-  const [greenFilters, setGreenFilters] = useState([]);
-  const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAddOpen, setModalAddOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [cameraLoading, setCameraLoading] = useState(true);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
@@ -54,6 +44,8 @@ export default function Film() {
   const currentQuestionIdRef = useRef();
   const isKeyPressed = useRef(false);
   const isCountdownActive = useRef(false);
+
+  const selectedGreenFilter = JSON.parse(localStorage.getItem("selectedGreenFilter"));
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -102,15 +94,6 @@ export default function Film() {
     isKeyPressed.current = false;
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-    fetchGreenFilters();
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   const initializeCamera = async () => {
     try {
       setCameraLoading(true);
@@ -118,8 +101,8 @@ export default function Film() {
         .getUserMedia({
           video: {
             facingMode: "portrait",
-            width: { ideal: 640 }, // Largeur souhaitée
-            height: { ideal: 1136 }, // Hauteur souhaitée
+            width: { ideal: 640 }, 
+            height: { ideal: 1136 }, 
           },
           audio: true,
         })
@@ -134,12 +117,12 @@ export default function Film() {
         }
       };
 
-      if (isFilterApplied) {
-        handleApplyBackground();
+      if (selectedGreenFilter) {
+        handleApplyBackground(selectedGreenFilter);
       }
 
     } catch (error) {
-      console.error("Erreur lors de l'accès à la caméra : ", error);
+      // console.error("Erreur lors de l'accès à la caméra : ", error);
       navigate("/malfunction");
     } finally {
       setCameraLoading(false);
@@ -165,7 +148,6 @@ export default function Film() {
       try {
         dispatch(changeStatus("loading"));
 
-        // Début du décompte
         await startCountdown();
         setCountdown(0);
 
@@ -178,8 +160,8 @@ export default function Film() {
           : await navigator.mediaDevices.getUserMedia({
               video: {
                 facingMode: "portrait",
-                width: { ideal: 640 }, // Largeur souhaitée
-                height: { ideal: 1136 }, // Hauteur souhaitée
+                width: { ideal: 640 },
+                height: { ideal: 1136 }, 
               },
             });
 
@@ -228,7 +210,7 @@ export default function Film() {
 
         setTimerIntervalId(intervalId);
       } catch (error) {
-        console.error("Erreur lors de l'accès à la caméra : ", error);
+        // console.error("Erreur lors de l'accès à la caméra : ", error);
         navigate("/malfunction");
       }
     } else {
@@ -329,29 +311,6 @@ export default function Film() {
     }
   };
 
-  const deleteLastVideo = async () => {
-    try {
-      await dispatch(
-        deleteVideoProcess({
-          token: token,
-          id: createdVideoId,
-        })
-      );
-    } catch (error) {
-      console.error("Error :", error);
-    } finally {
-    }
-  };
-
-  const handleRedoRecording = () => {
-    deleteLastVideo();
-    setVideoBase64(null);
-    setCreatedVideoPath(null);
-    setTimer(0);
-    clearInterval(timerIntervalId);
-    setMediaStream(null);
-  };
-
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600)
       .toString()
@@ -370,58 +329,42 @@ export default function Film() {
   });
 
   let backgroundImage;
-  
-  const fetchGreenFilters = async () => {
-    try {
-      const response = await dispatch(getGreenFilters(token));
-      const greenFiltersData = response.payload;
-      setGreenFilters(greenFiltersData);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des filtres :", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleApplyBackground = async () => {
-    if (
-      selectedGreenFilterIndex >= 0 &&
-      greenFilters[selectedGreenFilterIndex]
-    ) {
-      if (canvasRef.current && videoCameraRef.current) {
-        backgroundImage = new Image();
-        backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[selectedGreenFilterIndex].image}`;
-  
-        const checkVideoDimensions = () => {
-          const videoWidth = videoCameraRef.current.videoWidth;
-          const videoHeight = videoCameraRef.current.videoHeight;
-  
-          if (videoWidth > 0 && videoHeight > 0) {
-            canvasRef.current.width = videoWidth;
-            canvasRef.current.height = videoHeight;
-            
-            selfieSegmentation.setOptions({
-              modelSelection: 0,
-              selfieMode: false,
-              effect: 'mask',
-            });
-            selfieSegmentation.onResults(onResults);
-  
-            sendToMediaPipe();
-  
-            setIsFilterApplied(true);
-            closeModal();
-          } else {
-            console.error("Video dimensions are not valid. Retrying...");
-            setTimeout(checkVideoDimensions, 100);
-          }
-        };
-  
-        checkVideoDimensions();
-      } else {
-        console.error("canvasRef is not defined.");
+  const handleApplyBackground = async (filter) => {
+      if (filter) {
+        if (canvasRef.current && videoCameraRef.current) {
+          backgroundImage = new Image();
+          backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
+    
+          const checkVideoDimensions = () => {
+            const videoWidth = videoCameraRef.current.videoWidth;
+            const videoHeight = videoCameraRef.current.videoHeight;
+    
+            if (videoWidth > 0 && videoHeight > 0) {
+              canvasRef.current.width = videoWidth;
+              canvasRef.current.height = videoHeight;
+              
+              selfieSegmentation.setOptions({
+                modelSelection: 0,
+                selfieMode: false,
+                effect: 'mask',
+              });
+              selfieSegmentation.onResults(onResults);
+    
+              sendToMediaPipe();
+    
+              setIsFilterApplied(true);
+            } else {
+              // console.error("Video dimensions are not valid. Retrying...");
+              setTimeout(checkVideoDimensions, 100);
+            }
+          };
+    
+          checkVideoDimensions();
+        } else {
+          console.error("canvasRef is not defined.");
+        }
       }
-    }
   };
 
   const onResults = (results) => {
@@ -450,22 +393,17 @@ export default function Film() {
 
     contextRef.current.globalCompositeOperation = "source-out";
 
-    if (
-      selectedGreenFilterIndex >= 0 &&
-      greenFilters[selectedGreenFilterIndex]
-    ) {
-      // Inverser l'image sur l'axe X
-      contextRef.current.save();
-      contextRef.current.scale(-1, 1);
-      contextRef.current.drawImage(
-        backgroundImage,
-        -canvasRef.current.width,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-      contextRef.current.restore();
-    }
+    // Inverser l'image sur l'axe X
+    contextRef.current.save();
+    contextRef.current.scale(-1, 1);
+    contextRef.current.drawImage(
+      backgroundImage,
+      -canvasRef.current.width,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+    contextRef.current.restore();
 
     contextRef.current.globalCompositeOperation = "destination-atop";
     contextRef.current.drawImage(
@@ -487,11 +425,6 @@ export default function Film() {
         requestAnimationFrame(sendToMediaPipe);
       }
   }
-
-  const handleRemoveBackground = () => {
-    setIsFilterApplied(false);
-    setMediaStream(null);
-  };
 
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
@@ -626,30 +559,6 @@ export default function Film() {
                     : "Démarrer l'enregistrement"}
                 </button>
               )}
-
-              {!videoBase64 && (
-                isFilterApplied ? (
-                  <button
-                    onClick={handleRemoveBackground}
-                    className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
-                      status === "loading" ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    disabled={status === "loading"}
-                  >
-                    <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
-                  </button>
-                ) : (
-                  <button
-                    onClick={openModal}
-                    className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
-                      status === "loading" ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    disabled={status === "loading"}
-                  >
-                    Ecran vert
-                  </button>
-                )
-              )}
             </>
           )}
         </div>
@@ -674,65 +583,6 @@ export default function Film() {
           )}
         </button>
       )}
-
-      {/* GreenFilter Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
-          {loading ? (
-            <div className="text-center">
-              <PulseLoader color="#808080" size={16} />
-            </div>
-          ) : (
-            <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-              <p className="text-gray-800 text-lg">Liste des écrans verts</p>
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                {greenFilters.map((filter, index) => (
-                  <div
-                    key={filter.id}
-                    className={`card cursor-pointer mb-2 mx-2 relative ${
-                      selectedGreenFilterIndex === index
-                        ? "filter-selected"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedGreenFilterIndex(index)}
-                  >
-                    <img
-                      src={`${BASE_URL}/uploads/greenFilters/${filter.image}`}
-                      alt={filter.title}
-                      className="w-full h-32 object-cover rounded-md mb-2"
-                    />
-                    {selectedGreenFilterIndex === index && (
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <p className="text-blue-500 text-3xl">&hearts;</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <button
-                className="mt-4 mr-4 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-                onClick={handleApplyBackground}
-              >
-                Appliquer
-              </button>
-              <button
-                className="mt-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-md"
-                onClick={closeModal}
-              >
-                Fermer
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-      {/* ---- */}
-
-      <ModalGreenFilter
-        isOpen={modalAddOpen}
-        onClose={() => setModalAddOpen(false)}
-        fetchGreenFilters={fetchGreenFilters}
-      />
 
       <Tuto
         steps={[

@@ -11,6 +11,7 @@ export default function Home() {
   const exam = localStorage.getItem("examActivated");
   const isTrainExam = localStorage.getItem('isTrainExam');
   const examenInProgress = localStorage.getItem('examenInProgress');
+  const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
 
   useEffect(() => {
     if (training !== "true" && exam !== "true") {
@@ -23,6 +24,10 @@ export default function Home() {
 
     if (examenInProgress === 'true') {
       localStorage.removeItem('examenInProgress');
+    }
+
+    if (existingSelectedGreenFilter) {
+      localStorage.removeItem('selectedGreenFilter');
     }
 
   }, [training, exam, navigate]);
@@ -53,7 +58,7 @@ export default function Home() {
               className="w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
               onClick={() => navigate("/train")}
             >
-              Entrainement
+              Simulation d'entretien
             </button>
             )}
             {exam === "true" && (

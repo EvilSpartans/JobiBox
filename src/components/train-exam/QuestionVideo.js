@@ -72,7 +72,7 @@ export default function QuestionVideo() {
       "selectedQuestionsVideos",
       JSON.stringify(shuffledQuestions)
     );
-    navigate("/recordTE");
+    navigate("/greenFiltersTE");
   };
 
   return (

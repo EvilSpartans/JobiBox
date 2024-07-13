@@ -201,7 +201,7 @@ export default function Clip() {
         })
       );
       if (questions.length === 1) {
-        navigate("/questions");
+        navigate("/questionVideo");
       } else {
         fetchQuestions();
       }

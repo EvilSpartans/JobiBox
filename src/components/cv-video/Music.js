@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getMusics } from "../../store/slices/musicSlice";
 import PulseLoader from "react-spinners/PulseLoader";
-import ModalMusic from "../modals/ModalMusic";
+// import ModalMusic from "../modals/ModalMusic";
 import { useNavigate } from "react-router-dom";
 // import Tuto from "../Tuto";
 
@@ -19,7 +19,7 @@ export default function Music() {
   const [selectedMusic, setSelectedMusic] = useState(null);
   const [selectedLabel, setSelectedLabel] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
+  // const [modalOpen, setModalOpen] = useState(false);
 
   const fetchMusics = async () => {
     try {
@@ -40,7 +40,7 @@ export default function Music() {
   useEffect(() => {
     const existingSelectedMusic = localStorage.getItem("selectedMusic");
     if (existingSelectedMusic) {
-      navigate("/record");
+      navigate("/greenFilters");
     } else {
       fetchMusics();
     }
@@ -61,16 +61,16 @@ export default function Music() {
     audioPlayer.play();
   };
 
-  const handleNewMusicClick = () => {
-    setModalOpen(true);
-  };
+  // const handleNewMusicClick = () => {
+  //   setModalOpen(true);
+  // };
 
   const handleContinueClick = () => {
     const selectedMusic = musics[selectedLabel];
     if (selectedMusic) {
       localStorage.setItem("selectedMusic", JSON.stringify(selectedMusic));
     }
-    navigate("/record");
+    navigate("/greenFilters");
   };
 
   return (
@@ -163,11 +163,11 @@ export default function Music() {
           </div>
         )}
 
-        <ModalMusic
+        {/* <ModalMusic
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           fetchMusics={fetchMusics}
-        />
+        /> */}
       </div>
       <button
         className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide

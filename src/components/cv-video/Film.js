@@ -8,13 +8,8 @@ import {
   updateVideoProcess,
 } from "../../store/slices/videoProcessSlice";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getGreenFilters } from "../../store/slices/greenFilterSlice";
-import ModalGreenFilter from "../modals/ModalGreenFilter";
 import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import Tuto from "../core/Tuto";
-// import { gzipSync } from 'fflate';
 
 export default function Film() {
   
@@ -24,9 +19,11 @@ export default function Film() {
   const { status, error } = useSelector((state) => state.videoProcess);
   const { token } = user;
   const dispatch = useDispatch();
+
   const selectedTheme = JSON.parse(localStorage.getItem("selectedTheme"));
   const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
   const textStyle = JSON.parse(localStorage.getItem("textStyle"));
+  const selectedGreenFilter = JSON.parse(localStorage.getItem("selectedGreenFilter"));
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -43,9 +40,6 @@ export default function Film() {
   const [createdVideoPath, setCreatedVideoPath] = useState(null);
   const [greenFilters, setGreenFilters] = useState([]);
   const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAddOpen, setModalAddOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [cameraLoading, setCameraLoading] = useState(true);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
 
@@ -102,15 +96,6 @@ export default function Film() {
     isKeyPressed.current = false;
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-    fetchGreenFilters();
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   // const handleNewGreenFilter = () => {
   //     setModalAddOpen(true);
   // };
@@ -122,8 +107,8 @@ export default function Film() {
         .getUserMedia({
           video: {
             facingMode: "portrait",
-            width: { ideal: 640 }, // Largeur souhaitée
-            height: { ideal: 1136 }, // Hauteur souhaitée
+            width: { ideal: 640 }, 
+            height: { ideal: 1136 }, 
           },
           audio: true,
         })
@@ -138,8 +123,8 @@ export default function Film() {
         }
       };
 
-      if (isFilterApplied) {
-        handleApplyBackground();
+      if (selectedGreenFilter) {
+        handleApplyBackground(selectedGreenFilter);
       }
 
     } catch (error) {
@@ -169,7 +154,6 @@ export default function Film() {
       try {
         dispatch(changeStatus("loading"));
 
-        // Début du décompte
         await startCountdown();
         setCountdown(0);
 
@@ -182,8 +166,8 @@ export default function Film() {
           : await navigator.mediaDevices.getUserMedia({
               video: {
                 facingMode: "portrait",
-                width: { ideal: 640 }, // Largeur souhaitée
-                height: { ideal: 1136 }, // Hauteur souhaitée
+                width: { ideal: 640 }, 
+                height: { ideal: 1136 },
               },
             });
 
@@ -253,15 +237,6 @@ export default function Film() {
     let attempts = 0;
     const maxAttempts = 5;
     const retryDelay = 2000;
-
-    // COMPRESS...
-    // const videoArrayBuffer = await videoFile.arrayBuffer();
-    // const videoUint8Array = new Uint8Array(videoArrayBuffer);
-    // console.log(`Original video size: ${videoUint8Array.byteLength} bytes`);
-
-    // const compressedVideo = gzipSync(videoUint8Array, { level: 9 });
-    // const compressedBlob = new Blob([compressedVideo], { type: "application/gzip" });
-    // console.log(`Compressed video size: ${compressedBlob.byteLength} bytes`);
   
     while (attempts < maxAttempts) {
       try {
@@ -332,9 +307,10 @@ export default function Film() {
       setCreatedVideoPath(null);
       setRecording(false);
       setMediaStream(null);
+      setShowIntro(true);
     } else {
       localStorage.removeItem("selectedQuestions");
-      navigate("/review");
+      navigate("/review");      
     }
   };
 
@@ -359,13 +335,6 @@ export default function Film() {
     setTimer(0);
     clearInterval(timerIntervalId);
     setMediaStream(null);
-
-      // if (isFilterApplied) {
-      //   setShouldReapplyGreenFilter(true);
-      // } else {
-      //     initializeCamera();
-      // }
-
   };
 
   const formatTime = (seconds) => {
@@ -386,27 +355,12 @@ export default function Film() {
   });
 
   let backgroundImage;
-  
-  const fetchGreenFilters = async () => {
-    try {
-      const response = await dispatch(getGreenFilters(token));
-      const greenFiltersData = response.payload;
-      setGreenFilters(greenFiltersData);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des filtres :", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleApplyBackground = async () => {
-    if (
-      selectedGreenFilterIndex >= 0 &&
-      greenFilters[selectedGreenFilterIndex]
-    ) {
+  const handleApplyBackground = async (filter) => {
+    if (filter) {
       if (canvasRef.current && videoCameraRef.current) {
         backgroundImage = new Image();
-        backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[selectedGreenFilterIndex].image}`;
+        backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
   
         const checkVideoDimensions = () => {
           const videoWidth = videoCameraRef.current.videoWidth;
@@ -426,9 +380,8 @@ export default function Film() {
             sendToMediaPipe();
   
             setIsFilterApplied(true);
-            closeModal();
           } else {
-            console.error("Video dimensions are not valid. Retrying...");
+            // console.error("Video dimensions are not valid. Retrying...");
             setTimeout(checkVideoDimensions, 100);
           }
         };
@@ -466,22 +419,17 @@ export default function Film() {
 
     contextRef.current.globalCompositeOperation = "source-out";
 
-    if (
-      selectedGreenFilterIndex >= 0 &&
-      greenFilters[selectedGreenFilterIndex]
-    ) {
-      // Inverser l'image sur l'axe X
-      contextRef.current.save();
-      contextRef.current.scale(-1, 1);
-      contextRef.current.drawImage(
-        backgroundImage,
-        -canvasRef.current.width,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-      contextRef.current.restore();
-    }
+    // Inverser l'image sur l'axe X
+    contextRef.current.save();
+    contextRef.current.scale(-1, 1);
+    contextRef.current.drawImage(
+      backgroundImage,
+      -canvasRef.current.width,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+    contextRef.current.restore();
 
     contextRef.current.globalCompositeOperation = "destination-atop";
     contextRef.current.drawImage(
@@ -503,11 +451,6 @@ export default function Film() {
         requestAnimationFrame(sendToMediaPipe);
       }
   }
-
-  const handleRemoveBackground = () => {
-    setIsFilterApplied(false);
-    setMediaStream(null);
-  };
 
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
@@ -640,31 +583,6 @@ export default function Film() {
                 : "Démarrer l'enregistrement"}
             </button>
           )}
-
-          {!videoBase64 && (
-            isFilterApplied ? (
-              <button
-                onClick={handleRemoveBackground}
-                className={`ml-4 bg-orange-500 hover:bg-orange-700 text-white px-4 py-2 rounded-lg ${
-                  status === "loading" ? "opacity-50 pointer-events-none" : ""
-                }`}
-                disabled={status === "loading"}
-              >
-                <FontAwesomeIcon icon={faTrash} className="" /> Ecran vert
-              </button>
-            ) : (
-              <button
-                onClick={openModal}
-                className={`greenFilter ml-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg ${
-                  status === "loading" ? "opacity-50 pointer-events-none" : ""
-                }`}
-                disabled={status === "loading"}
-              >
-                Ecran vert
-              </button>
-            )
-          )}
-
         </div>
       </div>
 
@@ -684,84 +602,6 @@ export default function Film() {
           "Continuer"
         )}
       </button>
-
-      {/* GreenFilter Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
-          {loading ? (
-            <div className="text-center">
-              <PulseLoader color="#808080" size={16} />
-            </div>
-          ) : (
-            <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-              <p className="text-gray-800 text-lg">Liste des écrans verts</p>
-              <div className="grid grid-cols-3 gap-4 mt-4">
-                {/* Ajouter la première image en haut de la liste */}
-                {/* <div
-                  className={`card cursor-pointer mb-2 mx-2 ${
-                    selectedGreenFilterIndex === -1 ? "filter-selected" : ""
-                  }`}
-                  onClick={() => handleNewGreenFilter(-1)}
-                >
-                  <img
-                    src="assets/themes/addTheme.png"
-                    alt="Ajouter un thème"
-                    className="w-full h-32 object-cover rounded-md mb-2"
-                  />
-                  {selectedGreenFilterIndex === -1 && (
-                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                      <p className="text-blue-500 text-3xl">&hearts;</p>
-                    </div>
-                  )}
-                </div> */}
-
-                {greenFilters.map((filter, index) => (
-                  <div
-                    key={filter.id}
-                    className={`card cursor-pointer mb-2 mx-2 relative ${
-                      selectedGreenFilterIndex === index
-                        ? "filter-selected"
-                        : ""
-                    }`}
-                    onClick={() => setSelectedGreenFilterIndex(index)}
-                  >
-                    <img
-                      src={`${BASE_URL}/uploads/greenFilters/${filter.image}`}
-                      alt={filter.title}
-                      className="w-full h-32 object-cover rounded-md mb-2"
-                    />
-                    {selectedGreenFilterIndex === index && (
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <p className="text-blue-500 text-3xl">&hearts;</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <button
-                className="mt-4 mr-4 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-                onClick={handleApplyBackground}
-              >
-                Appliquer
-              </button>
-              <button
-                className="mt-4 bg-yellow-500 hover:bg-yellow-700 text-white px-4 py-2 rounded-md"
-                onClick={closeModal}
-              >
-                Fermer
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-      {/* ---- */}
-
-      <ModalGreenFilter
-        isOpen={modalAddOpen}
-        onClose={() => setModalAddOpen(false)}
-        fetchGreenFilters={fetchGreenFilters}
-      />
 
       <Tuto
         steps={[

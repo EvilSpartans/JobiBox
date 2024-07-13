@@ -10,10 +10,12 @@ import Record from "../screens/cv-video/Record";
 import Review from "../screens/cv-video/Review";
 import Post from "../screens/cv-video/Post";
 import CvVideo from '../screens/cv-video/CvVideo';
+import GreenFilters from '../screens/cv-video/GreenFilters';
 
 const CvVideoRoutes = ({ token }) => [
     <Route key="questions" path="/questions" element={token ? <Questions /> : <Navigate to="/welcome" />} />,
     <Route key="themes" path="/themes" element={token ? <Themes /> : <Navigate to="/welcome" />} />,
+    <Route key="greenFilters" path="/greenFilters" element={token ? <GreenFilters /> : <Navigate to="/welcome" />} />,
     <Route key="textStyles" path="/textStyles" element={token ? <TextStyles /> : <Navigate to="/welcome" />} />,
     <Route key="musics" path="/musics" element={token ? <Musics /> : <Navigate to="/welcome" />} />,
     <Route key="record" path="/record" element={token ? <Record /> : <Navigate to="/welcome" />} />,

@@ -5,7 +5,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getThemes } from "../../store/slices/themeSlice";
 import PulseLoader from "react-spinners/PulseLoader";
-import ModalTheme from "../modals/ModalTheme";
+// import ModalTheme from "../modals/ModalTheme";
 import { useNavigate } from "react-router-dom";
 
 export default function Theme() {
@@ -19,7 +19,7 @@ export default function Theme() {
   const [themes, setThemes] = useState([]);
   const [selectedThemeIndex, setSelectedThemeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
+  // const [modalOpen, setModalOpen] = useState(false);
 
   const sliderSettings = {
     infinite: true,
@@ -30,9 +30,9 @@ export default function Theme() {
 
   const navigate = useNavigate();
 
-  const handleNewThemeClick = () => {
-    setModalOpen(true);
-  };
+  // const handleNewThemeClick = () => {
+  //   setModalOpen(true);
+  // };
 
   const fetchThemes = async () => {
     try {
@@ -136,11 +136,11 @@ export default function Theme() {
           ))}
         </Slider>
 
-        <ModalTheme
+        {/* <ModalTheme
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           fetchThemes={fetchThemes}
-        />
+        /> */}
       </div>
       <button
         className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
