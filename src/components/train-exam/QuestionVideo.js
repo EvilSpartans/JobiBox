@@ -29,6 +29,7 @@ export default function QuestionVideo() {
 
   useEffect(() => {
     fetchQuestionVideos();
+    sessionStorage.removeItem('hasReloaded');
   }, [dispatch, token]);
 
   const openModal = () => {

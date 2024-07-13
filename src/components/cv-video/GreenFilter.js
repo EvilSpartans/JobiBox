@@ -51,7 +51,7 @@ export default function GreenFilter() {
 
     if (!hasReloaded) {
       sessionStorage.setItem('hasReloaded', 'true');
-      window.location.reload();
+      initializeCamera();
     } else {
       sessionStorage.removeItem('hasReloaded');
     }
@@ -106,6 +106,7 @@ export default function GreenFilter() {
     const selectedGreenFilter = greenFilters[selectedGreenFilterIndex];
     if (selectedGreenFilter) {
       localStorage.setItem("selectedGreenFilter", JSON.stringify(selectedGreenFilter));
+      sessionStorage.removeItem('hasReloaded');
     }
     navigate("/record");
   };

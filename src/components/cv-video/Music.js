@@ -39,6 +39,7 @@ export default function Music() {
 
   useEffect(() => {
     const existingSelectedMusic = localStorage.getItem("selectedMusic");
+    sessionStorage.removeItem('hasReloaded');
     if (existingSelectedMusic) {
       navigate("/greenFilters");
     } else {
