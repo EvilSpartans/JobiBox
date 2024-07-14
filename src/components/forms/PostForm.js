@@ -387,7 +387,7 @@ export default function PostForm() {
             type="submit"
             disabled={status}
           >
-            {status ? <PulseLoader color="#fff" size={16} /> : "Valider"}
+            {status ? <PulseLoader color="#fff" size={16} /> : "Publier"}
           </button>
         </form>
       </div>
