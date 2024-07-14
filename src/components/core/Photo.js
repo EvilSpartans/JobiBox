@@ -1,13 +1,42 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function Photo({ onPhotoTaken }) {
+
     const [photoConfirmed, setPhotoConfirmed] = useState(false); 
     const [showModal, setShowModal] = useState(false);
     const [photo, setPhoto] = useState(null);
+    const [countdown, setCountdown] = useState(null);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
+    const isKeyPressed = useRef(false);
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyPress);
+        window.addEventListener("keyup", handleKeyRelease);
+        return () => {
+          window.removeEventListener("keydown", handleKeyPress);
+          window.removeEventListener("keyup", handleKeyRelease);
+        };
+      }, [showModal, photo]);
+    
+      // Make Pad working
+      const handleKeyPress = (event) => {
+        if (
+          !isKeyPressed.current &&
+          /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)
+        ) {
+          isKeyPressed.current = true;
+          if (showModal && !photo) {
+            startCountdown();
+          }
+        }
+      };
+
+      const handleKeyRelease = () => {
+        isKeyPressed.current = false;
+      };
 
     let stream;
 
@@ -19,7 +48,7 @@ export default function Photo({ onPhotoTaken }) {
                     width: { ideal: 640 },
                     height: { ideal: 1136 },
                 },
-                audio: false, // Désactiver l'audio
+                audio: false, 
             })
             .then(stream => {
                 videoRef.current.srcObject = stream;
@@ -50,6 +79,20 @@ export default function Photo({ onPhotoTaken }) {
                     onPhotoTaken(file);
                 });
         }
+    };
+
+    const startCountdown = () => {
+        let countdownValue = 3;
+        setCountdown(countdownValue);
+        const countdownInterval = setInterval(() => {
+            countdownValue -= 1;
+            setCountdown(countdownValue);
+            if (countdownValue === 0) {
+                clearInterval(countdownInterval);
+                takePhoto();
+                setCountdown(null);
+            }
+        }, 1000);
     };
 
     const handleSubmit = async () => {
@@ -85,6 +128,7 @@ export default function Photo({ onPhotoTaken }) {
             >
                 <FontAwesomeIcon icon={faCamera} size="lg" /> 
                 {photoConfirmed && <FontAwesomeIcon icon={faCheckCircle} size="lg" className="ml-2 text-green-500" />}
+                &nbsp; <span className='text-sm'>Miniature vidéo</span>
             </button>
 
             {showModal && (
@@ -100,14 +144,22 @@ export default function Photo({ onPhotoTaken }) {
                         {photo ? (
                             <img src={photo} alt="Captured" className="mx-auto" />
                         ) : (
-                            <div>
+                            <div className="relative">
                                 <video ref={videoRef} autoPlay className="w-full h-auto transform -scale-x-100" /> {/* Mirror video */}
                                 <button
                                     className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
-                                    onClick={takePhoto}
+                                    onClick={startCountdown}
                                 >
                                     Prendre la Photo
                                 </button>
+                                {countdown !== null && (
+                                    <div className="countdown-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 text-white text-9xl">
+                                        {countdown}
+                                        <p className="text-sm mt-3 text-center">
+                                            Souris et regarde la caméra 😉 !
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         )}
                         {photo && (
