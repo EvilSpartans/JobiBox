@@ -62,6 +62,7 @@ export default function Film() {
   }, [currentQuestionIndex, questions]);
 
   useEffect(() => {
+    sessionStorage.removeItem('hasReloaded');
     const selectedQuestions = JSON.parse(
       localStorage.getItem("selectedQuestionsVideos")
     );

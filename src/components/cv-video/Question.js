@@ -14,14 +14,14 @@ export default function Question() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState("Candidat");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [questionOrder, setQuestionOrder] = useState([]);
+  const [selectedQuestionsCandidat, setSelectedQuestionsCandidat] = useState([]);
+  const [selectedQuestionsRecruteur, setSelectedQuestionsRecruteur] = useState([]);
 
-  // Create separate arrays for selected questions in each tab
-  const [selectedQuestionsCandidat, setSelectedQuestionsCandidat] = useState(
-    []
-  );
-  const [selectedQuestionsRecruteur, setSelectedQuestionsRecruteur] = useState(
-    []
-  );
+  useEffect(() => {
+    fetchQuestions();
+  }, [dispatch, token]);
 
   const fetchQuestions = async () => {
     try {
@@ -35,13 +35,6 @@ export default function Question() {
     }
   };
 
-  useEffect(() => {
-    fetchQuestions();
-  }, [dispatch, token]);
-
-  // Modal related code
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -52,27 +45,23 @@ export default function Question() {
 
   // Handle question selection
   const handleQuestionSelection = (question) => {
+    const updateOrder = (selectedQuestions, setSelectedQuestions) => {
+        if (selectedQuestions.includes(question)) {
+            const newOrder = questionOrder.filter(q => q !== question);
+            setQuestionOrder(newOrder);
+            setSelectedQuestions(selectedQuestions.filter(q => q !== question));
+        } else {
+            setSelectedQuestions([...selectedQuestions, question]);
+            setQuestionOrder([...questionOrder, question]);
+        }
+    };
+
     if (currentTab === "Candidat") {
-      if (selectedQuestionsCandidat.includes(question)) {
-        setSelectedQuestionsCandidat(
-          selectedQuestionsCandidat.filter((q) => q !== question)
-        );
-      } else {
-        setSelectedQuestionsCandidat([...selectedQuestionsCandidat, question]);
+        updateOrder(selectedQuestionsCandidat, setSelectedQuestionsCandidat);
         setSelectedQuestionsRecruteur([]);
-      }
     } else if (currentTab === "Recruteur") {
-      if (selectedQuestionsRecruteur.includes(question)) {
-        setSelectedQuestionsRecruteur(
-          selectedQuestionsRecruteur.filter((q) => q !== question)
-        );
-      } else {
-        setSelectedQuestionsRecruteur([
-          ...selectedQuestionsRecruteur,
-          question,
-        ]);
+        updateOrder(selectedQuestionsRecruteur, setSelectedQuestionsRecruteur);
         setSelectedQuestionsCandidat([]);
-      }
     }
   };
 
@@ -84,18 +73,14 @@ export default function Question() {
 
   // Save to localStorage
   const handleContinueClick = () => {
-    const allSelectedQuestions = [
-      ...selectedQuestionsCandidat,
-      ...selectedQuestionsRecruteur,
-    ];
+    const allSelectedQuestions = [...selectedQuestionsCandidat, ...selectedQuestionsRecruteur];
     const existingSelectedQuestions = localStorage.getItem("selectedQuestions");
     if (existingSelectedQuestions) {
-      localStorage.removeItem("selectedQuestions");
+        localStorage.removeItem("selectedQuestions");
+        localStorage.removeItem("questionOrder");
     }
-    localStorage.setItem(
-      "selectedQuestions",
-      JSON.stringify(allSelectedQuestions)
-    );
+    localStorage.setItem("selectedQuestions", JSON.stringify(allSelectedQuestions));
+    localStorage.setItem("questionOrder", JSON.stringify(questionOrder));
     navigate("/themes");
   };
 
@@ -160,17 +145,22 @@ export default function Question() {
                 {questions
                   .filter((question) => question.type === currentTab)
                   .map((question, index) => (
-                    <div key={index} className="mb-3">
+                  <div key={index} className="mb-3 flex items-center">
                       <label className="inline-flex items-center">
-                        <input
-                          type="checkbox"
-                          className="form-checkbox text-primary border-primary"
-                          onChange={() => handleQuestionSelection(question)}
-                          checked={selectedQuestions.includes(question)}
-                        />
-                        <span className="ml-2"> &nbsp; {question.title}</span>
+                          <input
+                              type="checkbox"
+                              className="form-checkbox text-primary border-primary"
+                              onChange={() => handleQuestionSelection(question)}
+                              checked={selectedQuestions.includes(question)}
+                          />
+                          <span className="ml-2"> &nbsp; {question.title}</span>
                       </label>
-                    </div>
+                      {questionOrder.includes(question) && (
+                          <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+                              {questionOrder.indexOf(question) + 1}
+                          </span>
+                      )}
+                  </div>
                   ))}
                 {questions.filter((question) => question.type === currentTab).length === 0 && (
                   <p className="text-center mt-4">Aucune question pour le moment</p>

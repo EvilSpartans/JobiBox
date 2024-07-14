@@ -10,10 +10,12 @@ import {
 import PulseLoader from "react-spinners/PulseLoader";
 import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
 import Tuto from "../core/Tuto";
+import IntroQuestion from "./IntroQuestion";
 
 export default function Film() {
   
   const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
+
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const { status, error } = useSelector((state) => state.videoProcess);
@@ -38,10 +40,9 @@ export default function Film() {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [createdVideoId, setCreatedVideoId] = useState(null);
   const [createdVideoPath, setCreatedVideoPath] = useState(null);
-  const [greenFilters, setGreenFilters] = useState([]);
-  const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(0);
   const [cameraLoading, setCameraLoading] = useState(true);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
 
   const refVideoRecord = useRef();
   const canvasRef = useRef();
@@ -65,19 +66,20 @@ export default function Film() {
   }, [currentQuestionIndex, questions]);
 
   useEffect(() => {
-    const selectedQuestions = JSON.parse(
-      localStorage.getItem("selectedQuestions")
-    );
-    if (selectedQuestions) {
-      setQuestions(selectedQuestions);
+    sessionStorage.removeItem('hasReloaded');
+    const selectedQuestions = JSON.parse(localStorage.getItem("selectedQuestions"));
+    const questionOrder = JSON.parse(localStorage.getItem("questionOrder"));
+    if (selectedQuestions && questionOrder) {
+        const orderedQuestions = questionOrder.map(order => selectedQuestions.find(q => q.id === order.id));
+        setQuestions(orderedQuestions);
     }
   }, []);
 
   useEffect(() => {
-    if (!mediaStream) {
+    if (!mediaStream && !showIntro) {
       initializeCamera();
     }
-  }, [mediaStream]);
+  }, [mediaStream, showIntro]);
 
   // Make Pad working
   const handleKeyPress = (event) => {
@@ -452,7 +454,18 @@ export default function Film() {
       }
   }
 
-  return (
+  return showIntro ? (
+    <div>
+      {showIntro && questions.length > 0 && (
+        <IntroQuestion
+          question={questions[currentQuestionIndex]}
+          textStyle={textStyle}
+          selectedTheme={selectedTheme}
+          setShowIntro={setShowIntro}
+        />
+      )}
+    </div>
+  ) : (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
         <div className="mt-6 text-base">
@@ -485,7 +498,6 @@ export default function Film() {
                   ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}`
                   : null
               }
-              // src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
               controlsList="nodownload"
@@ -498,7 +510,7 @@ export default function Film() {
             <div className="countdown-overlay">
               {timer}
               <p className="text-sm mt-3 text-center text-white">
-                Souris et regarde la caméra 😉 !{" "}
+                Souris et regarde la caméra 😉 !
               </p>
             </div>
           )}
@@ -534,7 +546,6 @@ export default function Film() {
                 } ${recording ? "" : "hidden"}`}
                 style={{
                   position: "absolute",
-                  // filter: "blur(3px)",
                   transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
                 }}
                 autoPlay
@@ -571,7 +582,7 @@ export default function Film() {
               onClick={toggleRecording}
               className={`${
                 recording
-                  ? "bg-red-500 hover.bg-red-700"
+                  ? "bg-red-500 hover:bg-red-700"
                   : "bg-green_2 hover:bg-green_1"
               } text-white px-4 py-2 rounded-lg actionBtn ${
                 timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""
@@ -587,7 +598,7 @@ export default function Film() {
       </div>
 
       <button
-        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover.bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
           !videoBase64 || status === "loading"
             ? "opacity-50 pointer-events-none"
             : ""
