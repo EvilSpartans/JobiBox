@@ -65,7 +65,7 @@ export default function JobiboxForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Configuration</h2>
-          <p className="mt-6 text-base">Connexion à la page <span className="text-blue-400">entreprise.</span></p>
+          <p className="mt-6 text-lg">Connexion à la page <span className="text-blue-400">entreprise.</span></p>
         </div>
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">

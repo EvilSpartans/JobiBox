@@ -9,7 +9,6 @@ import {
 } from "../../store/slices/videoProcessSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
-import Tuto from "../core/Tuto";
 import IntroQuestion from "./IntroQuestion";
 
 export default function Film() {
@@ -261,6 +260,7 @@ export default function Film() {
             musicId: selectedMusic.id,
             fontSize: textStyle.fontSize,
             fontColor: textStyle.textColor,
+            animation: 'scrolling'
           };
         }
   
@@ -469,7 +469,7 @@ export default function Film() {
   ) : (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
-        <div className="mt-6 text-base">
+        <div className="mt-6 text-lg">
           <p>
             C'est le moment de <span className="text-blue-400">filmer</span> ta
             séquence.
@@ -614,26 +614,6 @@ export default function Film() {
           "Continuer"
         )}
       </button>
-
-      <Tuto
-        steps={[
-          {
-            element: ".currentQuestion",
-            intro: "Le titre de la question en cours s'affichera ici.",
-          },
-          {
-            element: ".actionBtn",
-            intro:
-              "Démarre, recommence ou arrête un enregistrement depuis ce bouton.",
-          },
-          {
-            element: ".greenFilter",
-            intro:
-              "Tu peux aussi appliquer un écran vert pour changer le décor derrière toi.",
-          },
-        ]}
-        tutorialKey="filmTuto"
-      />
     </div>
   );
 }

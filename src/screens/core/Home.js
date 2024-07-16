@@ -44,7 +44,7 @@ export default function Home() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
             <h2 className="mt-6 text-3xl font-bold"><span className="text-blue_3">J</span>obiBox</h2>
-            <p className="mt-12 text-base">Bonjour <span className="text-blue-400">{user.username}</span>.</p>
+            <p className="mt-12 text-lg">Bonjour <span className="text-blue-400">{user.username}</span>.</p>
             </div>
             {/*Buttons*/}
             <button

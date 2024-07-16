@@ -24,7 +24,7 @@ export default function Malfunction() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-3xl font-bold">Dysfonctionnement</h2>
-              <p className="mt-6 text-base">Ton matériel semble défectueux, demande à un responsable de vérifier les branchements.</p>
+              <p className="mt-6 text-lg">Ton matériel semble défectueux, demande à un responsable de vérifier les branchements.</p>
             </div>
             {/*Buttons*/}
             <button className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"

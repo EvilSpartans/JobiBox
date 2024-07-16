@@ -11,6 +11,7 @@ export default function Welcome() {
   const handleKeyDown = useCallback((e) => {
     if (e.ctrlKey && e.altKey && e.key.toLowerCase() === "b") {
       localStorage.removeItem("businessId");
+      localStorage.removeItem('jobiboxId')
       alert("Configuration réinitialisée");
       navigate("/config");
     }
@@ -47,8 +48,8 @@ export default function Welcome() {
             className="mx-auto mt-10"
             style={{ maxHeight: "350px", width: "auto", height: "auto" }}
             />
-            <p className="mt-12 text-base">Bonjour à toi et bienvenue dans la Jobibox. Nous allons créer ensemble <span className="text-blue-400">ton CV vidéo</span> afin que tu te démarques dans ta recherche de stage, d’alternance ou d’emploi.</p>
-            <p className="mt-6 text-base">Ton CV vidéo sera ensuite <span className="text-blue-400">référencé sur la plateforme d’emploi Jobissim</span> afin que de nombreux recruteurs le voient et te contactent. Il te sera également envoyé par mail pour que tu le diffuses où tu le souhaites.</p>
+            <p className="mt-12 text-lg">Bonjour à toi et bienvenue dans la Jobibox. Nous allons créer ensemble <span className="text-blue-400">ton CV vidéo</span> afin que tu te démarques dans ta recherche de stage, d’alternance ou d’emploi.</p>
+            <p className="mt-6 text-lg">Ton CV vidéo sera ensuite <span className="text-blue-400">référencé sur la plateforme d’emploi Jobissim</span> afin que de nombreux recruteurs le voient et te contactent. Il te sera également envoyé par mail pour que tu le diffuses où tu le souhaites.</p>
             </div>
             {/*Buttons*/}
             <button

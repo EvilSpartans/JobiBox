@@ -53,7 +53,8 @@ export const createVideoProcess = createAsyncThunk(
             musicId,
             fontSize,
             fontColor,
-            questionVideo
+            questionVideo,
+            animation
         } = values;
 
         try {
@@ -65,6 +66,7 @@ export const createVideoProcess = createAsyncThunk(
             formData.append("fontSize", fontSize);
             formData.append("fontColor", fontColor);
             formData.append("questionVideo", questionVideo);
+            formData.append("animation", animation);
 
             const { data } = await axios.post(
                 `${BASE_URL}/videoProcess/create`,

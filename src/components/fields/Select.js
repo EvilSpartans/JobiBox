@@ -17,13 +17,13 @@ export default function Select({
 
     return (
         <div className="mt-8 content-center dark:text-dark_text_1 space-y-1">
-            <label htmlFor={name} className="text-sm font-bold tracking-wide">
+            <label htmlFor={name} className="text-base font-bold tracking-wide">
                 {placeholder}
             </label>
             <select
                 ref={selectRef}
                 onClick={handleSelectClick} 
-                className="w-full dark:bg-dark_bg_3 text-base py-2 px-4 rounded-lg h-10 outline-none"
+                className="w-full dark:bg-dark_bg_3 text-lg py-2 px-4 rounded-lg h-10 outline-none"
                 placeholder={placeholder}
                 {...register(name)}
                 defaultValue="Choisir"

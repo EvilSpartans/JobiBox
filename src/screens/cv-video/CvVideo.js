@@ -33,32 +33,32 @@ export default function CvVideo() {
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 {" "}
                 Ton <span className="text-blue-400">CV Vidéo</span> va se
                 réaliser en plusieurs étapes :
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Dans un premier temps, tu vas définir les questions qui te
                 serviront de{" "}
                 <span className="text-blue-400">fil conducteur.</span>
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Tu pourras ensuite choisir{" "}
                 <span className="text-blue-400">le thème et la musique</span>{" "}
                 qui te correspondent le mieux.
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 À la fin, une vue d'ensemble contenant l'ensemble de tes
                 séquences te sera proposée afin que tu puisses apporter des{" "}
                 <span className="text-blue-400">modifications</span> si tu le
                 souhaites.
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 La dernière étape te permettra de{" "}
                 <span className="text-blue-400">référencer</span> ta création,
                 afin de la diffuser auprès de tous nos partenaires. Tu recevras

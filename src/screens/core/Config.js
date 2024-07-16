@@ -55,7 +55,7 @@ export default function Config() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-3xl font-bold">Configuration</h2>
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Définir si la JobiBox doit être publique ou privée
               </p>
             </div>

@@ -40,7 +40,7 @@ export default function LoginForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Connexion</h2>
-          <p className="mt-6 text-base">
+          <p className="mt-6 text-lg">
               Tu peux te connecter avec tes <span className="text-blue-400">identifiants</span> Jobissim.
           </p>
         </div>

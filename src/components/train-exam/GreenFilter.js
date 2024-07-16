@@ -240,7 +240,7 @@ export default function GreenFilter() {
       {/* Heading */}
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des fonds verts</h2>
-        <p className="mt-6 text-base">
+        <p className="mt-6 text-lg">
           Pour finir, nous te recommandons de sélectionner un <span className="text-blue-400">fond vert</span> parmi la liste suivante. Celui-ci sera appliqué en arrière-plan dans tes séquences.
         </p>
       </div>

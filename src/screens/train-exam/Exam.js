@@ -74,26 +74,26 @@ export default function Exam() {
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 {" "}
                 Voici le déroulement de ton{" "}
                 <span className="text-blue-400">épreuve :</span>
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Ton référent t'a préparé une{" "}
                 <span className="text-blue-400">série de questions</span>{" "}
                 auxquelles tu devras répondre dans un format vidéo.
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Pour chacune d'entre elles, tu auras la possibilité de{" "}
                 <span className="text-blue-400">visionner plusieurs fois</span>{" "}
                 la séquence de la question, avant de te lancer dans l'enregistrement
                 de ta réponse.
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Une fois cette étape terminée, le montage se fera{" "}
                 <span className="text-blue-400">automatiquement</span> et tu
                 arriveras sur l'écran de publication.

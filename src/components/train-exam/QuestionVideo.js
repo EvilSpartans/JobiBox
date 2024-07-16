@@ -81,7 +81,7 @@ export default function QuestionVideo() {
       {/* Heading */}
       <div className="text-center dark:text-dark_text_1">
         <h2 className="text-3xl font-bold">Liste des questions</h2>
-        <p className="mt-6 text-base">
+        <p className="mt-6 text-lg">
           Tu vas pouvoir <span className="text-blue-400">sélectionner</span> les
           questions auxquelles tu vas répondre (entre 2 et 4 maximum) dans un
           format de type question / réponse en vidéo. L'objectif sera de{" "}

@@ -72,7 +72,7 @@ export default function Theme() {
       {/*Heading*/}
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des thèmes</h2>
-        <p className="mt-6 text-base">
+        <p className="mt-6 text-lg">
         Tu as sélectionné tes questions, tu peux maintenant <span className="text-blue-400">choisir un fond</span> de couleur (ou Template) sur lequel elles seront notées.
         </p>
       </div>

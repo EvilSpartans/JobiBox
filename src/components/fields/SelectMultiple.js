@@ -44,7 +44,7 @@ export default function SelectMultiple({
 
     return (
         <div className="mt-8 content-center dark:text-dark_text_1 space-y-1" style={style}>
-            <label htmlFor={name} className="text-sm font-bold tracking-wide">
+            <label htmlFor={name} className="text-base font-bold tracking-wide">
                 {placeholder}
             </label>
             <Select

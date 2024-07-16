@@ -33,18 +33,18 @@ export default function Train() {
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Tu vas pouvoir simuler un entretien à l'oral en toute{" "}
                 <span className="text-blue-400">liberté.</span>
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Dans un premier temps, tu vas définir les questions qui te
                 seront adressées, puis tu devras y répondre, le tout en
                 <span className="text-blue-400"> format vidéo.</span>
               </p>
 
-              <p className="mt-6 text-base">
+              <p className="mt-6 text-lg">
                 Tu auras ensuite{" "}
                 <span className="text-blue-400">une vue d'ensemble</span> de tes
                 différentes séquences et tu pourras envoyer ta vidéo à ton

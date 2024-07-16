@@ -22,11 +22,11 @@ export default function Input({
     return (
       <div className="mt-8 content-center dark:text-dark_text_1 space-y-1">
         <div className="flex flex-col"> 
-          <label htmlFor={name} className="text-sm font-bold tracking-wide py-1">
+          <label htmlFor={name} className="text-base font-bold tracking-wide py-1">
             {placeholder}
           </label>
           <DatePicker
-            className="w-full dark:bg-dark_bg_3 text-base py-2 px-4 rounded-lg outline-none"
+            className="w-full dark:bg-dark_bg_3 text-lg py-2 px-4 rounded-lg outline-none"
             selected={selected}
             onChange={onChange}
             placeholderText={placeholder}
@@ -39,12 +39,12 @@ export default function Input({
   } else {
     return (
       <div className="mt-8 content-center dark:text-dark_text_1 space-y-1" style={style}>
-        <label htmlFor={name} className="text-sm font-bold tracking-wide">
+        <label htmlFor={name} className="text-base font-bold tracking-wide">
           {placeholder}
         </label>
         <div className="relative">
           <input
-            className="w-full dark:bg-dark_bg_3 text-base py-2 px-4 rounded-lg outline-none"
+            className="w-full dark:bg-dark_bg_3 text-lg py-2 px-4 rounded-lg outline-none"
             type={isPasswordVisible ? "text" : type}
             placeholder={placeholder}
             {...register(name)}

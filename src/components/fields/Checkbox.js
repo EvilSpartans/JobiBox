@@ -13,9 +13,9 @@ export default function Checkbox({
                 type="checkbox"
                 id={name}
                 {...register(name)}
-                className="mr-2 dark:bg-dark_bg_3 text-base rounded-lg outline-none"
+                className="mr-2 dark:bg-dark_bg_3 text-lg rounded-lg outline-none"
             />
-            <label htmlFor={name} className="text-sm font-bold tracking-wide">
+            <label htmlFor={name} className="text-base font-bold tracking-wide">
                 {label}
             </label>
             {error && <p className="text-red-400">{error}</p>}
