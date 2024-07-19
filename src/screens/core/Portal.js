@@ -7,7 +7,7 @@ export default function Portal() {
 
   return (
   <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-    <GoBack itemToRemove={"businessId"} />
+    <GoBack itemsToRemove={["businessId"]} />
     <LogoutBtn />
     {/*Container*/}
     <div className="flex w-full mx-auto h-full">

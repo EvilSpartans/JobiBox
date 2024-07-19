@@ -73,7 +73,7 @@ export default function GreenFilter() {
             width: { ideal: 320 }, 
             height: { ideal: 568 },
           },
-          audio: true,
+          audio: false,
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;

@@ -230,6 +230,7 @@ export default function PostForm() {
       localStorage.removeItem("examenInProgress");
       localStorage.removeItem("isTrainExam");
       localStorage.removeItem("selectedGreenFilter");
+      localStorage.removeItem("selectedAnimation");
       dispatch(changeStatus(""));
     }
   };

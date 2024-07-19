@@ -250,6 +250,7 @@ export default function Film() {
             startValue: null,
             endValue: null,
             id: selectedQuestion.id,
+            animation: localStorage.getItem("selectedAnimation")
           };
         } else {
           values = {
@@ -260,7 +261,8 @@ export default function Film() {
             musicId: selectedMusic.id,
             fontSize: textStyle.fontSize,
             fontColor: textStyle.textColor,
-            animation: 'scrolling'
+            fontFamily: textStyle.fontFamily,
+            animation: localStorage.getItem("selectedAnimation")
           };
         }
   

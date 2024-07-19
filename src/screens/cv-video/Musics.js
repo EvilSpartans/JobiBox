@@ -6,7 +6,7 @@ import LogoutBtn from "../../components/core/LogoutBtn"
 export default function Musics() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-      <GoBack itemToRemove={"textStyle"} />
+      <GoBack itemsToRemove={["textStyle"]} />
       <LogoutBtn />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">

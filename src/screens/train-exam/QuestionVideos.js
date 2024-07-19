@@ -6,7 +6,7 @@ import QuestionVideo from "../../components/train-exam/QuestionVideo";
 export default function QuestionVideos() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-      <GoBack itemToRemove={"textStyle"} />
+      <GoBack itemsToRemove={["textStyle"]} />
       <LogoutBtn />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">

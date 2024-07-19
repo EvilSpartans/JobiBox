@@ -19,6 +19,7 @@ export default function Theme() {
   const [themes, setThemes] = useState([]);
   const [selectedThemeIndex, setSelectedThemeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedAnimation, setSelectedAnimation] = useState("fadeIn");
   // const [modalOpen, setModalOpen] = useState(false);
 
   const sliderSettings = {
@@ -46,6 +47,18 @@ export default function Theme() {
     }
   };
 
+  const handleAnimationChange = (animation) => {
+    setSelectedAnimation(animation);
+    const container = document.getElementById("animationContainer");
+    if (container) {
+      container.classList.remove("fadeIn", "swipe", "rotate", "slide");
+      if (animation !== "none") {
+        void container.offsetWidth; 
+        container.classList.add(animation);
+      }
+    }
+  };
+
   useEffect(() => {
     const existingSelectedTheme = localStorage.getItem("selectedTheme");
     if (existingSelectedTheme) {
@@ -63,6 +76,7 @@ export default function Theme() {
     const selectedTheme = themes[selectedThemeIndex];
     if (selectedTheme) {
       localStorage.setItem("selectedTheme", JSON.stringify(selectedTheme));
+      localStorage.setItem("selectedAnimation", selectedAnimation);
     }
     navigate("/textStyles");
   };
@@ -73,7 +87,7 @@ export default function Theme() {
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Liste des thèmes</h2>
         <p className="mt-6 text-lg">
-        Tu as sélectionné tes questions, tu peux maintenant <span className="text-blue-400">choisir un fond</span> de couleur (ou Template) sur lequel elles seront notées.
+        Tu as sélectionné tes questions, tu peux maintenant <span className="text-blue-400">choisir un fond</span> de couleur (ou Template) sur lequel elles seront notées. Tu peux aussi sélectionner une <span className="text-blue-400">animation</span> qui servira de transition entre les séquences.
         </p>
       </div>
       <div className="dark:text-dark_text_1">
@@ -84,7 +98,7 @@ export default function Theme() {
         ) : (
           <div className="mb-8">
             {themes && themes[selectedThemeIndex] && (
-              <div className="relative mb-4">
+              <div className="relative mb-4" id="animationContainer">
                 <img
                   src={`${BASE_URL}/${themes[selectedThemeIndex].image}`}
                   alt={themes[selectedThemeIndex].title}
@@ -96,6 +110,19 @@ export default function Theme() {
                   style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
                     Tes questions apparaîtront ici
                 </p>
+                <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
+                  {["fadeIn", "swipe", "rotate", "slide"].map((animation) => (
+                    <label key={animation} className="mr-2 text-white">
+                      <input
+                        type="radio"
+                        name="animation"
+                        value={animation}
+                        checked={selectedAnimation === animation}
+                        onChange={() => handleAnimationChange(animation)}
+                      /> {animation}
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
           </div>

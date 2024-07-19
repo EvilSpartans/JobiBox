@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import Wheel from '@uiw/react-color-wheel';
-// import Tuto from "../Tuto";
 
 export default function TextStyle() {
   
@@ -14,6 +13,7 @@ export default function TextStyle() {
   const [textStyle, setTextStyle] = useState({
     fontSize: 20,
     textColor: "#ffffff",
+    fontFamily: "Roboto", 
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,12 +42,16 @@ export default function TextStyle() {
     setTextStyle((prev) => ({ ...prev, textColor: color.hex }));
   };
 
+  const handleFontFamilyChange = (fontFamily) => {
+    setTextStyle((prev) => ({ ...prev, fontFamily }));
+  };
+
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
         <h2 className="mt-6 text-3xl font-bold">Style des questions</h2>
         <p className="mt-6 text-lg">
-        Tu peux <span className="text-blue-400">ajuster la taille</span> de tes questions en faisant glisser le curseur, Tu as aussi la possibilité d'en définir la <span className="text-blue-400">couleur</span>.
+          Tu peux <span className="text-blue-400">ajuster la taille</span> de tes questions en faisant glisser le curseur, Tu as aussi la possibilité d'en définir la <span className="text-blue-400">couleur</span> et la <span className="text-blue-400">police</span>.
         </p>
       </div>
       <div className="dark:text-dark_text_1">
@@ -64,12 +68,42 @@ export default function TextStyle() {
                 style={{
                   fontSize: `${textStyle.fontSize}px`,
                   color: textStyle.textColor,
-                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+                  textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
+                  fontFamily: textStyle.fontFamily, // Application de la police
                 }}
                 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-sm whitespace-nowrap"
               >
                 Vos questions apparaîtront ici
               </p>
+              <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
+                <label className="mr-2 text-white">
+                  <input
+                    type="radio"
+                    name="fontFamily"
+                    value="Roboto"
+                    checked={textStyle.fontFamily === "Roboto"}
+                    onChange={() => handleFontFamilyChange("Roboto")}
+                  /> Roboto
+                </label>
+                <label className="mr-2 text-white">
+                  <input
+                    type="radio"
+                    name="fontFamily"
+                    value="Impact"
+                    checked={textStyle.fontFamily === "Impact"}
+                    onChange={() => handleFontFamilyChange("Impact")}
+                  /> Impact
+                </label>
+                <label className="text-white">
+                  <input
+                    type="radio"
+                    name="fontFamily"
+                    value="Cursive"
+                    checked={textStyle.fontFamily === "Cursive"}
+                    onChange={() => handleFontFamilyChange("Cursive")}
+                  /> Cursive
+                </label>
+              </div>
             </div>
           )}
           <div className="mt-8 text-center">
@@ -81,7 +115,7 @@ export default function TextStyle() {
               onChange={handleFontSizeChange}
             />
           </div>
-          <div className="mt-12 flex items-center justify-center">
+          <div className="mt-8 flex items-center justify-center">
             <Wheel
               color={textStyle.textColor}
               onChange={handleTextColorChange}
@@ -95,21 +129,6 @@ export default function TextStyle() {
       >
         Continuer
       </button>
-
-      {/* <Tuto
-        steps={[
-          {
-            element: ".rc-slider-handle",
-            intro:
-              "Tu peux ajuster la taille de tes questions en faisant glisser ce curseur.",
-          },
-          {
-            element: ".circle-picker",
-            intro: "Tu as aussi la possibilité d'en définir la couleur.",
-          },
-        ]}
-        tutorialKey="textStyleTuto"
-      /> */}
     </div>
   );
 }

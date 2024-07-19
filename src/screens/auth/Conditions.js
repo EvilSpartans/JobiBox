@@ -4,7 +4,7 @@ import GoBack from "../../components/core/GoBack";
 export default function Conditions() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-      <GoBack itemToRemove={"textStyle"} />
+      <GoBack />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}

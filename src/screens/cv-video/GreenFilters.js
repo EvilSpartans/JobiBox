@@ -7,7 +7,7 @@ export default function GreenFilters() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       <LogoutBtn />
-      <GoBack itemToRemove={"selectedMusic"} />
+      <GoBack itemsToRemove={["selectedMusic"]} />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}

@@ -53,6 +53,7 @@ export const createVideoProcess = createAsyncThunk(
             musicId,
             fontSize,
             fontColor,
+            fontFamily,
             questionVideo,
             animation
         } = values;
@@ -65,6 +66,7 @@ export const createVideoProcess = createAsyncThunk(
             formData.append("musicId", musicId);
             formData.append("fontSize", fontSize);
             formData.append("fontColor", fontColor);
+            formData.append("fontFamily", fontFamily);
             formData.append("questionVideo", questionVideo);
             formData.append("animation", animation);
 
