@@ -50,6 +50,7 @@ const BASE_URL_THEME = process.env.REACT_APP_THEME_BASE_URL;
     contentDiv.style.alignItems = "center";
     contentDiv.style.color = textStyle.textColor;
     contentDiv.style.fontSize = `${textStyle.fontSize}px`;
+    contentDiv.style.fontFamily = textStyle.fontFamily;
     contentDiv.style.overflow = "hidden"; 
     
     const textDiv = document.createElement("div");

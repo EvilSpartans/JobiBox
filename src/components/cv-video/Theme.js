@@ -19,7 +19,7 @@ export default function Theme() {
   const [themes, setThemes] = useState([]);
   const [selectedThemeIndex, setSelectedThemeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [selectedAnimation, setSelectedAnimation] = useState("fadeIn");
+  const [selectedAnimation, setSelectedAnimation] = useState("fade");
   // const [modalOpen, setModalOpen] = useState(false);
 
   const sliderSettings = {
@@ -111,7 +111,7 @@ export default function Theme() {
                     Tes questions apparaîtront ici
                 </p>
                 <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
-                  {["fadeIn", "swipe", "rotate", "slide"].map((animation) => (
+                  {["fade", "swipe", "rotate", "slide"].map((animation) => (
                     <label key={animation} className="mr-2 text-white">
                       <input
                         type="radio"

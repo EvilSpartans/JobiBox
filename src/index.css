@@ -423,11 +423,11 @@ canvas {
     transition: all 0.5s ease-in-out;
   }
   
-  .fadeIn {
-    animation: fadeIn 1s forwards;
+  .fade {
+    animation: fade 1s forwards;
   }
   
-  @keyframes fadeIn {
+  @keyframes fade {
     from {
       opacity: 0;
     }
