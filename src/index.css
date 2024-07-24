@@ -442,10 +442,10 @@ canvas {
   
   @keyframes rotate {
     from {
-      transform: rotate(0deg);
+      transform: rotate(-90deg);
     }
     to {
-      transform: rotate(360deg);
+      transform: rotate(0deg);
     }
   }
   
@@ -475,3 +475,23 @@ canvas {
     }
   }
   
+  @font-face {
+    font-family: 'Cursive2';
+    src: url('/assets/fonts/Cursive/Cursive2.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Roboto2';
+    src: url('/assets/fonts/Roboto/Roboto-Black.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Impact2';
+    src: url('/assets/fonts/Impact/Impact.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }

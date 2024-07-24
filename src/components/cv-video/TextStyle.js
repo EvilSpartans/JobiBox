@@ -11,9 +11,9 @@ export default function TextStyle() {
   const selectedTheme = JSON.parse(localStorage.getItem("selectedTheme"));
   const user = useSelector((state) => state.user.user);
   const [textStyle, setTextStyle] = useState({
-    fontSize: 20,
+    fontSize: 25,
     textColor: "#ffffff",
-    fontFamily: "Roboto", 
+    fontFamily: "Roboto2", 
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -66,7 +66,7 @@ export default function TextStyle() {
               />
               <p
                 style={{
-                  fontSize: `${textStyle.fontSize}px`,
+                  fontSize: `${textStyle.fontSize / 1.3}px`,
                   color: textStyle.textColor,
                   textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)',
                   fontFamily: textStyle.fontFamily, // Application de la police
@@ -75,14 +75,15 @@ export default function TextStyle() {
               >
                 Vos questions apparaîtront ici
               </p>
-              <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
+              <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
+              <p className="text-white mb-2 text-center" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Choisi une police :</p>
                 <label className="mr-2 text-white">
                   <input
                     type="radio"
                     name="fontFamily"
                     value="Roboto"
-                    checked={textStyle.fontFamily === "Roboto"}
-                    onChange={() => handleFontFamilyChange("Roboto")}
+                    checked={textStyle.fontFamily === "Roboto2"}
+                    onChange={() => handleFontFamilyChange("Roboto2")}
                   /> Roboto
                 </label>
                 <label className="mr-2 text-white">
@@ -90,8 +91,8 @@ export default function TextStyle() {
                     type="radio"
                     name="fontFamily"
                     value="Impact"
-                    checked={textStyle.fontFamily === "Impact"}
-                    onChange={() => handleFontFamilyChange("Impact")}
+                    checked={textStyle.fontFamily === "Impact2"}
+                    onChange={() => handleFontFamilyChange("Impact2")}
                   /> Impact
                 </label>
                 <label className="text-white">
@@ -99,8 +100,8 @@ export default function TextStyle() {
                     type="radio"
                     name="fontFamily"
                     value="Cursive"
-                    checked={textStyle.fontFamily === "Cursive"}
-                    onChange={() => handleFontFamilyChange("Cursive")}
+                    checked={textStyle.fontFamily === "Cursive2"}
+                    onChange={() => handleFontFamilyChange("Cursive2")}
                   /> Cursive
                 </label>
               </div>
@@ -108,8 +109,8 @@ export default function TextStyle() {
           )}
           <div className="mt-8 text-center">
             <Slider
-              min={14}
-              max={25}
+              min={22}
+              max={28}
               step={1}
               value={textStyle.fontSize}
               onChange={handleFontSizeChange}

@@ -110,7 +110,8 @@ export default function Theme() {
                   style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
                     Tes questions apparaîtront ici
                 </p>
-                <div className="absolute bottom-48 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
+                <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
+                <p className="text-white mb-2 text-center" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Choisi une animation :</p>
                   {["fade", "swipe", "rotate", "slide"].map((animation) => (
                     <label key={animation} className="mr-2 text-white">
                       <input
