@@ -19,7 +19,7 @@ export default function Theme() {
   const [themes, setThemes] = useState([]);
   const [selectedThemeIndex, setSelectedThemeIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [selectedAnimation, setSelectedAnimation] = useState("fade");
+  const [selectedAnimation, setSelectedAnimation] = useState("");
   // const [modalOpen, setModalOpen] = useState(false);
 
   const sliderSettings = {
@@ -28,6 +28,14 @@ export default function Theme() {
     slidesToShow: 4,
     slidesToScroll: 3,
   };
+
+  const animations = [
+    { label: "0", value: "" },
+    { label: "1", value: "fade" },
+    { label: "2", value: "swipe" },
+    { label: "3", value: "rotate" },
+    { label: "4", value: "slide" }
+  ];
 
   const navigate = useNavigate();
 
@@ -112,15 +120,15 @@ export default function Theme() {
                 </p>
                 <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-70 p-4 rounded-lg">
                 <p className="text-white mb-2 text-center" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>Choisi une animation :</p>
-                  {["fade", "swipe", "rotate", "slide"].map((animation) => (
-                    <label key={animation} className="mr-2 text-white">
+                  {animations.map((animation) => (
+                    <label key={animation.value} className="mr-2 text-white">
                       <input
                         type="radio"
                         name="animation"
-                        value={animation}
-                        checked={selectedAnimation === animation}
-                        onChange={() => handleAnimationChange(animation)}
-                      /> {animation}
+                        value={animation.value}
+                        checked={selectedAnimation === animation.value}
+                        onChange={() => handleAnimationChange(animation.value)}
+                      /> {animation.label}
                     </label>
                   ))}
                 </div>
