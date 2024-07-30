@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import LogoutBtn from "../../components/core/LogoutBtn";
+import Logout from "../../components/core/Logout";
 import { useSelector } from "react-redux";
 
 export default function Home() {
@@ -34,7 +34,7 @@ export default function Home() {
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-        <LogoutBtn />
+        <Logout />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}

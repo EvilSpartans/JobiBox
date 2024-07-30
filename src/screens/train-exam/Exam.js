@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import GoBack from "../../components/core/GoBack";
-import LogoutBtn from "../../components/core/LogoutBtn";
+import Logout from "../../components/core/Logout";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -58,7 +58,7 @@ export default function Exam() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       <GoBack itemsToRemove={["textStyle"]} />
-      <LogoutBtn />
+      <Logout />
       <div className="flex w-full mx-auto h-full">
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
           {/* Container */}

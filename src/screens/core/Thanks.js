@@ -25,7 +25,7 @@ export default function Thanks() {
               </p>
             </div>
             {/*Buttons*/}
-            <Logout />
+            <Logout position="static" />
           </div>
         </div>
       </div>

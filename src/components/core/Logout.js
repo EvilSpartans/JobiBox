@@ -3,7 +3,7 @@ import { logout } from "../../store/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteVideoProcess } from "../../store/slices/videoProcessSlice";
 
-export default function Logout() {
+export default function Logout({ position = "fixed" }) {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const videoId = localStorage.getItem("videoId");
@@ -39,7 +39,6 @@ export default function Logout() {
       );
     } catch (error) {
       console.error("Error :", error);
-    } finally {
     }
   };
 
@@ -71,12 +70,12 @@ export default function Logout() {
       if (result.success) {
       }
     } catch (error) {
-      console.error('Error clearing cache:', error);
+      console.error("Error clearing cache:", error);
     }
   };
 
   return (
-    <div>
+    <div className={position === "fixed" ? "fixed top-3 right-4 z-50" : ""}>
       <button
         className="w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
                     font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"

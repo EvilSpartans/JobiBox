@@ -8,7 +8,7 @@ import {
   createTranscription,
 } from "../../store/slices/transcriptSlice";
 import Tuto from "../../components/core/Tuto";
-import LogoutBtn from "../../components/core/LogoutBtn";
+import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
 
 export default function Transcription() {
@@ -83,7 +83,7 @@ export default function Transcription() {
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
       {/* Container */}
       <GoBack />
-      <LogoutBtn />
+      <Logout />
       <div className="flex w-full mx-auto h-full">
         {/* Login Form */}
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
