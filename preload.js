@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electron', {
     },
     fileApi: {
         
-    }
+    },
+    clearCache: () => ipcRenderer.invoke('clear-cache')
 
 })

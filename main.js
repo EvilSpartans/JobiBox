@@ -11,6 +11,7 @@ const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const isDev = !app.isPackaged;
 let updateInterval = null;
+let mainApp = null; 
 
 const dockIcon = path.join(__dirname, "assets", "images", "logo1.png");
 const trayIcon = path.join(__dirname, "assets", "images", "logo2.png");
@@ -73,7 +74,7 @@ app.whenReady().then(() => {
   tray.setContextMenu(menu);
 
   const splash = createSplashWindow();
-  const mainApp = createWindow();
+  mainApp = createWindow();
 
   mainApp.once("ready-to-show", () => {
     // splash.destroy();
@@ -126,6 +127,21 @@ autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
   });
 });
 
+// Clear cache
+ipcMain.handle('clear-cache', async () => {
+  try {
+      await mainApp.webContents.session.clearCache();
+      await mainApp.webContents.session.clearStorageData({
+        storages: ['cookies', 'indexeddb', 'websql']
+      });
+      return { success: true };
+  } catch (error) {
+      console.error('Error clearing cache:', error);
+      return { success: false, error };
+  }
+});
+
+// Notify
 ipcMain.on("notify", (_, message) => {
   new Notification({ title: "Notification", body: message }).show();
 });

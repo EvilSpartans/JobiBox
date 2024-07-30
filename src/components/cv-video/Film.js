@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import {
   createVideoProcess,
   changeStatus,
-  deleteVideoProcess,
   updateVideoProcess,
 } from "../../store/slices/videoProcessSlice";
 import PulseLoader from "react-spinners/PulseLoader";
@@ -42,6 +41,7 @@ export default function Film() {
   const [cameraLoading, setCameraLoading] = useState(true);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  const [lostConnexion, setLostConnexion] = useState(null);
 
   const refVideoRecord = useRef();
   const canvasRef = useRef();
@@ -154,8 +154,6 @@ export default function Film() {
   };
 
   const toggleRecording = async () => {
-    // const questionId = currentQuestionIdRef.current;
-    // const selectedQuestion = selectedQuestionRef.current;
 
     if (!recording) {
       try {
@@ -195,23 +193,12 @@ export default function Film() {
 
         recorder.onstop = async () => {
           const blob = new Blob(chunks, { type: "video/webm" });
-          // const videoFile = new File([blob], "video.mp4", {
-          //   type: "video/mp4",
-          // });
-
           setVideoBase64(blob);
           stream.getTracks().forEach((track) => track.stop());
           setRecording(false);
           setTimer(0);
           clearInterval(timerIntervalId);
           dispatch(changeStatus(""));
-
-          // await saveVideoToDatabase(
-          //   videoFile,
-          //   questionId,
-          //   selectedQuestion,
-          //   token
-          // );
         };
 
         recorder.start();
@@ -308,7 +295,7 @@ export default function Film() {
   
     if (!success) {
       console.error("Échec de la sauvegarde du clip après plusieurs tentatives.");
-      alert("Échec de la sauvegarde du clip après plusieurs tentatives.")
+      setLostConnexion(true);
     }
   };
 
@@ -337,28 +324,14 @@ export default function Film() {
       setRecording(false);
       setMediaStream(null);
       setShowIntro(true);
+      setLostConnexion(null);
     } else {
       localStorage.removeItem("selectedQuestions");
       navigate("/review");      
     }
   };
 
-  const deleteLastVideo = async () => {
-    try {
-      await dispatch(
-        deleteVideoProcess({
-          token: token,
-          id: createdVideoId,
-        })
-      );
-    } catch (error) {
-      console.error("Error :", error);
-    } finally {
-    }
-  };
-
   const handleRedoRecording = () => {
-    // deleteLastVideo();
     setVideoBase64(null);
     setCreatedVideoPath(null);
     setTimer(0);
@@ -492,6 +465,18 @@ export default function Film() {
         />
       )}
     </div>
+    ) : lostConnexion ? (
+      <div className="flex flex-col justify-center items-center min-h-screen">
+        <p className="text-red-500 font-bold">
+          Échec de la sauvegarde du clip après plusieurs tentatives.
+        </p>
+        <button
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          onClick={handleRedoRecording}
+        >
+          Réessayer l'enregistrement
+        </button>
+      </div>
   ) : (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
@@ -520,11 +505,6 @@ export default function Film() {
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
-              // src={
-              //   createdVideoPath
-              //     ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}`
-              //     : null
-              // }
               src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
