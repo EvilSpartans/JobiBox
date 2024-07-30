@@ -175,6 +175,7 @@ export default function Clip() {
       updateState: true
     };
     localStorage.setItem("selectedQuestions", JSON.stringify([selectedQuestion]));
+    localStorage.setItem("questionOrder", null);
     navigate("/record");
   };
 

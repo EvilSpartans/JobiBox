@@ -68,9 +68,14 @@ export default function Film() {
     sessionStorage.removeItem('hasReloaded');
     const selectedQuestions = JSON.parse(localStorage.getItem("selectedQuestions"));
     const questionOrder = JSON.parse(localStorage.getItem("questionOrder"));
-    if (selectedQuestions && questionOrder) {
+
+    if (selectedQuestions) {
+      if (questionOrder) {
         const orderedQuestions = questionOrder.map(order => selectedQuestions.find(q => q.id === order.id));
         setQuestions(orderedQuestions);
+      } else {
+        setQuestions(selectedQuestions);
+      }
     }
   }, []);
 
@@ -149,8 +154,8 @@ export default function Film() {
   };
 
   const toggleRecording = async () => {
-    const questionId = currentQuestionIdRef.current;
-    const selectedQuestion = selectedQuestionRef.current;
+    // const questionId = currentQuestionIdRef.current;
+    // const selectedQuestion = selectedQuestionRef.current;
 
     if (!recording) {
       try {
@@ -190,22 +195,23 @@ export default function Film() {
 
         recorder.onstop = async () => {
           const blob = new Blob(chunks, { type: "video/webm" });
-          const videoFile = new File([blob], "video.mp4", {
-            type: "video/mp4",
-          });
+          // const videoFile = new File([blob], "video.mp4", {
+          //   type: "video/mp4",
+          // });
 
           setVideoBase64(blob);
           stream.getTracks().forEach((track) => track.stop());
           setRecording(false);
           setTimer(0);
           clearInterval(timerIntervalId);
+          dispatch(changeStatus(""));
 
-          await saveVideoToDatabase(
-            videoFile,
-            questionId,
-            selectedQuestion,
-            token
-          );
+          // await saveVideoToDatabase(
+          //   videoFile,
+          //   questionId,
+          //   selectedQuestion,
+          //   token
+          // );
         };
 
         recorder.start();
@@ -216,6 +222,7 @@ export default function Film() {
         }, 1000);
 
         setTimerIntervalId(intervalId);
+
       } catch (error) {
         console.error("Erreur lors de l'accès à la caméra : ", error);
         navigate("/malfunction");
@@ -305,7 +312,24 @@ export default function Film() {
     }
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+
+    if (videoBase64 && !createdVideoPath) {
+      const questionId = currentQuestionIdRef.current;
+      const selectedQuestion = selectedQuestionRef.current;
+  
+      const videoFile = new File([videoBase64], "video.mp4", {
+        type: "video/mp4",
+      });
+  
+      await saveVideoToDatabase(
+        videoFile,
+        questionId,
+        selectedQuestion,
+        token
+      );
+    }
+
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setVideoBase64(null);
@@ -334,7 +358,7 @@ export default function Film() {
   };
 
   const handleRedoRecording = () => {
-    deleteLastVideo();
+    // deleteLastVideo();
     setVideoBase64(null);
     setCreatedVideoPath(null);
     setTimer(0);
@@ -496,16 +520,17 @@ export default function Film() {
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
-              src={
-                createdVideoPath
-                  ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}`
-                  : null
-              }
+              // src={
+              //   createdVideoPath
+              //     ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}`
+              //     : null
+              // }
+              src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
               controlsList="nodownload"
               preload="true"
-              className="w-full h-full object-contain tall:object-cover"
+              className="w-full h-full object-contain tall:object-cover mirror"
             />
           )}
 
