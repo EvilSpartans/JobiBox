@@ -336,7 +336,7 @@ export default function Clip() {
             ></div>
             <div className="relative flex items-center justify-center">
               <div className="modal-content bg-white p-4 rounded-lg text-center z-50 relative">
-                <p className="text-gray-800 text-lg">Scinder le clip</p>
+                <p className="text-gray-800 text-lg">Raccourcir le clip</p>
                 <div
                   style={{ height: "50vh" }}
                   className="modal-content bg-white p-4 rounded-lg h-screen max-h-screen overflow-hidden"

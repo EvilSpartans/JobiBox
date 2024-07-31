@@ -93,16 +93,21 @@ export default function RegisterForm() {
           />
           <Checkbox 
             name="terms"
-            label="J'accepte les conditions d'utilisation"
             register={register}
             error={errors?.terms?.message}
+            label={(
+              <>
+                J'accepte les{" "}
+                <Link to="/conditions" className="text-blue-500 underline">
+                  conditions d'utilisation
+                </Link>{" "}
+                et la{" "}
+                <Link to="/politiques" className="text-blue-500 underline">
+                  politique de protection des données.
+                </Link>
+              </>
+            )}
           />
-          <span
-            onClick={() => navigate("/conditions")}
-            className="hover:underline cursor-pointer transition ease-in duration-300 text-blue_3"
-          >
-            Prendre connaissance
-          </span>
           {/*if we have an error*/}
           {error ? (
             <div>

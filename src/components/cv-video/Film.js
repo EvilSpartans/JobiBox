@@ -42,6 +42,7 @@ export default function Film() {
   const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [lostConnexion, setLostConnexion] = useState(null);
+  const [isSavingVideo, setIsSavingVideo] = useState(false);
 
   const refVideoRecord = useRef();
   const canvasRef = useRef();
@@ -228,6 +229,9 @@ export default function Film() {
     selectedQuestion,
     token
   ) => {
+
+    setIsSavingVideo(true);
+
     let res;
     let success = false;
     let attempts = 0;
@@ -297,6 +301,7 @@ export default function Film() {
       console.error("Échec de la sauvegarde du clip après plusieurs tentatives.");
       setLostConnexion(true);
     }
+    setIsSavingVideo(false);
   };
 
   const handleNextQuestion = async () => {
@@ -305,7 +310,7 @@ export default function Film() {
       const questionId = currentQuestionIdRef.current;
       const selectedQuestion = selectedQuestionRef.current;
   
-      const videoFile = new File([videoBase64], "video.mp4", {
+      const videoFile = new File([videoBase64], `video-${user.id}.mp4`, {
         type: "video/mp4",
       });
   
@@ -607,15 +612,20 @@ export default function Film() {
 
       <button
         className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
-          !videoBase64 || status === "loading"
+          !videoBase64 || status === "loading" || isSavingVideo
             ? "opacity-50 pointer-events-none"
             : ""
         }`}
         onClick={handleNextQuestion}
-        disabled={!videoBase64 || status === "loading"}
+        disabled={!videoBase64 || status === "loading" || isSavingVideo}
         style={{ marginTop: 20 }}
       >
-        {status === "loading" ? (
+        {isSavingVideo ? (
+          <div className="flex items-center justify-center">
+            <PulseLoader color="#fff" size={16} />
+            <span className="ml-2">Sauvegarde en cours</span>
+          </div>
+        ) : status === "loading" ? (
           <PulseLoader color="#fff" size={16} />
         ) : (
           "Continuer"

@@ -19,7 +19,7 @@ export default function Conditions() {
               <div className="max-h-96 tall:max-h-[50rem] overflow-y-auto">
                 <p>
                   L’accès et l’utilisation du site Internet accessible à
-                  l’adresse suivante : https://www.jobissim.com (ci-après
+                  l’adresse suivante : https://www.jobissim.com et de la JobiBox (ci-après
                   dénommé le « Site ») de la société JOBISSIM (ci-après dénommée
                   le « Responsable du Site ») et des services qui y sont
                   proposés sont soumis au respect des présentes Conditions
@@ -65,7 +65,7 @@ export default function Conditions() {
                   </li>
                   <li>
                     <strong>« Client » :</strong> désigne le consommateur ou le
-                    professionnel qui effectue une Commande sur le Site ;
+                    professionnel qui effectue une Commande ou utilise le Site ;
                   </li>
                   <li>
                     <strong>« Responsable du site » :</strong> désigne la
@@ -78,7 +78,7 @@ export default function Conditions() {
                   <li>
                     <strong>« Site » :</strong> désigne le site Internet de la
                     société JOBISSIM accessible à l’adresse url :
-                    https://www.jobissim.com
+                    https://www.jobissim.com ainsi que la JobiBox
                   </li>
                 </ul>
                 <h3 className="font-bold mt-4">3. OBJET</h3>
@@ -291,7 +291,7 @@ export default function Conditions() {
                 <p>
                   Le prix de vente des Services est celui en vigueur au jour de
                   la confirmation de la Commande. Les prix des Services sont
-                  indiqués en euros Toutes Taxes Comprises. Toutes les
+                  indiqués en euros hors Taxes Comprises. Toutes les
                   Commandes, quelle que soit leur pays d’origine, sont payables
                   en euros. Le prix des Services est exigible en totalité après
                   la confirmation de la Commande par le Client. Le Responsable
@@ -458,260 +458,7 @@ export default function Conditions() {
                   de la découverte du vice.
                 </p>
                 <h3 className="font-bold mt-4">12. DONNÉES PERSONNELLES</h3>
-                <p>
-                  Pour délivrer son service, JOBISSIM collecte des données à
-                  caractère personnel des Utilisateurs. JOBISSIM, en tant que
-                  Responsable de traitement, s’engage à respecter les
-                  dispositions du règlement (UE) n°2016/679 du 27 avril 2016
-                  relatif à la protection des données à caractère personnel
-                  (RGPD) et de la loi n°78-17 du 6 janvier 1978 modifiée.
-                </p>
-                <h4 className="font-bold mt-2">
-                  1. IDENTITÉ DU RESPONSABLE DE TRAITEMENT
-                </h4>
-                <p>
-                  La société qui collecte les données à caractère personnel et
-                  met en œuvre les traitements de donnée est : JOBISSIM, SAS au
-                  capital de 6 000 € Immatriculée au RCS de Lille Métropole sous
-                  le numéro 893 384 123 Dont le siège social se situe 2 rue de
-                  l’Eglise, 59147 Chemy
-                </p>
-                <h4 className="font-bold mt-2">
-                  2. FINALITÉS DE COLLECTE DES DONNÉES ET BASES LÉGALES
-                </h4>
-                <p>
-                  JOBISSIM est amenée à collecter et à traiter les données à
-                  caractère personnel de ses clients Utilisateurs pour effectuer
-                  les traitements suivants :
-                </p>
-                <table className="w-full border-collapse border border-gray-200">
-                  <thead>
-                    <tr>
-                      <th className="border border-gray-200 p-2">
-                        Finalité de traitement mise en œuvre par JOBISSIM
-                      </th>
-                      <th className="border border-gray-200 p-2">
-                        Base légale
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border border-gray-200 p-2">
-                        Gestion des commandes ;
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        Exécution du contrat passé entre un Utilisateur et
-                        JOBISSIM
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-200 p-2">
-                        Gestion des opérations de paiement ;
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        Exécution du contrat passé entre un Utilisateur et
-                        JOBISSIM
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-200 p-2">
-                        Gestion de la relation client (téléphone / email), du
-                        suivi des commandes, du service après-vente, des retours
-                        produits et des remboursements ;
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        Exécution du contrat passé entre un Utilisateur et
-                        JOBISSIM
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-200 p-2">
-                        Envoi d’offres commerciales ciblées par email, SMS, ou
-                        courrier postal
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        Consentement de l’Utilisateur ; Intérêt légitime pour
-                        les envois de prospection sur support papier
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-200 p-2">
-                        Mesure de fréquentation des sites (mobile et desktop) ;
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        Consentement de l’Utilisateur
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-200 p-2">
-                        Comptes utilisateurs suspendus pour manquements aux
-                        Conditions Générales
-                      </td>
-                      <td className="border border-gray-200 p-2">
-                        Exécution du contrat passé entre un Utilisateur et
-                        JOBISSIM ; Intérêt légitime
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <h4 className="font-bold mt-2">3. DROITS DES PERSONNES</h4>
-                <h5 className="font-bold mt-2">
-                  a. Quels sont les droits pouvant être exercés ?
-                </h5>
-                <p>
-                  En application des articles 15 à 22 du règlement 2016/679 du
-                  27 avril 2016, toute personne physique dont les données ont
-                  été collectées a la faculté d’exercer les droits suivants :
-                </p>
-                <ul className="list-disc list-inside ml-4">
-                  <li>Un droit d’accès</li>
-                  <li>Un droit de rectification</li>
-                  <li>
-                    Un droit d’opposition au traitement de ses données et
-                    d’effacement de ses données
-                  </li>
-                  <li>Un droit d’opposition au profilage</li>
-                  <li>Un droit à la limitation du traitement</li>
-                  <li>Un droit à la portabilité de ses données</li>
-                </ul>
-                <p>
-                  L’Utilisateur peut également formuler des directives relatives
-                  à la conservation, à l'effacement et à la communication de ses
-                  données à caractère personnel après son décès conformément à
-                  l’article 40-1 de la loi 78-17 du 6 janvier 1978. Ces
-                  directives peuvent être générales ou particulières. Enfin,
-                  l’Utilisateur a la faculté de retirer son consentement à tout
-                  moment.
-                </p>
-                <h5 className="font-bold mt-2">b. Comment les exercer ?</h5>
-                <p>
-                  Ces droits peuvent être exercés auprès de la société JOBISSIM
-                  qui a collecté les données à caractère personnel de la manière
-                  suivante : Par voie électronique, à l’adresse :
-                  jobissim@jobissim.com La demande doit indiquer, les nom,
-                  prénom, email, si possible la référence client. Après
-                  vérification de votre identité, JOBISSIM adresse une réponse
-                  dans un délai d’un mois après l’exercice du droit. Dans
-                  certains cas, liés à la complexité de la demande ou au nombre
-                  de demandes, ce délai peut être prolongé de 2 mois. Ces droits
-                  peuvent dans certains cas prévus par la règlementation être
-                  soumis à exceptions. En cas d’absence de réponse ou de réponse
-                  non satisfaisante, la personne concernée à la faculté de
-                  saisir l’autorité de contrôle sur la protection des données
-                  (la CNIL).
-                </p>
-                <h4 className="font-bold mt-2">
-                  4. DURÉE DE CONSERVATION DES DONNÉES
-                </h4>
-                <p>
-                  JOBISSIM a déterminé des règles précises concernant la durée
-                  de conservation des données à caractère personnel des
-                  Utilisateurs. Par principe, sauf obligation légale contraire,
-                  les données sont conservées pendant la durée nécessaire à
-                  l’accomplissement des finalités pour lesquelles elles ont été
-                  collectées.
-                </p>
-                <p>Les durées de conservation retenues sont les suivantes :</p>
-                <ul className="list-disc list-inside ml-4">
-                  <li>
-                    Les données des Utilisateurs sont conservées 3 ans après la
-                    dernière interaction émanant de l’Utilisateur ;
-                  </li>
-                  <li>
-                    Les cookies de mesure d’audience se déposent sur le terminal
-                    de l’Utilisateur pendant une durée de 13 mois ;
-                  </li>
-                  <li>Les factures d’achat sont conservées pendant 10 ans.</li>
-                </ul>
-                <h4 className="font-bold mt-2">5. PROSPECTION COMMERCIALE</h4>
-                <p>
-                  JOBISSIM utilise vos coordonnées pour vous adresser des
-                  publicités ciblées notamment par email, courrier postal, sms.
-                  JOBISSIM respecte les règles édictées par la directive
-                  2002/58/CE du 12 juillet 2002 qui prévoit le recueil préalable
-                  express du consentement de l’Utilisateur pour l’envoi de
-                  prospection commerciale par voie électronique (e-mail ou SMS).
-                  JOBISSIM ne vous adressera pas de sollicitations
-                  personnalisées par email ou sms si vous n’y avez pas consenti.
-                  Il existe une exception lorsque le Client/Utilisateur, sans
-                  avoir donné son consentement préalable, peut cependant être
-                  démarché dès lors qu’il est déjà client de la société JOBISSIM
-                  et que l’objet de la prospection est de proposer des produits
-                  ou services analogues. Dans tous les cas, le
-                  client/Utilisateur a la possibilité de s’opposer à la
-                  réception de ces sollicitations en effectuant les actions
-                  suivantes :
-                </p>
-                <ul className="list-disc list-inside ml-4">
-                  <li>
-                    Pour l’email, en cliquant sur le lien de désabonnement prévu
-                    dans chaque email ;
-                  </li>
-                  <li>
-                    Pour le sms, en envoyant un stop SMS au numéro indiqué dans
-                    celui-ci ;
-                  </li>
-                  <li>En contactant le service client.</li>
-                </ul>
-                <h4 className="font-bold mt-2">6. COOKIES, TAGS ET TRACEURS</h4>
-                <h5 className="font-bold mt-2">a. Qu’est-ce qu’un cookie ?</h5>
-                <p>
-                  Les cookies sont de petits fichiers textes souvent cryptés qui
-                  sont stockés dans le navigateur de votre ordinateur ou sur
-                  votre appareil mobile lorsque vous visitez certains sites web.
-                  Ils sont destinés à collecter des informations anonymes sur la
-                  façon dont les utilisateurs naviguent notre site web. Les
-                  cookies sont également utilisés pour connaître l'affluence et
-                  ou la fréquence de visiteurs présents sur notre site afin
-                  notamment de s'assurer que ce dernier fonctionne rapidement.
-                  Toutefois, les données obtenues sont restreintes. Elles
-                  concernent uniquement le nombre de pages visitées, la ville où
-                  est localisée l’adresse IP de connexion au site web, la
-                  fréquence et la récurrence des visites, la durée de la visite,
-                  le navigateur, l’opérateur ou le type de terminal à partir
-                  duquel la visite est effectuée. Des données telles que le nom,
-                  le prénom de l’utilisateur ou l'adresse postale de connexion
-                  ne sont, en aucun cas, obtenues. Les cookies n'endommagent pas
-                  votre ordinateur et ne peuvent être utilisés pour vous
-                  identifier personnellement. Sachez que seul l'émetteur d'un
-                  cookie est susceptible de lire ou de modifier les informations
-                  qui y sont contenues.
-                </p>
-                <h5 className="font-bold mt-2">
-                  b. À quoi servent les cookies ?
-                </h5>
-                <p>
-                  Selon vos choix (que vous pouvez modifier à tout moment), les
-                  cookies que nous émettons nous permettent de vous proposer des
-                  publicités ciblées, de partager du contenu sur les réseaux
-                  sociaux, de mesurer l’audience du site, de conserver vos
-                  informations de panier d’achat ou d’authentification, et de
-                  personnaliser l'interface du site.
-                </p>
-                <h5 className="font-bold mt-2">
-                  c. Durée de conservation des cookies
-                </h5>
-                <p>
-                  Les cookies sont conservés pour une durée de 13 mois après
-                  leur premier dépôt dans l’équipement terminal de
-                  l’utilisateur.
-                </p>
-                <h5 className="font-bold mt-2">d. Les cookies utilisés</h5>
-                <p>
-                  Les cookies utilisés par JOBISSIM sont portés à la
-                  connaissance de l’utilisateur du site au sein du gestionnaire
-                  de consentement implémenté par JOBISSIM.
-                </p>
-                <h5 className="font-bold mt-2">e. Vos choix</h5>
-                <p>
-                  L'enregistrement d'un cookie dans un terminal est subordonné
-                  au consentement de l'Utilisateur. Vous pouvez exprimer et
-                  modifier à tout moment et gratuitement vos préférences en
-                  matière de cookies, à travers les choix qui vous sont offerts
-                  au sein du gestionnaire de consentement mis en place par
-                  JOBISSIM.
-                </p>
+                <p>Les règles relatives à la protection des données à caractère personnel sont décrites dans la politique de protection des données accessible sur le Site.</p>
                 <h3 className="font-bold mt-4">13. PROPRIÉTÉ INTELLECTUELLE</h3>
                 <h4 className="font-bold mt-2">
                   a. Droits du Responsable du Site
@@ -825,23 +572,15 @@ export default function Conditions() {
                   </li>
                 </ul>
                 <h4 className="font-bold mt-2">
-                  c. Droits relatifs aux vidéos montées par le Responsable du
+                  c. Droits relatifs aux vidéos montées par le Client sur le
                   Site
                 </h4>
                 <p>
-                  Le Responsable du Site est seul titulaire des droits d’auteurs
-                  relatifs aux vidéos montées qu’il réalise à la demande du
-                  Client. Par les présentes CGV/CGU, le Responsable du Site
-                  accepte de concéder au Client ayant recours à ce Service une
-                  licence d’utilisation simple, aux fins de lui permettre
-                  d’utiliser la vidéo montée par le Responsable du Site, pour un
-                  usage exclusivement au sein du Site. Les droits de
-                  reproduction et de représentation de la vidéo montée hors du
-                  Site, ainsi que le droit d’adaptation, sont expressément
-                  exclus de la licence concédée par le Responsable du Site. De
-                  plus, le Client reconnaît que la mention « by JOBISSIM » sera
-                  apposée par le Responsable du Site au titre de l’exercice du
-                  droit de paternité dont il dispose sur la vidéo montée.
+                  Le client est seul titulaire des droits d’auteurs
+                  relatifs aux vidéos montées qu’il réalise à partir du Site. 
+                  Par les présentes CGV/CGU, le Responsable du Site
+                  accepte de concéder au Client ayant recours à ce Service son utilisation, aux fins de lui permettre d’utiliser la vidéo montée par le Responsable du Site, pour un
+                  usage personnel.
                 </p>
                 <h4 className="font-bold mt-2">
                   d. Droits relatifs aux bases de données du Responsable du Site
@@ -879,11 +618,10 @@ export default function Conditions() {
                 <ul className="list-disc list-inside ml-4">
                   <li>
                     Par téléphone (du lundi au vendredi de 8h00 à 18h00) :
-                    06.46.83.07.01
+                    09.78.80.11.85
                   </li>
                   <li>
-                    Par courrier : Société JOBISSIM, 2 rue de l’Eglise, 59147
-                    Chemy, France
+                    Par courrier : Société JOBISSIM, 35 A route nationale, 59710 Ennevelin, France
                   </li>
                   <li>Par email : jobissim@jobissim.com</li>
                 </ul>

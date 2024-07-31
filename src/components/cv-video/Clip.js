@@ -30,7 +30,6 @@ export default function Clip() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [trimModalOpen, setTrimModalOpen] = useState(false);
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
-  const [startValue, setStartValue] = useState(0);
   const [endValue, setEndValue] = useState(100);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isSliderMoved, setIsSliderMoved] = useState(false);
@@ -126,32 +125,28 @@ export default function Clip() {
     navigate("/questions");
   };
 
-  const handleSliderChange = (values) => {
-    const maxDuration = 100; // La durée maximale de la vidéo, ajustez selon votre besoin
-    const newStartValue = Math.min(values[0], maxDuration);
-    const newEndValue = Math.min(values[1], maxDuration);
-
-    setStartValue(newStartValue);
+  const handleSliderChange = (value) => {
+    const minEndValue = 3;
+    const newEndValue = Math.max(value, minEndValue);
     setEndValue(newEndValue);
     setIsSliderMoved(true);
-
-    // Si la vidéo est en cours de lecture, ajustez la position de lecture
+  
     if (videoRef.current && !videoRef.current.paused) {
-      videoRef.current.currentTime = newStartValue;
+      videoRef.current.currentTime = newEndValue;
       videoRef.current.play();
     }
   };
 
   const handleTrim = async (index) => {
     closeTrimModal();
-
+  
     let res;
     try {
       dispatch(changeStatus("loading"));
       const values = {
         token,
         video: null,
-        startValue,
+        startValue: 0,
         endValue,
         id: questions[index].id,
       };
@@ -164,7 +159,7 @@ export default function Clip() {
         dispatch(changeStatus(""));
       }
     }
-  };
+  }
 
   const handleEdit = async (index) => {
     closeEditModal();
@@ -315,21 +310,19 @@ export default function Clip() {
             ></div>
             <div className="relative flex items-center justify-center">
               <div className="modal-content bg-white p-4 rounded-lg text-center z-50 relative">
-                <p className="text-gray-800 text-lg">Scinder le clip</p>
+                <p className="text-gray-800 text-lg">Raccourcir le clip</p>
                 <div
                   style={{ height: "50vh" }}
                   className="modal-content bg-white p-4 rounded-lg h-screen max-h-screen overflow-hidden"
                 >
                   <video
                     ref={(ref) => {
-                      // Créer une référence pour accéder au lecteur vidéo
                       if (ref) {
                         videoRef.current = ref;
-                        ref.currentTime = startValue; // Définir le temps de début initial
+                        ref.currentTime = 0; 
                       }
                     }}
                     onTimeUpdate={(e) => {
-                      // Arrêtez la vidéo à la finValue
                       if (e.target.currentTime >= endValue) {
                         e.target.pause();
                       }
@@ -344,24 +337,17 @@ export default function Clip() {
                     disablePictureInPicture
                     controlsList="nodownload"
                     className="w-full h-full object-cover hide-video-controls"
-                  ></video>
+                  />
                 </div>
                 <p className="text-gray-500 text-sm">
-                  Début : {startValue} - Fin : {endValue}
+                  Fin : {endValue}
                 </p>
                 <Slider
-                  range
-                  min={0}
+                  min={3} 
                   step={0.1}
                   max={videoDuration}
-                  value={[startValue, endValue]}
-                  onChange={(values) => {
-                    handleSliderChange(values);
-                    // Mettre à jour le temps de début du lecteur vidéo en fonction de la valeur du slider
-                    if (videoRef.current) {
-                      videoRef.current.currentTime = values[0];
-                    }
-                  }}
+                  value={endValue}
+                  onChange={handleSliderChange}
                 />
                 <div className="mt-4">
                   <button

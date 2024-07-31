@@ -34,10 +34,7 @@ const IntroQuestion = ({ question, textStyle, selectedTheme, setShowIntro }) => 
     const textDiv = document.createElement("div");
     textDiv.innerText = question.title;
     textDiv.style.textAlign = "center";
-    textDiv.style.maxWidth = "80%";
-    textDiv.style.maxHeight = "80%";
     textDiv.style.overflow = "hidden";
-    textDiv.style.padding = "10px";
     
     contentDiv.appendChild(textDiv);
     introDiv.appendChild(contentDiv);
