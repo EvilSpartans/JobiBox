@@ -36,7 +36,6 @@ export default function Film() {
   const videoCameraRef = useRef(null);
   const [mediaStream, setMediaStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [createdVideoId, setCreatedVideoId] = useState(null);
   const [createdVideoPath, setCreatedVideoPath] = useState(null);
   const [cameraLoading, setCameraLoading] = useState(true);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
@@ -81,10 +80,10 @@ export default function Film() {
   }, []);
 
   useEffect(() => {
-    if (!mediaStream && !showIntro) {
+    if (!mediaStream && !showIntro && !lostConnexion) {
       initializeCamera();
     }
-  }, [mediaStream, showIntro]);
+  }, [mediaStream, showIntro, lostConnexion]);
 
   // Make Pad working
   const handleKeyPress = (event) => {
@@ -272,7 +271,6 @@ export default function Film() {
   
         if (res.meta.requestStatus === "fulfilled") {
           success = true;
-          setCreatedVideoId(res.payload.id);
           setCreatedVideoPath(res.payload.video);
           dispatch(changeStatus(""));
   
@@ -300,8 +298,11 @@ export default function Film() {
     if (!success) {
       console.error("Échec de la sauvegarde du clip après plusieurs tentatives.");
       setLostConnexion(true);
+      return false;
     }
+
     setIsSavingVideo(false);
+    return true;
   };
 
   const handleNextQuestion = async () => {
@@ -314,12 +315,17 @@ export default function Film() {
         type: "video/mp4",
       });
   
-      await saveVideoToDatabase(
+      const success = await saveVideoToDatabase(
         videoFile,
         questionId,
         selectedQuestion,
         token
       );
+
+      if (!success) {
+        return; 
+      }
+
     }
 
     if (currentQuestionIndex < questions.length - 1) {
@@ -337,11 +343,18 @@ export default function Film() {
   };
 
   const handleRedoRecording = () => {
+    setIsSavingVideo(false);
+    setLostConnexion(null);
     setVideoBase64(null);
     setCreatedVideoPath(null);
     setTimer(0);
     clearInterval(timerIntervalId);
     setMediaStream(null);
+  };
+
+  const resetLostConnexion = () => {
+    setIsSavingVideo(false);
+    setLostConnexion(null);
   };
 
   const formatTime = (seconds) => {
@@ -477,7 +490,7 @@ export default function Film() {
         </p>
         <button
           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          onClick={handleRedoRecording}
+          onClick={resetLostConnexion}
         >
           Réessayer l'enregistrement
         </button>
