@@ -182,7 +182,7 @@ export default function Film() {
 
         recorder.onstop = async () => {
           const blob = new Blob(chunks, { type: "video/webm" });
-          const videoFile = new File([blob], "video.mp4", {
+          const videoFile = new File([blob], `video-${user.id}.mp4`, {
             type: "video/mp4",
           });
 
