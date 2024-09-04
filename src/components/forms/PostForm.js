@@ -19,6 +19,7 @@ import SelectMultiple from "../fields/SelectMultiple";
 
 import { PostSchema } from "../../utils/Validation";
 import Photo from "../core/Photo";
+import { getEducationLevelsByCountry } from "../../utils/EducationLevel";
 
 export default function PostForm() {
   
@@ -35,6 +36,8 @@ export default function PostForm() {
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
+  const [studiesOptions, setStudiesOptions] = useState([]);
+  const [contractOptions, setContractOptions] = useState([]);
   const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
   const businessId = localStorage.getItem('businessId') || null;
   const isTrainExam = localStorage.getItem('isTrainExam') || null;
@@ -88,6 +91,12 @@ export default function PostForm() {
 
       setPortalsOptions(portalsOptions);
 
+      const educationLevelsForCountry = getEducationLevelsByCountry(portalsData.country);
+      setStudiesOptions(educationLevelsForCountry);
+
+      const contractTypesForCountry = getEducationLevelsByCountry(portalsData.country);
+      setContractOptions(contractTypesForCountry);
+
     } catch (error) {
       console.error(
         "Erreur lors de la récupération des portails :",
@@ -109,33 +118,6 @@ export default function PostForm() {
   const commentOptions = [
     { value: "Oui", label: "Oui" },
     { value: "Non", label: "Non" },
-  ];
-
-  const contractOptions = [
-    { value: "CDI", label: "CDI" },
-    { value: "CDD", label: "CDD" },
-    { value: "Alternance", label: "Alternance" },
-    { value: "Stage", label: "Stage" },
-    { value: "Freelance", label: "Freelance" },
-    { value: "CDD", label: "CDD" },
-    { value: "Intérim", label: "Intérim" },
-    { value: "Vie", label: "Vie" },
-    { value: "Statutaire", label: "Statutaire" },
-    { value: "Franchise", label: "Franchise" },
-    { value: "Saisonnier", label: "Saisonnier" },
-    { value: "Volontaire", label: "Volontaire" },
-    { value: "Formation", label: "Formation" },
-  ];
-
-  const studiesOptions = [
-    { value: "Brevet", label: "Brevet" },
-    { value: "CAP, BEP", label: "CAP, BEP" },
-    { value: "Baccalauréat", label: "Baccalauréat" },
-    { value: "DEUG, BTS, DUT, DEUST", label: "DEUG, BTS, DUT, DEUST" },
-    { value: "Licence, licence professionnelle, BUT", label: "Licence, licence professionnelle, BUT" },
-    { value: "Maîtrise", label: "Maîtrise" },
-    { value: "Master, diplôme d'ingénieur", label: "Master, diplôme d'ingénieur" },
-    { value: "Doctorat", label: "Doctorat" }
   ];
 
   const kmOptions = [

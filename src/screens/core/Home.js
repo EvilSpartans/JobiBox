@@ -1,36 +1,49 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "../../components/core/Logout";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getJobiboxPortals } from "../../store/slices/jobiboxSlice";
 
 export default function Home() {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
-  const isTrainExam = localStorage.getItem('isTrainExam');
   const examenInProgress = localStorage.getItem('examenInProgress');
   const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
 
   useEffect(() => {
-    if (training !== "true" && exam !== "true") {
-      navigate("/cvVideo");
-    }
-
-    if (isTrainExam === 'true') {
-      localStorage.removeItem('isTrainExam');
-    }
-
+    const fetchJobibox = async () => {
+      try {
+        const jobiboxId = localStorage.getItem('jobiboxId');
+        const response = await dispatch(getJobiboxPortals({ id: jobiboxId }));
+        const portalsData = response.payload;
+  
+        localStorage.setItem("trainingActivated", portalsData.training);
+        localStorage.setItem("examActivated", portalsData.exam);
+  
+        if (!portalsData.training && !portalsData.exam) {
+          navigate("/cvVideo");
+        }
+  
+      } catch (error) {
+        console.error("Erreur lors de la récupération des portails :", error);
+      }
+    };
+  
+    fetchJobibox();
+  
     if (examenInProgress === 'true') {
       localStorage.removeItem('examenInProgress');
     }
-
+  
     if (existingSelectedGreenFilter) {
       localStorage.removeItem('selectedGreenFilter');
     }
-
-  }, [training, exam, navigate]);
+  
+  }, [navigate, dispatch, examenInProgress, existingSelectedGreenFilter]);
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
