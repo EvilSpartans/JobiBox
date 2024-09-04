@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "../../components/core/Logout";
 import { useDispatch, useSelector } from "react-redux";
+import PulseLoader from "react-spinners/PulseLoader";
 import { getJobiboxPortals } from "../../store/slices/jobiboxSlice";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
   const exam = localStorage.getItem("examActivated");
   const examenInProgress = localStorage.getItem('examenInProgress');
   const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchJobibox = async () => {
@@ -26,6 +28,8 @@ export default function Home() {
   
         if (!portalsData.training && !portalsData.exam) {
           navigate("/cvVideo");
+        } else {
+          setLoading(false); 
         }
   
       } catch (error) {
@@ -44,6 +48,14 @@ export default function Home() {
     }
   
   }, [navigate, dispatch, examenInProgress, existingSelectedGreenFilter]);
+
+  if (loading) {
+    return (
+      <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center">
+        <PulseLoader color="#fff" size={16} />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">

@@ -20,6 +20,7 @@ import SelectMultiple from "../fields/SelectMultiple";
 import { PostSchema } from "../../utils/Validation";
 import Photo from "../core/Photo";
 import { getEducationLevelsByCountry } from "../../utils/EducationLevel";
+import { getContractTypesByCountry } from "../../utils/ContractTypes";
 
 export default function PostForm() {
   
@@ -94,7 +95,7 @@ export default function PostForm() {
       const educationLevelsForCountry = getEducationLevelsByCountry(portalsData.country);
       setStudiesOptions(educationLevelsForCountry);
 
-      const contractTypesForCountry = getEducationLevelsByCountry(portalsData.country);
+      const contractTypesForCountry = getContractTypesByCountry(portalsData.country);
       setContractOptions(contractTypesForCountry);
 
     } catch (error) {

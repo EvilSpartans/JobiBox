@@ -14,10 +14,10 @@ export const ContractTypes = {
       { value: "Formation", label: "Formation" }
     ],
     Belgique: [
-      { value: "CDI", label: "Contrat à Durée Indéterminée" },
-      { value: "CDD", label: "Contrat à Durée Déterminée" },
+      { value: "CDI", label: "CDI" },
+      { value: "CDD", label: "CDD" },
       { value: "Intérim", label: "Contrat Intérimaire" },
-      { value: "Freelance", label: "Indépendant/Freelance" },
+      { value: "Freelance", label: "Freelance" },
       { value: "Stage", label: "Stage" },
       { value: "Alternance", label: "Contrat d'Alternance" },
       { value: "Contrat de remplacement", label: "Contrat de Remplacement" },
@@ -27,7 +27,7 @@ export const ContractTypes = {
     Suisse: [
       { value: "CDI", label: "Contrat de Travail à Durée Indéterminée" },
       { value: "CDD", label: "Contrat de Travail à Durée Déterminée" },
-      { value: "Freelance", label: "Indépendant/Freelance" },
+      { value: "Freelance", label: "Freelance" },
       { value: "Stage", label: "Stage" },
       { value: "Intérim", label: "Contrat Temporaire" },
       { value: "Contrat d'apprentissage", label: "Contrat d'Apprentissage" },
@@ -45,10 +45,10 @@ export const ContractTypes = {
       { value: "Saisonarbeit", label: "Saisonarbeitsvertrag" }
     ],
     Luxembourg: [
-      { value: "CDI", label: "Contrat à Durée Indéterminée" },
-      { value: "CDD", label: "Contrat à Durée Déterminée" },
+      { value: "CDI", label: "CDI" },
+      { value: "CDD", label: "CDD" },
       { value: "Intérim", label: "Contrat Intérimaire" },
-      { value: "Freelance", label: "Indépendant/Freelance" },
+      { value: "Freelance", label: "Freelance" },
       { value: "Stage", label: "Stage" },
       { value: "Contrat d'apprentissage", label: "Contrat d'Apprentissage" },
       { value: "Contrat étudiant", label: "Contrat Étudiant" },

@@ -56,6 +56,7 @@ export default function SelectMultiple({
                 className="w-full h-10"
                 styles={customStyles}
                 placeholder={placeholder}
+                isSearchable={false}
             />
             {/* Hidden fields for each selected value */}
             {value.map((selectedOption, index) => (
