@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Logout from "../../components/core/Logout";
 import { useDispatch, useSelector } from "react-redux";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getJobiboxPortals } from "../../store/slices/jobiboxSlice";
+import { getJobiboxPortals, updateJobibox } from "../../store/slices/jobiboxSlice";
+import { AppVersion } from "../../components/core/AppVersion";
 
 export default function Home() {
 
@@ -14,9 +15,10 @@ export default function Home() {
   const exam = localStorage.getItem("examActivated");
   const examenInProgress = localStorage.getItem('examenInProgress');
   const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    
     const fetchJobibox = async () => {
       try {
         const jobiboxId = localStorage.getItem('jobiboxId');
@@ -25,6 +27,11 @@ export default function Home() {
   
         localStorage.setItem("trainingActivated", portalsData.training);
         localStorage.setItem("examActivated", portalsData.exam);
+
+        const appVersion = await AppVersion();
+        if (portalsData.version !== appVersion) {
+          await dispatch(updateJobibox({ id: jobiboxId, version: appVersion }));
+        }
   
         if (!portalsData.training && !portalsData.exam) {
           navigate("/cvVideo");

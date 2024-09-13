@@ -6,12 +6,10 @@ contextBridge.exposeInMainWorld('electron', {
             ipcRenderer.send('notify', message);
         }        
     },
-    batteryApi: {
-
-    },
-    fileApi: {
-        
+    appVersionApi: {
+        getAppVersion() {
+            return ipcRenderer.invoke('get-app-version');
+        }
     },
     clearCache: () => ipcRenderer.invoke('clear-cache')
-
 })

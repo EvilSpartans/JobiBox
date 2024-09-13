@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../fields/Input";
 import { useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ export default function LoginForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.user);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   const {
     register,
@@ -22,6 +23,10 @@ export default function LoginForm() {
   } = useForm({
     resolver: yupResolver(signInSchema),
   });
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((prevState) => !prevState);
+  };
 
   const onSubmit = async (data) => {
     dispatch(changeStatus("loading"));
@@ -59,6 +64,8 @@ export default function LoginForm() {
             placeholder="Mot de passe"
             register={register}
             error={errors?.password?.message}
+            toggleVisibility={togglePasswordVisibility}
+            isPasswordVisible={passwordVisible}
           />
           {/*if we have an error*/}
           {error ? (

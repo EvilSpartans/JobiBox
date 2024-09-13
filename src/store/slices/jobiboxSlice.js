@@ -33,6 +33,24 @@ export const getJobiboxPortals = createAsyncThunk(
     }
 );
 
+export const updateJobibox = createAsyncThunk(
+    "jobibox/update",
+    async (values, { rejectWithValue }) => {
+        const { id, version } = values;
+        try {
+            const { data } = await axios.put(
+                `${BASE_URL}/jobibox/${id}`,
+                {
+                    version,
+                },
+            );
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.response);
+        }
+    }
+);
+
 export const jobiboxSlice = createSlice({
     name: "jobibox",
     initialState,
@@ -62,6 +80,17 @@ export const jobiboxSlice = createSlice({
                 state.portals = action.payload;
             })
             .addCase(getJobiboxPortals.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload.data.message;
+            })
+            .addCase(updateJobibox.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(updateJobibox.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.portals = action.payload;
+            })
+            .addCase(updateJobibox.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload.data.message;
             });

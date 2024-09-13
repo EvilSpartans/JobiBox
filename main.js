@@ -146,6 +146,11 @@ ipcMain.on("notify", (_, message) => {
   new Notification({ title: "Notification", body: message }).show();
 });
 
+// App version
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion();
+});
+
 ipcMain.on("app-quit", () => {
   app.quit();
 });
