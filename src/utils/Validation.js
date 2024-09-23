@@ -3,12 +3,10 @@ import * as Yup from "yup";
 export const signUpSchema = Yup.object({
     firstname: Yup.string()
         .required("Le prénom est requis")
-        .matches(/^[a-zA-Z_ ]*$/, "Caractères spécials non autorisés.")
         .min(2, "Le prénom doit contenir entre 2 et 25 caractères")
         .max(25, "Le prénom doit contenir entre 2 et 25 caractères"),
     lastname: Yup.string()
         .required("Le nom est requis")
-        .matches(/^[a-zA-Z_ ]*$/, "Caractères spécials non autorisés.")
         .min(2, "Le nom doit contenir entre 2 et 25 caractères")
         .max(25, "Le nom doit contenir entre 2 et 25 caractères"),
     email: Yup.string()

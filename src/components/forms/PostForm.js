@@ -71,6 +71,12 @@ export default function PostForm() {
   const fetchPortals = async () => {
     try {
       const jobiboxId = localStorage.getItem('jobiboxId');
+
+      if (jobiboxId === null) {
+        setStudiesOptions(getEducationLevelsByCountry("France"));
+        setContractOptions(getContractTypesByCountry("France"));
+      }
+
       const response = await dispatch(getJobiboxPortals({id: jobiboxId}));
       const portalsData = response.payload;
 
