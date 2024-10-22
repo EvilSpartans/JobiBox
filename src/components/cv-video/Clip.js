@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faPen, faTrash, faCut } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faRedo, faTrash, faCut } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import {
   getVideoProcesses,
@@ -247,30 +247,30 @@ export default function Clip() {
         {status !== "loading" && questions && questions.length > 0 &&
           questions.map((question, index) => (
             <div key={index} className="mb-3 flex items-center allIcons">
-              <span className="flex-grow">{question.questionTitle}</span>
+              <span className="flex-grow text-lg">{question.questionTitle}</span>
               <button
                 onClick={() => openShowModal(index)}
-                className="showIcon bg-blue-100 hover:bg-blue-200 text-blue-500 font-semibold px-1 rounded-md mr-1"
+                className="ml-3 showIcon bg-blue-100 hover:bg-blue-200 text-blue-500 font-semibold px-3 py-2 rounded-md mr-2"
               >
-                <FontAwesomeIcon icon={faEye} className="" />
+                <FontAwesomeIcon icon={faEye} size="lg" />
               </button>
               <button
                 onClick={() => openEditModal(index)}
-                className="editIcon bg-green-100 hover-bg-green-200 text-green-500 font-semibold px-1 rounded-md mr-1"
+                className="editIcon bg-green-100 hover:bg-green-200 text-green-500 font-semibold px-3 py-2 rounded-md mr-2"
               >
-                <FontAwesomeIcon icon={faPen} className="" />
+                <FontAwesomeIcon icon={faRedo} size="lg" />
               </button>
               <button
                 onClick={() => openTrimModal(index)}
-                className="trimIcon bg-yellow-100 hover-bg-yellow-200 text-yellow-500 font-semibold px-1 rounded-md mr-1"
+                className="trimIcon bg-yellow-100 hover:bg-yellow-200 text-yellow-500 font-semibold px-3 py-2 rounded-md mr-2"
               >
-                <FontAwesomeIcon icon={faCut} className="" />
+                <FontAwesomeIcon icon={faCut} size="lg" />
               </button>
               <button
                 onClick={() => openConfirmationModal(index)}
-                className="deleteIcon bg-red-100 hover-bg-red-200 text-red-500 font-semibold px-1 rounded-md"
+                className="deleteIcon bg-red-100 hover:bg-red-200 text-red-500 font-semibold px-3 py-2 rounded-md"
               >
-                <FontAwesomeIcon icon={faTrash} className="" />
+                <FontAwesomeIcon icon={faTrash} size="lg" />
               </button>
             </div>
           ))}

@@ -529,6 +529,7 @@ export default function Film() {
               controlsList="nodownload"
               preload="true"
               className="w-full h-full object-contain tall:object-cover mirror"
+              autoPlay
             />
           )}
 

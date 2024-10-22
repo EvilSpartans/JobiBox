@@ -1,9 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
 import Logout from "../../components/core/Logout";
+import {QRCodeSVG} from 'qrcode.react';
 
 export default function Thanks() {
-  const user = useSelector((state) => state.user.user);
+
+  const videoPath = localStorage.getItem("urlQrcode");
+  const BASE_URL = process.env.REACT_APP_AWS_BASE_URL;
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
@@ -21,8 +23,13 @@ export default function Thanks() {
                 JOBISSIM</span> espère que cette expérience t’a plu et te souhaite
                 bonne chance dans tes recherches.
                 <br /> <br />
-                PS : Ton CV vidéo vient d'atterrir sur ta <span className="text-blue-400">boite mail</span>, télécharge le et diffuse le au maximum !
+                PS : Ton CV vidéo vient d'atterrir sur ta <span className="text-blue-400">boite mail</span>, télécharge le et diffuse le au maximum ! Tu peux aussi scanner le QR code ci-dessous :
               </p>
+
+              <div className="flex justify-center items-center mt-10 mb-5">
+                <QRCodeSVG value={`${BASE_URL}/${videoPath}`} />
+              </div>
+
             </div>
             {/*Buttons*/}
             <Logout position="static" />

@@ -210,6 +210,7 @@ export default function PostForm() {
       const res = await dispatch(createPost(postData));
       console.log(res);
       if (res?.payload?.title) {
+        localStorage.setItem('urlQrcode', res.payload.video);
         navigate("/thanks");
         sendConfirmNotification();
       }
@@ -265,7 +266,7 @@ export default function PostForm() {
           <Input
             name="title"
             type="text"
-            placeholder="Titre de la vidéo"
+            placeholder="Nom du poste recherché"
             register={register}
             error={errors?.title?.message}
           />
@@ -363,7 +364,7 @@ export default function PostForm() {
               <Textarea
                 name="description"
                 type="text"
-                placeholder="Description"
+                placeholder="Résumé du cv, téléphone et email"
                 register={register}
                 error={errors?.description?.message}
               />

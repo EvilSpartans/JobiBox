@@ -18,6 +18,10 @@ export default function Welcome() {
   }, []);
 
   useEffect(() => {
+    if (localStorage.getItem("urlQrcode")) {
+      localStorage.removeItem("urlQrcode");
+    }
+  
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
