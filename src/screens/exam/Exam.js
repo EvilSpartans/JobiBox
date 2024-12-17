@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GoBack from "../../components/core/GoBack";
 import Logout from "../../components/core/Logout";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
@@ -15,6 +15,10 @@ export default function Exam() {
   const dispatch = useDispatch();
   const { token } = user;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    sessionStorage.removeItem('hasReloaded');
+  }, []);
 
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -40,7 +44,8 @@ export default function Exam() {
       JSON.stringify(shuffledQuestions)
     );
     localStorage.setItem("examenInProgress", "true");
-    navigate("/recordTE");
+    // navigate("/recordS");
+    navigate("/greenFiltersE");
   };
 
   const fetchQuestionVideos = async () => {

@@ -307,7 +307,7 @@ export default function Film() {
       setShowIntro(true);
     } else {
       localStorage.removeItem("selectedQuestionsVideos");
-      navigate("/reviewTE");
+      navigate("/reviewE");
     }
   };
 

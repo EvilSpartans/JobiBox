@@ -39,7 +39,7 @@ export default function GreenFilter() {
     const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
 
     if (existingSelectedGreenFilter) {
-      navigate("/recordTE");
+      navigate("/recordE");
     } else {
       fetchGreenFilters();
     }
@@ -106,7 +106,7 @@ export default function GreenFilter() {
       localStorage.setItem("selectedGreenFilter", JSON.stringify(selectedGreenFilter));
       sessionStorage.removeItem('hasReloaded');
     }
-    navigate("/recordTE");
+    navigate("/recordE");
   };
 
   const handleGreenFilterClick = (index) => {

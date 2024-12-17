@@ -1,19 +1,19 @@
 import React from "react";
-import Film from "../../components/train-exam/Film";
 import GoBack from "../../components/core/GoBack";
 import Logout from "../../components/core/Logout";
+import GreenFilter from "../../components/simulation/GreenFilter";
 
-export default function Record() {
+export default function GreenFilters() {
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-      <GoBack itemsToRemove={["selectedGreenFilter"]} />
       <Logout />
+      <GoBack />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
-        <div className="w-full flex items-center justify-center overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
           {/* Container */}
-          <Film />
+          <GreenFilter />
         </div>
       </div>
     </div>

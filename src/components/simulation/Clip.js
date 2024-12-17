@@ -188,7 +188,7 @@ export default function Clip() {
       updateState: true
     };
     localStorage.setItem("selectedQuestionsVideos", JSON.stringify([selectedQuestion]));
-    navigate("/recordTE");
+    navigate("/recordS");
   };
 
   const handleDelete = async (index) => {
