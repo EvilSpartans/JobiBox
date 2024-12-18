@@ -224,6 +224,9 @@ export default function PostForm() {
       localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
       localStorage.removeItem("examenInProgress");
+      localStorage.removeItem("beginnerInProgress");
+      localStorage.removeItem("intermediateInProgress");
+      localStorage.removeItem("expertInProgress");
       localStorage.removeItem("isTrainExam");
       localStorage.removeItem("selectedGreenFilter");
       localStorage.removeItem("selectedAnimation");

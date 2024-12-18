@@ -8,6 +8,9 @@ export default function Questions() {
   useEffect(() => {
     const isTrainExam = localStorage.getItem('isTrainExam');
     const examenInProgress = localStorage.getItem('examenInProgress');
+    const beginnerInProgress = localStorage.getItem('beginnerInProgress');
+    const intermediateInProgress = localStorage.getItem('intermediateInProgress');
+    const expertInProgress = localStorage.getItem('expertInProgress');
 
     if (isTrainExam === 'true') {
       localStorage.removeItem('isTrainExam');
@@ -15,6 +18,18 @@ export default function Questions() {
 
     if (examenInProgress === 'true') {
       localStorage.removeItem('examenInProgress');
+    }
+
+    if (beginnerInProgress === 'true') {
+      localStorage.removeItem('beginnerInProgress');
+    }
+
+    if (intermediateInProgress === 'true') {
+      localStorage.removeItem('intermediateInProgress');
+    }
+
+    if (expertInProgress === 'true') {
+      localStorage.removeItem('expertInProgress');
     }
   }, []);
 

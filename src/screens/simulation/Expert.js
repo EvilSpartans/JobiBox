@@ -4,6 +4,7 @@ import Logout from "../../components/core/Logout"
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
+import expertImg from "../../../assets/images/expert.png";
 
 export default function Expert() {
 
@@ -47,13 +48,13 @@ export default function Expert() {
         localStorage.removeItem("selectedQuestionsVideos");
     }
     const fetchedQuestions = await fetchQuestionVideos();
-    const simulationQuestions = fetchedQuestions.filter((question) => question.training && question.difficulty === "intermediate");
+    const simulationQuestions = fetchedQuestions.filter((question) => question.training && question.difficulty === "Intermédiaire");
     const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
     localStorage.setItem(
         "selectedQuestionsVideos",
         JSON.stringify(shuffledQuestions)
     );
-    localStorage.setItem("examenInProgress", "true");
+    localStorage.setItem("expertInProgress", "true");
     navigate("/greenFiltersE");
     };
 
@@ -70,7 +71,13 @@ export default function Expert() {
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
                 <h2 className="text-3xl font-bold">Niveau expert</h2>
-                <p className="mt-6 text-lg">
+                <img
+                src={expertImg}
+                alt="Welcome"
+                className="mx-auto mt-10"
+                style={{ maxHeight: "350px", width: "auto", height: "auto" }}
+                />
+                <p className="mt-12 text-lg">
                 Un seul scénario te sera proposé, regroupant toutes les thématiques avec des questions de <span className="text-blue-400">niveau intermédiaire ou difficile</span>.  
                 Tu devras enchaîner <span className="text-blue-400">sans répit</span> et il ne sera <span className="text-blue-400">pas possible</span> de recommencer.
                 </p>

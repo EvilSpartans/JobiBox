@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GoBack from "../../components/core/GoBack";
 import Logout from "../../components/core/Logout";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,24 @@ export default function Train() {
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const beginnerInProgress = localStorage.getItem('beginnerInProgress');
+    const intermediateInProgress = localStorage.getItem('intermediateInProgress');
+    const expertInProgress = localStorage.getItem('expertInProgress');
+
+    if (beginnerInProgress === 'true') {
+      localStorage.removeItem('beginnerInProgress');
+    }
+
+    if (intermediateInProgress === 'true') {
+      localStorage.removeItem('intermediateInProgress');
+    }
+
+    if (expertInProgress === 'true') {
+      localStorage.removeItem('expertInProgress');
+    }
+  }, []);
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">

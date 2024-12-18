@@ -35,7 +35,11 @@ export default function Clip() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [isSliderMoved, setIsSliderMoved] = useState(false);
   const videoRef = useRef(null);
-  const examenInProgress = localStorage.getItem("examenInProgress");
+  const simulationInProgress =
+  localStorage.getItem("beginnerInProgress") ||
+  localStorage.getItem("intermediateInProgress") ||
+  localStorage.getItem("expertInProgress");
+
 
   const fetchQuestions = async () => {
     try {
@@ -86,7 +90,7 @@ export default function Clip() {
 
   useEffect(() => {
     const checkExamenInProgress = async () => {
-      if (examenInProgress === "true") {
+      if (simulationInProgress === "true") {
         await assembleAndStoreVideo();
       }
     };
@@ -233,7 +237,7 @@ export default function Clip() {
     }
   };
 
-  if (examenInProgress === "true") {
+  if (simulationInProgress === "true") {
     return (
       <div className="text-center mt-8">
         <PulseLoader color="#fff" size={16} />

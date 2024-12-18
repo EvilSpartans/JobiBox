@@ -14,6 +14,9 @@ export default function Home() {
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
   const examenInProgress = localStorage.getItem('examenInProgress');
+  const beginnerInProgress = localStorage.getItem('beginnerInProgress');
+  const intermediateInProgress = localStorage.getItem('intermediateInProgress');
+  const expertInProgress = localStorage.getItem('expertInProgress');
   const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
   const [loading, setLoading] = useState(true);
 
@@ -49,12 +52,24 @@ export default function Home() {
     if (examenInProgress === 'true') {
       localStorage.removeItem('examenInProgress');
     }
+
+    if (beginnerInProgress === 'true') {
+      localStorage.removeItem('beginnerInProgress');
+    }
+
+    if (intermediateInProgress === 'true') {
+      localStorage.removeItem('intermediateInProgress');
+    }
+
+    if (expertInProgress === 'true') {
+      localStorage.removeItem('expertInProgress');
+    }
   
     if (existingSelectedGreenFilter) {
       localStorage.removeItem('selectedGreenFilter');
     }
   
-  }, [navigate, dispatch, examenInProgress, existingSelectedGreenFilter]);
+  }, [navigate, dispatch, examenInProgress, existingSelectedGreenFilter, expertInProgress, intermediateInProgress, beginnerInProgress]);
 
   if (loading) {
     return (

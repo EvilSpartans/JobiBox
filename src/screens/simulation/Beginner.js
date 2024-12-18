@@ -4,6 +4,7 @@ import Logout from "../../components/core/Logout"
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
+import beginnerImg from "../../../assets/images/beginner.png";
 
 export default function Beginner() {
 
@@ -47,13 +48,13 @@ export default function Beginner() {
         localStorage.removeItem("selectedQuestionsVideos");
     }
     const fetchedQuestions = await fetchQuestionVideos();
-    const simulationQuestions = fetchedQuestions.filter((question) => question.training && question.difficulty === "easy");
+    const simulationQuestions = fetchedQuestions.filter((question) => question.training && question.difficulty === "Facile");
     const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
     localStorage.setItem(
         "selectedQuestionsVideos",
         JSON.stringify(shuffledQuestions)
     );
-    localStorage.setItem("examenInProgress", "true");
+    localStorage.setItem("beginnerInProgress", "true");
     navigate("/greenFiltersE");
     };
 
@@ -70,7 +71,13 @@ export default function Beginner() {
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
                 <h2 className="text-3xl font-bold">Niveau débutant</h2>
-                <p className="mt-6 text-lg">
+                <img
+                src={beginnerImg}
+                alt="Welcome"
+                className="mx-auto mt-10"
+                style={{ maxHeight: "350px", width: "auto", height: "auto" }}
+                />
+                <p className="mt-12 text-lg">
                 Les questions de <span className="text-blue-400">difficulté facile</span>, définies par l'entreprise, te seront posées <span className="text-blue-400">aléatoirement</span>.  
                 Tu pourras te filmer à ton rythme et <span className="text-blue-400">recommencer</span> les séquences si nécessaire.
                 </p>

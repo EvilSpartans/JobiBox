@@ -141,8 +141,8 @@ export default function Film() {
   };
 
   const toggleRecording = async () => {
-    const questionId = currentQuestionIdRef.current;
-    const selectedQuestion = selectedQuestionRef.current;
+    // const questionId = currentQuestionIdRef.current;
+    // const selectedQuestion = selectedQuestionRef.current;
 
     if (!recording) {
       try {
@@ -182,24 +182,34 @@ export default function Film() {
 
         recorder.onstop = async () => {
           const blob = new Blob(chunks, { type: "video/webm" });
-          const videoFile = new File([blob], `video-${user.id}.mp4`, {
-            type: "video/mp4",
-          });
-
           setVideoBase64(blob);
           stream.getTracks().forEach((track) => track.stop());
           setRecording(false);
           setTimer(0);
           clearInterval(timerIntervalId);
-
-          await saveVideoToDatabase(
-            videoFile,
-            questionId,
-            selectedQuestion,
-            token
-          );
-          handleNextQuestion();
+          dispatch(changeStatus(""));
         };
+
+        // recorder.onstop = async () => {
+        //   const blob = new Blob(chunks, { type: "video/webm" });
+        //   const videoFile = new File([blob], `video-${user.id}.mp4`, {
+        //     type: "video/mp4",
+        //   });
+
+        //   setVideoBase64(blob);
+        //   stream.getTracks().forEach((track) => track.stop());
+        //   setRecording(false);
+        //   setTimer(0);
+        //   clearInterval(timerIntervalId);
+
+        //   await saveVideoToDatabase(
+        //     videoFile,
+        //     questionId,
+        //     selectedQuestion,
+        //     token
+        //   );
+        //   handleNextQuestion();
+        // };
 
         recorder.start();
         setRecording(true);
@@ -293,11 +303,37 @@ export default function Film() {
   
     if (!success) {
       console.error("Échec de la sauvegarde du clip après plusieurs tentatives.");
-      alert("Échec de la sauvegarde du clip après plusieurs tentatives.")
+      // setLostConnexion(true);
+      return false;
     }
+
+    // setIsSavingVideo(false);
+    return true;
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+
+    if (videoBase64 && !createdVideoPath) {
+      const questionId = currentQuestionIdRef.current;
+      const selectedQuestion = selectedQuestionRef.current;
+  
+      const videoFile = new File([videoBase64], `video-${user.id}.mp4`, {
+        type: "video/mp4",
+      });
+  
+      const success = await saveVideoToDatabase(
+        videoFile,
+        questionId,
+        selectedQuestion,
+        token
+      );
+
+      if (!success) {
+        return; 
+      }
+
+    }
+
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setVideoBase64(null);
@@ -305,10 +341,35 @@ export default function Film() {
       setRecording(false);
       setMediaStream(null);
       setShowIntro(true);
+      // setLostConnexion(null);
     } else {
       localStorage.removeItem("selectedQuestionsVideos");
-      navigate("/reviewS");
+      navigate("/reviewS");      
     }
+  };
+
+  // const handleNextQuestion = () => {
+  //   if (currentQuestionIndex < questions.length - 1) {
+  //     setCurrentQuestionIndex(currentQuestionIndex + 1);
+  //     setVideoBase64(null);
+  //     setCreatedVideoPath(null);
+  //     setRecording(false);
+  //     setMediaStream(null);
+  //     setShowIntro(true);
+  //   } else {
+  //     localStorage.removeItem("selectedQuestionsVideos");
+  //     navigate("/reviewS");
+  //   }
+  // };
+
+  const handleRedoRecording = () => {
+    // setIsSavingVideo(false);
+    // setLostConnexion(null);
+    setVideoBase64(null);
+    setCreatedVideoPath(null);
+    setTimer(0);
+    clearInterval(timerIntervalId);
+    setMediaStream(null);
   };
 
   const formatTime = (seconds) => {
@@ -454,11 +515,7 @@ export default function Film() {
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
             <video
-              src={
-                createdVideoPath
-                  ? `${BASE_URL}/uploads/videoProcess/${createdVideoPath}`
-                  : null
-              }
+              src={URL.createObjectURL(videoBase64)}
               controls
               disablePictureInPicture
               controlsList="nodownload"
@@ -540,27 +597,35 @@ export default function Film() {
         </div>
 
         <div className="mt-4 flex items-center justify-center">
-          {!showIntro && (
-            <>
-              {videoBase64 ? null : (
-                <button
-                  onClick={toggleRecording}
-                  className={`${
-                    recording
-                      ? "bg-red-500 hover:bg-red-700"
-                      : "bg-green_2 hover:bg-green_1"
-                  } text-white px-4 py-2 rounded-lg actionBtn ${
-                    timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""
-                  }`}
-                  disabled={timer > 0 && !recording}
-                >
-                  {recording
-                    ? "Arrêter l'enregistrement"
-                    : "Démarrer l'enregistrement"}
-                </button>
-              )}
-            </>
-          )}
+        {!showIntro && (
+          <>
+            {videoBase64 ? (
+              <button
+                onClick={handleRedoRecording}
+                className="bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 transition ease-in duration-300"
+              >
+                Recommencer
+              </button>
+            ) : (
+              <button
+                onClick={toggleRecording}
+                className={`${
+                  recording
+                    ? "bg-red-500 hover:bg-red-700"
+                    : "bg-green_2 hover:bg-green_1"
+                } text-white px-4 py-2 rounded-lg actionBtn ${
+                  timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""
+                }`}
+                disabled={timer > 0 && !recording}
+              >
+                {recording
+                  ? "Arrêter l'enregistrement"
+                  : "Démarrer l'enregistrement"}
+              </button>
+            )}
+          </>
+        )}
+
         </div>
 
       </div>

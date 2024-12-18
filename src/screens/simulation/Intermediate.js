@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
 import PulseLoader from "react-spinners/PulseLoader";
+import intermediateImg from "../../../assets/images/intermediate.png";
 
 export default function Intermediate() {
 
@@ -13,15 +14,36 @@ export default function Intermediate() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [questions, setQuestions] = useState([]);
-  const [selectedTheme, setSelectedTheme] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     sessionStorage.removeItem("hasReloaded");
+    fetchCategories();
   }, []);
 
-  const handleThemeClick = (theme) => {
-    setSelectedTheme(theme);
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("https://jobissim.com/api/questionLists", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setCategories(data);
+      } else {
+        console.error("Erreur lors de la récupération des catégories :", response.status);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'appel API pour les catégories :", error);
+    }
+  };
+
+  const handleCategoryClick = (categoryId) => {
+    setSelectedCategory(categoryId);
   };
 
   const shuffleArray = (array) => {
@@ -50,29 +72,32 @@ export default function Intermediate() {
       localStorage.removeItem("selectedQuestionsVideos");
     }
   
-    if (!selectedTheme) return;
+    if (!selectedCategory) return;
   
     setLoading(true);
   
     const fetchedQuestions = await fetchQuestionVideos();
+
+    console.log(fetchedQuestions);
   
-    const themeIdMap = {
-      "Thématique 1": 1,
-      "Thématique 2": 2,
-      "Thématique 3": 3,
-    };
+    const selectedCategoryObject = categories.find((category) => category.id === selectedCategory);
+    if (!selectedCategoryObject) {
+      console.error("Thème sélectionné introuvable !");
+      setLoading(false);
+      return;
+    }
   
     const simulationQuestions = fetchedQuestions.filter(
       (question) =>
         question.training &&
-        question.difficulty === "intermediate" &&
-        question.questionList.id === themeIdMap[selectedTheme]
+        question.difficulty === "Intermédiaire" &&
+        question.questionList.id === selectedCategoryObject.id
     );
   
-    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 8);
+    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
   
     localStorage.setItem("selectedQuestionsVideos", JSON.stringify(shuffledQuestions));
-    localStorage.setItem("examenInProgress", "true");
+    localStorage.setItem("intermediateInProgress", "true");
   
     navigate("/greenFiltersE");
   };
@@ -88,7 +113,13 @@ export default function Intermediate() {
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="text-3xl font-bold">Niveau Intermédiaire</h2>
-              <p className="mt-6 text-lg">
+              <img
+              src={intermediateImg}
+              alt="Welcome"
+              className="mx-auto mt-10"
+              style={{ maxHeight: "350px", width: "auto", height: "auto" }}
+              />
+              <p className="mt-12 text-lg">
                 Choisis une thématique parmi celles proposées : les questions
                 apparaîtront <span className="text-blue-400">aléatoirement</span>. Tu pourras te filmer à ton rythme, mais il ne sera{" "}
                 <span className="text-blue-400">pas possible</span> de{" "}
@@ -103,18 +134,18 @@ export default function Intermediate() {
                 </div>
               ) : ( */}
                 <div className="flex justify-around space-x-4">
-                  {["Thématique 1", "Thématique 2", "Thématique 3"].map(
-                    (theme) => (
+                  {categories.map(
+                    (category) => (
                     <div
-                      key={theme}
+                      key={category.id}
                       className={`cursor-pointer p-6 w-1/3 text-center rounded-lg shadow-lg transform transition-all duration-300 ${
-                        selectedTheme === theme
+                        selectedCategory === category.id
                           ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white scale-105 shadow-2xl"
                           : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105 hover:shadow-md"
                       }`}
-                      onClick={() => handleThemeClick(theme)}
+                      onClick={() => handleCategoryClick(category.id)}
                     >
-                      <span className="font-semibold tracking-wide">{theme}</span>
+                      <span className="font-semibold tracking-wide">{category.title}</span>
                     </div>
                     )
                   )}
@@ -124,10 +155,10 @@ export default function Intermediate() {
 
             <button
               className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
-                !selectedTheme ? "opacity-50 pointer-events-none" : ""
+                !selectedCategory ? "opacity-50 pointer-events-none" : ""
               }`}
               onClick={handleContinueClick}
-              disabled={!selectedTheme}
+              disabled={!selectedCategory}
             >
               Continuer
             </button>
