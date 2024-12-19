@@ -26,18 +26,24 @@ export default function Evaluation() {
       if (response.ok) {
         const data = await response.json();
   
-        // Récupérer la valeur `intermediateInProgress` ou `beginnerInProgress`
+        // Récupérer la valeur `intermediateInProgress` ou `beginnerInProgress`, ou fallback à `expertInProgress`
         const simulationInProgress =
           localStorage.getItem("beginnerInProgress") ||
-          localStorage.getItem("intermediateInProgress");
-        
-        if (simulationInProgress) {
+          localStorage.getItem("intermediateInProgress") ||
+          "expertInProgress";
+  
+        if (simulationInProgress === "expertInProgress") {
+          // Définir directement le chemin pour le guide expert
+          setSelectedCategory({
+            document: "guide-expert.pdf",
+          });
+        } else {
           // Filtrer la catégorie correspondant à `simulationInProgress`
           const matchedCategory = data.find(
             (category) => category.title === simulationInProgress
           );
   
-          console.log("Catégorie correspondante :", matchedCategory); 
+          console.log("Catégorie correspondante :", matchedCategory);
   
           setSelectedCategory(matchedCategory);
         }

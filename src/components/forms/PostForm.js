@@ -50,6 +50,8 @@ export default function PostForm() {
   localStorage.getItem("beginnerInProgress") ||
   localStorage.getItem("intermediateInProgress");
 
+  const expertInProgress = localStorage.getItem("expertInProgress");
+
   // Form's options
   const {
     register,
@@ -235,7 +237,7 @@ export default function PostForm() {
       console.log(res);
       if (res?.payload?.title) {
         localStorage.setItem('urlQrcode', res.payload.video);
-        if (simulationInProgress) {
+        if (simulationInProgress || expertInProgress) {
           navigate("/evaluation");
         } else {
           navigate("/thanks");   
