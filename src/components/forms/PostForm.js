@@ -21,6 +21,8 @@ import { PostSchema } from "../../utils/Validation";
 import Photo from "../core/Photo";
 import { getEducationLevelsByCountry } from "../../utils/EducationLevel";
 import { getContractTypesByCountry } from "../../utils/ContractTypes";
+import { updateQuestionLists } from "../../store/slices/userSlice";
+import axios from "axios";
 
 export default function PostForm() {
   
@@ -43,6 +45,10 @@ export default function PostForm() {
   const businessId = localStorage.getItem('businessId') || null;
   const isTrainExam = localStorage.getItem('isTrainExam') || null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
+
+  const simulationInProgress =
+  localStorage.getItem("beginnerInProgress") ||
+  localStorage.getItem("intermediateInProgress");
 
   // Form's options
   const {
@@ -207,11 +213,33 @@ export default function PostForm() {
     };
 
     try {
+
+      // Mise à jour de l'API si simulationInProgress est vrai
+      if (simulationInProgress) {
+        const updateResponse = await axios.put(`${BASE_URL}/api/questionList/${simulationInProgress}`, {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (updateResponse.status === 201) {
+          console.log("Liste des questions mise à jour avec succès :", updateResponse.data);
+          dispatch(updateQuestionLists(updateResponse.data.questionLists));
+        }
+      }
+
       const res = await dispatch(createPost(postData));
       console.log(res);
       if (res?.payload?.title) {
         localStorage.setItem('urlQrcode', res.payload.video);
-        navigate("/thanks");
+        if (simulationInProgress) {
+          navigate("/evaluation");
+        } else {
+          navigate("/thanks");   
+        }
         sendConfirmNotification();
       }
     } catch (error) {
@@ -224,9 +252,9 @@ export default function PostForm() {
       localStorage.removeItem("videoId");
       localStorage.removeItem("textStyle");
       localStorage.removeItem("examenInProgress");
-      localStorage.removeItem("beginnerInProgress");
-      localStorage.removeItem("intermediateInProgress");
-      localStorage.removeItem("expertInProgress");
+      // localStorage.removeItem("beginnerInProgress");
+      // localStorage.removeItem("intermediateInProgress");
+      // localStorage.removeItem("expertInProgress");
       localStorage.removeItem("isTrainExam");
       localStorage.removeItem("selectedGreenFilter");
       localStorage.removeItem("selectedAnimation");

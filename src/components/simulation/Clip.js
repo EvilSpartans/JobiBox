@@ -90,7 +90,7 @@ export default function Clip() {
 
   useEffect(() => {
     const checkExamenInProgress = async () => {
-      if (simulationInProgress === "true") {
+      if (simulationInProgress) {
         await assembleAndStoreVideo();
       }
     };
@@ -237,7 +237,7 @@ export default function Clip() {
     }
   };
 
-  if (simulationInProgress === "true") {
+  if (simulationInProgress) {
     return (
       <div className="text-center mt-8">
         <PulseLoader color="#fff" size={16} />

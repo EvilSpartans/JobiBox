@@ -48,14 +48,22 @@ export default function Beginner() {
         localStorage.removeItem("selectedQuestionsVideos");
     }
     const fetchedQuestions = await fetchQuestionVideos();
-    const simulationQuestions = fetchedQuestions.filter((question) => question.training && question.difficulty === "Facile");
-    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
+    
+    const simulationQuestions = fetchedQuestions.filter(
+      (question) =>
+          question.training &&
+          question.questionList &&
+          question.questionList.title === "Débutant"
+    );
+  
+    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 4);
     localStorage.setItem(
         "selectedQuestionsVideos",
         JSON.stringify(shuffledQuestions)
     );
-    localStorage.setItem("beginnerInProgress", "true");
-    navigate("/greenFiltersE");
+    localStorage.setItem("beginnerInProgress", "Débutant");
+    // navigate("/greenFiltersS");
+    navigate("/recordS");
     };
 
   return (

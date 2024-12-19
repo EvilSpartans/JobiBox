@@ -4,13 +4,41 @@ import Logout from "../../components/core/Logout";
 import { useNavigate } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
 import TrainImage from "../../../assets/images/train.png";
+import { useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLock } from "@fortawesome/free-solid-svg-icons";
 
 export default function Train() {
 
   const [loading, setLoading] = useState(false);
+  const [isIntermediateLocked, setIsIntermediateLocked] = useState(true);
+  const [isExpertLocked, setIsExpertLocked] = useState(true);
+
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
+    console.log(user)
+
+    const beginnerExists = user?.questionLists.some(
+      (questionList) => questionList.title === "Débutant"
+    );
+
+    // Débloque Intermédiaire si "Débutant" existe
+    if (beginnerExists) {
+      setIsIntermediateLocked(false);
+    }
+
+    // Débloque Expert si "Intermédiaire" est atteint (ajuster cette logique si nécessaire)
+    const requiredExpertTitles = ["Motivation", "Technique", "Comportemental"];
+    const hasAllExpertTitles = requiredExpertTitles.every((title) =>
+      user?.questionLists.some((questionList) => questionList.title === title)
+    );
+
+    if (hasAllExpertTitles) {
+      setIsExpertLocked(false);
+    }
+
     const beginnerInProgress = localStorage.getItem('beginnerInProgress');
     const intermediateInProgress = localStorage.getItem('intermediateInProgress');
     const expertInProgress = localStorage.getItem('expertInProgress');
@@ -26,7 +54,7 @@ export default function Train() {
     if (expertInProgress === 'true') {
       localStorage.removeItem('expertInProgress');
     }
-  }, []);
+  }, [user]);
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
@@ -63,21 +91,41 @@ export default function Train() {
               </button>
 
               <button
-                className={`w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300 ${
-                  loading ? "opacity-50 pointer-events-none" : ""
+                className={`w-full flex items-center justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300 ${
+                  isIntermediateLocked ? "opacity-50 pointer-events-none" : ""
                 }`}
                 onClick={() => navigate("/intermediate")}
+                disabled={isIntermediateLocked}
               >
-                {loading ? <PulseLoader color="#fff" size={16} /> : "Intermédiaire"}
+                 {loading ? (
+                <PulseLoader color="#fff" size={16} />
+              ) : (
+                <>
+                  Intermédiaire
+                  {isIntermediateLocked && (
+                    <FontAwesomeIcon icon={faLock} className="ml-3" />
+                  )}
+                </>
+              )}
               </button>
 
               <button
-                className={`w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300 ${
-                  loading ? "opacity-50 pointer-events-none" : ""
+                className={`w-full flex items-center justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300 ${
+                  isExpertLocked ? "opacity-50 pointer-events-none" : ""
                 }`}
                 onClick={() => navigate("/expert")}
+                disabled={isExpertLocked}
               >
-                {loading ? <PulseLoader color="#333" size={16} /> : "Expert"}
+                 {loading ? (
+                <PulseLoader color="#333" size={16} />
+              ) : (
+                <>
+                  Expert
+                  {isExpertLocked && (
+                    <FontAwesomeIcon icon={faLock} className="ml-3" />
+                  )}
+                </>
+              )}
               </button>
 
           </div>

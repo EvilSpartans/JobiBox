@@ -48,14 +48,17 @@ export default function Expert() {
         localStorage.removeItem("selectedQuestionsVideos");
     }
     const fetchedQuestions = await fetchQuestionVideos();
-    const simulationQuestions = fetchedQuestions.filter((question) => question.training && question.difficulty === "Intermédiaire");
+    const simulationQuestions = fetchedQuestions.filter(
+      (question) => question.training && question.questionList.title !== "Débutant"
+    );
     const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
     localStorage.setItem(
         "selectedQuestionsVideos",
         JSON.stringify(shuffledQuestions)
     );
     localStorage.setItem("expertInProgress", "true");
-    navigate("/greenFiltersE");
+    // navigate("/greenFiltersS");
+    navigate("/recordS");
     };
 
   return (

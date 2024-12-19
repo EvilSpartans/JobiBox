@@ -12,7 +12,8 @@ const initialState = {
         lastname: "",
         email: "",
         avatar: "",
-        token: ""
+        token: "",
+        questionLists: []
     }
 }
 
@@ -52,12 +53,18 @@ export const userSlice = createSlice({
                 lastname: "",
                 email: "",
                 avatar: "",
-                token: ""
+                token: "",
+                questionLists: []
             };
         },
         changeStatus: (state, action) => {
             state.status = action.payload;
         },
+        updateQuestionLists: (state, action) => {
+            if (state.user) {
+                state.user.questionLists = action.payload;
+            }
+        }
     },
     extraReducers(builder) {
         builder.addCase(registerUser.pending, (state) => {
@@ -93,5 +100,26 @@ export const userSlice = createSlice({
     }
 })
 
-export const { logout, changeStatus } = userSlice.actions;
+export const { logout, changeStatus, updateQuestionLists } = userSlice.actions;
 export default userSlice.reducer;
+
+
+
+const updateLists = async (newQuestionLists) => {
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.user);
+
+    try {
+        const response = await axios.post(`${BASE_URL}/updateQuestionLists`, {
+            token: user.token,
+            questionLists: newQuestionLists
+        });
+
+        if (response.status === 200) {
+            // Mets à jour le store Redux
+            dispatch(updateQuestionLists(response.data.questionLists));
+        }
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour des listes de questions :", error);
+    }
+};

@@ -45,6 +45,9 @@ export default function Film() {
   const isCountdownActive = useRef(false);
 
   const selectedGreenFilter = JSON.parse(localStorage.getItem("selectedGreenFilter"));
+  const beginnerInProgress = localStorage.getItem('beginnerInProgress');
+  const intermediateInProgress = localStorage.getItem('intermediateInProgress');
+  const expertInProgress = localStorage.getItem('expertInProgress');
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -188,6 +191,10 @@ export default function Film() {
           setTimer(0);
           clearInterval(timerIntervalId);
           dispatch(changeStatus(""));
+
+          if (intermediateInProgress || expertInProgress) {
+            await handleNextQuestion(blob);
+          }
         };
 
         // recorder.onstop = async () => {
@@ -311,13 +318,15 @@ export default function Film() {
     return true;
   };
 
-  const handleNextQuestion = async () => {
+  const handleNextQuestion = async (blob = null) => {
 
-    if (videoBase64 && !createdVideoPath) {
+    const videoData = blob || videoBase64;
+
+    if (videoData  && !createdVideoPath) {
       const questionId = currentQuestionIdRef.current;
       const selectedQuestion = selectedQuestionRef.current;
   
-      const videoFile = new File([videoBase64], `video-${user.id}.mp4`, {
+      const videoFile = new File([videoData ], `video-${user.id}.mp4`, {
         type: "video/mp4",
       });
   
@@ -514,25 +523,34 @@ export default function Film() {
 
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
           {videoBase64 && (
-            <video
-              src={URL.createObjectURL(videoBase64)}
-              controls
-              disablePictureInPicture
-              controlsList="nodownload"
-              preload="true"
-              className="w-full h-full object-contain tall:object-cover"
-            />
+            intermediateInProgress || expertInProgress ? (
+              <PulseLoader color="#808080" size={16} />
+            ) : (
+              <video
+                src={URL.createObjectURL(videoBase64)}
+                controls
+                disablePictureInPicture
+                controlsList="nodownload"
+                preload="true"
+                className="w-full h-full object-contain tall:object-cover"
+              />
+            )
           )}
 
           {showIntro && (
             <video
               src={`${BASE_URL_AWS}/${questions[currentQuestionIndex]?.video}`}
-              controls
               disablePictureInPicture
               controlsList="nodownload"
               preload="true"
               className="w-full h-full object-contain tall:object-cover"
-              onEnded={() => setShowIntro(false)}
+              onEnded={() => {
+                setShowIntro(false);
+                if (expertInProgress) {
+                  toggleRecording();
+                }
+              }}
+              autoPlay
             />
           )}
 
@@ -598,33 +616,44 @@ export default function Film() {
 
         <div className="mt-4 flex items-center justify-center">
         {!showIntro && (
-          <>
-            {videoBase64 ? (
-              <button
-                onClick={handleRedoRecording}
-                className="bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 transition ease-in duration-300"
-              >
-                Recommencer
-              </button>
-            ) : (
-              <button
-                onClick={toggleRecording}
-                className={`${
-                  recording
-                    ? "bg-red-500 hover:bg-red-700"
-                    : "bg-green_2 hover:bg-green_1"
-                } text-white px-4 py-2 rounded-lg actionBtn ${
-                  timer > 0 && !recording ? "opacity-50 pointer-events-none" : ""
-                }`}
-                disabled={timer > 0 && !recording}
-              >
-                {recording
-                  ? "Arrêter l'enregistrement"
-                  : "Démarrer l'enregistrement"}
-              </button>
-            )}
-          </>
+  <>
+    {videoBase64 ? (
+      !intermediateInProgress && !expertInProgress ? (
+        <button
+          onClick={handleRedoRecording}
+          className="bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 transition ease-in duration-300"
+        >
+          Recommencer
+        </button>
+      ) : null
+    ) : (
+      <>
+        {recording ? (
+          // Bouton "Arrêter l'enregistrement" toujours visible si recording est true
+          <button
+            onClick={toggleRecording}
+            className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-lg actionBtn"
+          >
+            Arrêter l'enregistrement
+          </button>
+        ) : (
+          // Bouton "Démarrer l'enregistrement" visible seulement si expertInProgress est false
+          !expertInProgress && (
+            <button
+              onClick={toggleRecording}
+              className={`bg-green_2 hover:bg-green_1 text-white px-4 py-2 rounded-lg actionBtn ${
+                timer > 0 ? "opacity-50 pointer-events-none" : ""
+              }`}
+              disabled={timer > 0}
+            >
+              Démarrer l'enregistrement
+            </button>
+          )
         )}
+      </>
+    )}
+  </>
+)}
 
         </div>
 
@@ -637,7 +666,7 @@ export default function Film() {
               ? "opacity-50 pointer-events-none"
               : ""
           }`}
-          onClick={handleNextQuestion}
+          onClick={() => handleNextQuestion()}
           disabled={!videoBase64 || status === "loading"}
           style={{ marginTop: 20 }}
         >

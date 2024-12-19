@@ -25,25 +25,34 @@ export default function Intermediate() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("https://jobissim.com/api/questionLists", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setCategories(data);
-      } else {
-        console.error("Erreur lors de la récupération des catégories :", response.status);
-      }
+        const response = await fetch("https://jobissim.com/api/questionLists", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log("Données avant filtrage :", data);
+
+            // Filtrer pour retirer "Débutant"
+            const filteredData = data.filter(
+                (category) => category.title.trim().toLowerCase() !== "débutant"
+            );
+
+            console.log("Données après filtrage :", filteredData);
+            setCategories(filteredData);
+        } else {
+            console.error("Erreur lors de la récupération des catégories :", response.status);
+        }
     } catch (error) {
-      console.error("Erreur lors de l'appel API pour les catégories :", error);
+        console.error("Erreur lors de l'appel API pour les catégories :", error);
     }
   };
 
-  const handleCategoryClick = (categoryId) => {
+  const handleCategoryClick = async (categoryId) => {
     setSelectedCategory(categoryId);
+    await handleContinueClick(categoryId);
   };
 
   const shuffleArray = (array) => {
@@ -66,21 +75,19 @@ export default function Intermediate() {
   }
   };
 
-  const handleContinueClick = async () => {
+  const handleContinueClick = async (categoryId) => {
     const existingSelectedQuestions = localStorage.getItem("selectedQuestionsVideos");
     if (existingSelectedQuestions) {
       localStorage.removeItem("selectedQuestionsVideos");
     }
   
-    if (!selectedCategory) return;
+    if (!categoryId) return;
   
     setLoading(true);
   
     const fetchedQuestions = await fetchQuestionVideos();
 
-    console.log(fetchedQuestions);
-  
-    const selectedCategoryObject = categories.find((category) => category.id === selectedCategory);
+    const selectedCategoryObject = categories.find((category) => category.id === categoryId);
     if (!selectedCategoryObject) {
       console.error("Thème sélectionné introuvable !");
       setLoading(false);
@@ -89,17 +96,18 @@ export default function Intermediate() {
   
     const simulationQuestions = fetchedQuestions.filter(
       (question) =>
-        question.training &&
-        question.difficulty === "Intermédiaire" &&
-        question.questionList.id === selectedCategoryObject.id
+          question.training &&
+          question.questionList &&
+          question.questionList.id === selectedCategoryObject.id
     );
   
-    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
+    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 4);
   
     localStorage.setItem("selectedQuestionsVideos", JSON.stringify(shuffledQuestions));
-    localStorage.setItem("intermediateInProgress", "true");
+    localStorage.setItem("intermediateInProgress", selectedCategoryObject.title);
   
-    navigate("/greenFiltersE");
+    // navigate("/greenFiltersS");
+    navigate("/recordS");
   };
 
   return (
@@ -153,7 +161,7 @@ export default function Intermediate() {
               {/* )} */}
             </div>
 
-            <button
+            {/* <button
               className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
                 !selectedCategory ? "opacity-50 pointer-events-none" : ""
               }`}
@@ -161,7 +169,7 @@ export default function Intermediate() {
               disabled={!selectedCategory}
             >
               Continuer
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
