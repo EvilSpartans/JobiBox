@@ -48,15 +48,39 @@ export default function Expert() {
         localStorage.removeItem("selectedQuestionsVideos");
     }
     const fetchedQuestions = await fetchQuestionVideos();
-    const simulationQuestions = fetchedQuestions.filter(
-      (question) => question.training && question.questionList.title !== "Débutant"
+
+     // Identifier la question principale (celle avec `questionType` à `null`)
+    const mainQuestion = fetchedQuestions.find(
+      (question) =>
+        question.questionList === null
     );
-    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 5);
+
+    if (!mainQuestion) {
+      console.error("Main Question introuvable !");
+      setLoading(false);
+      return;
+    }
+
+    // Filtrer les autres questions
+    const simulationQuestions = fetchedQuestions.filter(
+      (question) =>
+        question.training &&
+        question.questionList !== null &&
+        question.questionList.title !== "Débutant" &&
+        question.id !== mainQuestion.id // Exclure la mainQuestion
+    );
+
+    // Mélanger les autres questions
+    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 4);
+
+    // Construire la liste finale avec la `mainQuestion` en premier
+    const finalQuestions = [mainQuestion, ...shuffledQuestions];
+
     localStorage.setItem(
         "selectedQuestionsVideos",
-        JSON.stringify(shuffledQuestions)
+        JSON.stringify(finalQuestions)
     );
-    localStorage.setItem("expertInProgress", "true");
+    localStorage.setItem("expertInProgress", JSON.stringify(finalQuestions));
     // navigate("/greenFiltersS");
     navigate("/recordS");
     };

@@ -18,7 +18,12 @@ export default function Train() {
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
-    console.log(user)
+    console.log(user);
+
+    if (!user || !user.questionLists) {
+      console.warn("L'objet 'user' ou 'user.questionLists' est indéfini");
+      return;
+    }
 
     const beginnerExists = user?.questionLists.some(
       (questionList) => questionList.title === "Débutant"
@@ -43,15 +48,15 @@ export default function Train() {
     const intermediateInProgress = localStorage.getItem('intermediateInProgress');
     const expertInProgress = localStorage.getItem('expertInProgress');
 
-    if (beginnerInProgress === 'true') {
+    if (beginnerInProgress) {
       localStorage.removeItem('beginnerInProgress');
     }
 
-    if (intermediateInProgress === 'true') {
+    if (intermediateInProgress) {
       localStorage.removeItem('intermediateInProgress');
     }
 
-    if (expertInProgress === 'true') {
+    if (expertInProgress) {
       localStorage.removeItem('expertInProgress');
     }
   }, [user]);

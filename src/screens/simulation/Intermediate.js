@@ -4,8 +4,9 @@ import Logout from "../../components/core/Logout";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
-import PulseLoader from "react-spinners/PulseLoader";
 import intermediateImg from "../../../assets/images/intermediate.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckCircle  } from "@fortawesome/free-solid-svg-icons";
 
 export default function Intermediate() {
 
@@ -17,15 +18,17 @@ export default function Intermediate() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const [mainQuestion, setMainQuestion] = useState(null);
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
 
   useEffect(() => {
     sessionStorage.removeItem("hasReloaded");
-    fetchCategories();
+    fetchQuestionTypes();
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchQuestionTypes = async () => {
     try {
-        const response = await fetch("https://jobissim.com/api/questionLists", {
+        const response = await fetch(`${BASE_URL}/questionLists`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -52,7 +55,26 @@ export default function Intermediate() {
 
   const handleCategoryClick = async (categoryId) => {
     setSelectedCategory(categoryId);
-    await handleContinueClick(categoryId);
+  
+    // Trouver le thème correspondant au `categoryId`
+    const selectedCategoryObject = categories.find((category) => category.id === categoryId);
+    if (!selectedCategoryObject) {
+      console.error("Thème sélectionné introuvable !");
+      return;
+    }
+  
+    // Trouver et sauvegarder la `mainQuestion`
+    const mainQuestion = selectedCategoryObject.mainQuestionVideo;
+    if (!mainQuestion) {
+      console.error("Question principale introuvable pour le thème sélectionné !");
+      return;
+    }
+  
+    // Met à jour l'état immédiatement
+    setMainQuestion(mainQuestion);
+  
+    // Passer la `mainQuestion` directement à `handleContinueClick`
+    await handleContinueClick(categoryId, mainQuestion);
   };
 
   const shuffleArray = (array) => {
@@ -75,7 +97,7 @@ export default function Intermediate() {
   }
   };
 
-  const handleContinueClick = async (categoryId) => {
+  const handleContinueClick = async (categoryId, mainQuestion) => {
     const existingSelectedQuestions = localStorage.getItem("selectedQuestionsVideos");
     if (existingSelectedQuestions) {
       localStorage.removeItem("selectedQuestionsVideos");
@@ -86,7 +108,8 @@ export default function Intermediate() {
     setLoading(true);
   
     const fetchedQuestions = await fetchQuestionVideos();
-
+  
+    // Trouver le thème sélectionné
     const selectedCategoryObject = categories.find((category) => category.id === categoryId);
     if (!selectedCategoryObject) {
       console.error("Thème sélectionné introuvable !");
@@ -94,19 +117,28 @@ export default function Intermediate() {
       return;
     }
   
+    // Filtrer les autres questions liées au thème, excluant la `mainQuestion`
     const simulationQuestions = fetchedQuestions.filter(
       (question) =>
-          question.training &&
-          question.questionList &&
-          question.questionList.id === selectedCategoryObject.id
+        question.training &&
+        question.questionList &&
+        question.questionList.id === selectedCategoryObject.id &&
+        question.id !== mainQuestion.id // Exclure la mainQuestion
     );
   
-    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 4);
+    // Mélanger les autres questions
+    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 3);
   
-    localStorage.setItem("selectedQuestionsVideos", JSON.stringify(shuffledQuestions));
-    localStorage.setItem("intermediateInProgress", selectedCategoryObject.title);
+    // Construire la liste finale avec la mainQuestion en premier
+    const finalQuestions = [mainQuestion, ...shuffledQuestions];
   
-    // navigate("/greenFiltersS");
+    // Sauvegarder les questions sélectionnées
+    localStorage.setItem("selectedQuestionsVideos", JSON.stringify(finalQuestions));
+    localStorage.setItem("intermediateInProgress", JSON.stringify(finalQuestions));
+  
+    console.log("Liste finale des questions :", finalQuestions);
+  
+    // Naviguer vers la page suivante
     navigate("/recordS");
   };
 
@@ -136,29 +168,33 @@ export default function Intermediate() {
             </div>
 
             <div className="dark:text-dark_text_1">
-              {/* {loading ? (
-                <div className="text-center">
-                  <PulseLoader color="#fff" size={16} />
-                </div>
-              ) : ( */}
-                <div className="flex justify-around space-x-4">
-                  {categories.map(
-                    (category) => (
+              <div className="flex justify-around space-x-4">
+                {categories.map((category) => {
+                  // Vérifie si la catégorie est terminée
+                  const completed = user.questionLists.some((list) => list.id === category.id);
+
+                  return (
                     <div
                       key={category.id}
                       className={`cursor-pointer p-6 w-1/3 text-center rounded-lg shadow-lg transform transition-all duration-300 ${
-                        selectedCategory === category.id
+                        completed
+                          ? "bg-green-400 text-white scale-105 shadow-2xl"
+                          : selectedCategory === category.id
                           ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white scale-105 shadow-2xl"
                           : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105 hover:shadow-md"
                       }`}
                       onClick={() => handleCategoryClick(category.id)}
                     >
-                      <span className="font-semibold tracking-wide">{category.title}</span>
+                      <span className="font-semibold tracking-wide mr-2">
+                        {category.title}
+                      </span>
+                      {completed && (
+                        <FontAwesomeIcon icon={faCheckCircle} className="text-white mt-4 mx-auto" size="lg" />
+                      )}
                     </div>
-                    )
-                  )}
-                </div>
-              {/* )} */}
+                  );
+                })}
+              </div>
             </div>
 
             {/* <button

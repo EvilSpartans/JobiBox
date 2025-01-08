@@ -20,15 +20,15 @@ export default function Questions() {
       localStorage.removeItem('examenInProgress');
     }
 
-    if (beginnerInProgress === 'true') {
+    if (beginnerInProgress) {
       localStorage.removeItem('beginnerInProgress');
     }
 
-    if (intermediateInProgress === 'true') {
+    if (intermediateInProgress) {
       localStorage.removeItem('intermediateInProgress');
     }
 
-    if (expertInProgress === 'true') {
+    if (expertInProgress) {
       localStorage.removeItem('expertInProgress');
     }
   }, []);

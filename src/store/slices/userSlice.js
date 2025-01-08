@@ -61,10 +61,26 @@ export const userSlice = createSlice({
             state.status = action.payload;
         },
         updateQuestionLists: (state, action) => {
-            if (state.user) {
-                state.user.questionLists = action.payload;
+            if (state.user && state.user.questionLists) {
+                const newElement = action.payload;
+        
+                // Vérifie que newElement est un objet valide avec un id
+                if (!newElement || typeof newElement.id === "undefined") {
+                    console.error("Élément invalide reçu :", newElement);
+                    return;
+                }
+        
+                // Vérifie si l'élément existe déjà
+                const exists = state.user.questionLists.some(
+                    (questionList) => questionList.id === newElement.id
+                );
+        
+                // Ajoute l'élément uniquement s'il n'existe pas
+                if (!exists) {
+                    state.user.questionLists.push(newElement);
+                }
             }
-        }
+        },
     },
     extraReducers(builder) {
         builder.addCase(registerUser.pending, (state) => {
@@ -102,24 +118,3 @@ export const userSlice = createSlice({
 
 export const { logout, changeStatus, updateQuestionLists } = userSlice.actions;
 export default userSlice.reducer;
-
-
-
-const updateLists = async (newQuestionLists) => {
-    const dispatch = useDispatch();
-    const user = useSelector((state) => state.user.user);
-
-    try {
-        const response = await axios.post(`${BASE_URL}/updateQuestionLists`, {
-            token: user.token,
-            questionLists: newQuestionLists
-        });
-
-        if (response.status === 200) {
-            // Mets à jour le store Redux
-            dispatch(updateQuestionLists(response.data.questionLists));
-        }
-    } catch (error) {
-        console.error("Erreur lors de la mise à jour des listes de questions :", error);
-    }
-};
