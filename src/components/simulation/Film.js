@@ -532,7 +532,7 @@ export default function Film() {
                 disablePictureInPicture
                 controlsList="nodownload"
                 preload="true"
-                className="w-full h-full object-contain tall:object-cover"
+                className="w-full h-full object-contain tall:object-cover mirror"
               />
             )
           )}
@@ -601,6 +601,20 @@ export default function Film() {
                 controlsList="nodownload"
                 muted
               />
+
+               {/* Miniature de la vidéo d'introduction */}
+              {questions[currentQuestionIndex]?.video && (
+                <div className="absolute bottom-4 right-4 w-40 h-40 bg-gray-800 rounded-md shadow-lg overflow-hidden z-10">
+                  <video
+                    src={`${BASE_URL_AWS}/${questions[currentQuestionIndex]?.video}`}
+                    disablePictureInPicture
+                    controlsList="nodownload"
+                    preload="true"
+                    className="w-full h-full object-cover"
+                    muted
+                  />
+                </div>
+              )}
             </>
           )}
 

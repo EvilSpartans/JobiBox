@@ -7,6 +7,7 @@ import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
 import intermediateImg from "../../../assets/images/intermediate.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle  } from "@fortawesome/free-solid-svg-icons";
+import { getCategories } from "../../store/slices/categorySlice";
 
 export default function Intermediate() {
 
@@ -14,17 +15,45 @@ export default function Intermediate() {
   const { token } = user;
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
+
   const [questions, setQuestions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [mainQuestion, setMainQuestion] = useState(null);
-  const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [selectedNewCategory, setSelectedNewCategory] = useState("");
 
   useEffect(() => {
     sessionStorage.removeItem("hasReloaded");
     fetchQuestionTypes();
+    fetchCategories();
   }, []);
+
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      const response = await dispatch(getCategories(token));
+      const categoriesData = response.payload;
+      const updatedCategoryOptions = categoriesData.map((category) => ({
+        value: category.name,
+        label: category.name,
+      }));
+      setCategoryOptions(updatedCategoryOptions);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des catégories :", error);
+    }
+  };
+
+  const handleNewCategoryChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedNewCategory(selectedValue);
+  
+    // Sauvegarde dans le localStorage
+    localStorage.setItem("selectedActivity", selectedValue);
+    console.log("Nouvelle catégorie sélectionnée :", selectedValue);
+  };
 
   const fetchQuestionTypes = async () => {
     try {
@@ -72,9 +101,6 @@ export default function Intermediate() {
   
     // Met à jour l'état immédiatement
     setMainQuestion(mainQuestion);
-  
-    // Passer la `mainQuestion` directement à `handleContinueClick`
-    await handleContinueClick(categoryId, mainQuestion);
   };
 
   const shuffleArray = (array) => {
@@ -97,20 +123,23 @@ export default function Intermediate() {
   }
   };
 
-  const handleContinueClick = async (categoryId, mainQuestion) => {
+  const handleContinueClick = async () => {
     const existingSelectedQuestions = localStorage.getItem("selectedQuestionsVideos");
     if (existingSelectedQuestions) {
       localStorage.removeItem("selectedQuestionsVideos");
     }
   
-    if (!categoryId) return;
+    if (!selectedCategory || !mainQuestion) {
+      console.error("Catégorie ou question principale manquante !");
+      return;
+    }  
   
     setLoading(true);
   
     const fetchedQuestions = await fetchQuestionVideos();
   
     // Trouver le thème sélectionné
-    const selectedCategoryObject = categories.find((category) => category.id === categoryId);
+    const selectedCategoryObject = categories.find((category) => category.id === selectedCategory);
     if (!selectedCategoryObject) {
       console.error("Thème sélectionné introuvable !");
       setLoading(false);
@@ -167,7 +196,27 @@ export default function Intermediate() {
               </p>
             </div>
 
-            <div className="dark:text-dark_text_1">
+            <div className="mt-8">
+            <label htmlFor="new-category-select" className="block text-lg dark:text-dark_text_1 mb-2">
+    Choisissez un domaine d’activité :
+  </label>
+  <select
+    id="new-category-select"
+    className="w-full p-4 bg-white border border-gray-300 rounded-lg shadow-md focus:outline-none"
+    value={selectedNewCategory}
+    onChange={handleNewCategoryChange}
+  >
+    <option value="">-- Sélectionnez un domaine --</option>
+    {categoryOptions.map((option) => (
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+</div>
+
+            <div className="dark:text-dark_text_1" style={{ marginTop: '2rem' }}>
+              <h1 className="block text-lg dark:text-dark_text_1 mb-2">Choisissez une thématique :</h1>
               <div className="flex justify-around space-x-4">
                 {categories.map((category) => {
                   // Vérifie si la catégorie est terminée
@@ -177,35 +226,41 @@ export default function Intermediate() {
                     <div
                       key={category.id}
                       className={`cursor-pointer p-6 w-1/3 text-center rounded-lg shadow-lg transform transition-all duration-300 ${
-                        completed
-                          ? "bg-green-400 text-white scale-105 shadow-2xl"
-                          : selectedCategory === category.id
-                          ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white scale-105 shadow-2xl"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105 hover:shadow-md"
+                        selectedCategory === category.id
+                          ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white scale-105 shadow-2xl" // Style bleu si sélectionné
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105 hover:shadow-md" // Style gris sinon
                       }`}
                       onClick={() => handleCategoryClick(category.id)}
                     >
-                      <span className="font-semibold tracking-wide mr-2">
-                        {category.title}
-                      </span>
-                      {completed && (
-                        <FontAwesomeIcon icon={faCheckCircle} className="text-white mt-4 mx-auto" size="lg" />
-                      )}
+                      <div className="flex flex-col items-center">
+                        <span className="font-semibold tracking-wide mb-2">
+                          {category.title}
+                        </span>
+                        {completed && (
+                          <FontAwesomeIcon
+                            icon={faCheckCircle}
+                            className={`${
+                              selectedCategory === category.id ? "text-yellow-400" : "text-gray-500"
+                            }`}
+                            size="lg"
+                          />
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* <button
+            <button
               className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
-                !selectedCategory ? "opacity-50 pointer-events-none" : ""
+                !selectedCategory || !selectedNewCategory ? "opacity-50 pointer-events-none" : ""
               }`}
               onClick={handleContinueClick}
-              disabled={!selectedCategory}
+              disabled={!selectedCategory || !selectedNewCategory}
             >
               Continuer
-            </button> */}
+            </button>
           </div>
         </div>
       </div>
