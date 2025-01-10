@@ -1,58 +1,85 @@
 import React, { useEffect, useState } from "react";
 import GoBack from "../../components/core/GoBack";
-import Logout from "../../components/core/Logout"
+import Logout from "../../components/core/Logout";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getQuestionVideos } from "../../store/slices/questionVideoSlice";
 import expertImg from "../../../assets/images/expert.png";
+import { getCategories } from "../../store/slices/categorySlice";
 
 export default function Expert() {
+  const user = useSelector((state) => state.user.user);
+  const { token } = user;
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const user = useSelector((state) => state.user.user);
-    const { token } = user;
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const [questions, setQuestions] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-    useEffect(() => {
-    sessionStorage.removeItem('hasReloaded');
-    }, []);
+  useEffect(() => {
+    sessionStorage.removeItem("hasReloaded");
+    fetchCategories();
+  }, []);
 
-    const shuffleArray = (array) => {
-        for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    };
-    
-    const fetchQuestionVideos = async () => {
+  // Fetch categories
+  const fetchCategories = async () => {
     try {
-        const response = await dispatch(getQuestionVideos(token));
-        const payload = response.payload;
-        setQuestions(payload);
-        return payload;
+      const response = await dispatch(getCategories(token));
+      const categoriesData = response.payload;
+      const updatedCategoryOptions = categoriesData.map((category) => ({
+        value: category.name,
+        label: category.name,
+      }));
+      setCategoryOptions(updatedCategoryOptions);
     } catch (error) {
-        console.error("Erreur lors de la récupération des questions :", error);
-        return [];
+      console.error("Erreur lors de la récupération des catégories :", error);
     }
-    };
+  };
 
-    const handleContinueClick = async () => {
+  const handleNewCategoryChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedCategory(selectedValue);
+
+    // Sauvegarde dans le localStorage
+    localStorage.setItem("selectedActivity", selectedValue);
+    console.log("Nouvelle catégorie sélectionnée :", selectedValue);
+  };
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
+  const fetchQuestionVideos = async () => {
+    try {
+      const response = await dispatch(getQuestionVideos(token));
+      const payload = response.payload;
+      setQuestions(payload);
+      return payload;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des questions :", error);
+      return [];
+    }
+  };
+
+  const handleContinueClick = async () => {
     setLoading(true);
     const existingSelectedQuestions = localStorage.getItem(
-        "selectedQuestionsVideos"
+      "selectedQuestionsVideos"
     );
     if (existingSelectedQuestions) {
-        localStorage.removeItem("selectedQuestionsVideos");
+      localStorage.removeItem("selectedQuestionsVideos");
     }
     const fetchedQuestions = await fetchQuestionVideos();
 
-     // Identifier la question principale (celle avec `questionType` à `null`)
+    // Identifier la question principale (celle avec `questionType` à `null`)
     const mainQuestion = fetchedQuestions.find(
-      (question) =>
-        question.questionList === null
+      (question) => question.questionList === null
     );
 
     if (!mainQuestion) {
@@ -62,28 +89,38 @@ export default function Expert() {
     }
 
     // Filtrer les autres questions
-    const simulationQuestions = fetchedQuestions.filter(
-      (question) =>
+    const simulationQuestions = fetchedQuestions.filter((question) => {
+      const isIntermediateOrDifficult =
         question.training &&
         question.questionList !== null &&
-        question.questionList.title !== "Débutant" &&
-        question.id !== mainQuestion.id // Exclure la mainQuestion
-    );
+        question.questionList.title !== "Débutant";
+  
+      const isNotMainQuestion = question.id !== mainQuestion.id;
+  
+      const hasMatchingCategory = question.category.some(
+        (cat) => cat.name === selectedCategory
+      );
+  
+      return isIntermediateOrDifficult && isNotMainQuestion && hasMatchingCategory;
+    });
 
     // Mélanger les autres questions
-    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(0, 4);
+    const shuffledQuestions = shuffleArray([...simulationQuestions]).slice(
+      0,
+      4
+    );
 
     // Construire la liste finale avec la `mainQuestion` en premier
     const finalQuestions = [mainQuestion, ...shuffledQuestions];
 
     localStorage.setItem(
-        "selectedQuestionsVideos",
-        JSON.stringify(finalQuestions)
+      "selectedQuestionsVideos",
+      JSON.stringify(finalQuestions)
     );
     localStorage.setItem("expertInProgress", JSON.stringify(finalQuestions));
     // navigate("/greenFiltersS");
     navigate("/recordS");
-    };
+  };
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
@@ -97,26 +134,58 @@ export default function Expert() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-                <h2 className="text-3xl font-bold">Niveau expert</h2>
-                <img
+              <h2 className="text-3xl font-bold">Niveau expert</h2>
+              <img
                 src={expertImg}
                 alt="Welcome"
                 className="mx-auto mt-10"
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
-                />
-                <p className="mt-12 text-lg">
-                Un seul scénario te sera proposé, regroupant toutes les thématiques avec des questions de <span className="text-blue-400">niveau intermédiaire ou difficile</span>.  
-                Tu devras enchaîner <span className="text-blue-400">sans répit</span> et il ne sera <span className="text-blue-400">pas possible</span> de recommencer.
-                </p>
+              />
+              <p className="mt-12 text-lg">
+                Un seul scénario te sera proposé, regroupant toutes les
+                thématiques avec des questions de{" "}
+                <span className="text-blue-400">
+                  niveau intermédiaire ou difficile
+                </span>
+                . Tu devras enchaîner{" "}
+                <span className="text-blue-400">sans répit</span> et il ne sera{" "}
+                <span className="text-blue-400">pas possible</span> de
+                recommencer.
+              </p>
+            </div>
+
+            <div className="mt-8">
+              <label
+                htmlFor="new-category-select"
+                className="block text-lg dark:text-dark_text_1 mb-2"
+              >
+                Domaine d’activité :
+              </label>
+              <select
+                id="new-category-select"
+                className="w-full p-4 bg-white border border-gray-300 rounded-lg shadow-md focus:outline-none"
+                value={selectedCategory}
+                onChange={handleNewCategoryChange}
+              >
+                <option value="">-- Sélectionne un domaine --</option>
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <button
-                className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300`}
-                onClick={handleContinueClick}
+              className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
+                !selectedCategory ? "opacity-50 pointer-events-none" : ""
+              }`}
+              onClick={handleContinueClick}
+              disabled={!selectedCategory}
             >
-                Continuer
+              Continuer
             </button>
-            </div>
+          </div>
         </div>
       </div>
     </div>

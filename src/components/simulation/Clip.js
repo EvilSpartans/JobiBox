@@ -231,7 +231,13 @@ export default function Clip() {
         localStorage.setItem("videoPath", res.payload.video);
         localStorage.setItem("videoId", res.payload.id);
         localStorage.setItem("isTrainExam", 'true');
-        navigate("/post");
+
+        if (simulationInProgress) {
+          navigate("/evaluation");
+        } else {
+          navigate("/post");          
+        }
+
         dispatch(changeStatus(""));
       }
     }

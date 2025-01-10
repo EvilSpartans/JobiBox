@@ -3,17 +3,101 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { updateQuestionLists } from "../../store/slices/userSlice";
+import { getJobiboxPortals } from "../../store/slices/jobiboxSlice";
+import { createPost, changeStatus } from "../../store/slices/postSlice";
+import PulseLoader from "react-spinners/PulseLoader";
 
 export default function Evaluation() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
   const { token } = user;
+  const { status, error } = useSelector((state) => state.post);
   const BASE_URL = process.env.REACT_APP_BASE_URL;
+  const AWS_BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
 
   const [questions, setQuestions] = useState([]);
   const [responses, setResponses] = useState({});
   const [score, setScore] = useState(null);
+  const [portals, setPortals] = useState([]);
+
+  const businessId = localStorage.getItem("businessId") || null;
+  const selectedActivity = localStorage.getItem("selectedActivity");
+
+  // Video properties
+  const videoPath = localStorage.getItem("videoPath");
+  const handleMetadata = (e) => {
+    e.preventDefault();
+    e.target.currentTime = 0;
+  };
+
+  const generateImageFromVideo = async () => {
+    const videoElement = document.createElement("video");
+    videoElement.src = `${AWS_BASE_URL}/${videoPath}`;
+    videoElement.currentTime = 4;
+
+    return new Promise((resolve) => {
+      videoElement.addEventListener("loadeddata", () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          resolve(blob);
+
+          URL.revokeObjectURL(videoElement.src);
+          videoElement.remove();
+          canvas.remove();
+        }, "image/jpeg");
+      });
+      videoElement.load();
+    });
+  };
+
+  const handlePublish = async () => {
+    dispatch(changeStatus("loading"));
+
+    const imageBlob = await generateImageFromVideo();
+    const imageFile = new File([imageBlob], "thumbnail.jpg", {
+      type: "image/jpeg",
+    });
+
+    // Générer un titre court et unique
+    const generateUniqueTitle = () => {
+      const timestamp = Date.now(); 
+      const baseTitle = selectedActivity || "Uncategorized";
+      return `${baseTitle}-${timestamp}`;
+    };
+
+    const uniqueTitle = generateUniqueTitle();
+
+    const postData = {
+      token: token,
+      title: uniqueTitle,
+      category: selectedActivity,
+      subCategory: "Portail",
+      createdFrom: "jobibox",
+      video: videoPath,
+      image: imageFile,
+      businessId: businessId,
+      portal: portals.length > 0 ? portals.map((portal) => portal.id) : [],
+      date: "",
+    };
+
+    console.log("Données envoyées à l'API :", postData);
+
+    try {
+      const res = await dispatch(createPost(postData));
+      console.log(res);
+      if (res?.payload?.title) {
+      }
+    } catch (error) {
+      console.error("Erreur lors de la création de la publication :", error);
+    } finally {
+      dispatch(changeStatus(""));
+    }
+  };
 
   useEffect(() => {
     // Récupérer les questions depuis localStorage
@@ -34,8 +118,32 @@ export default function Evaluation() {
   useEffect(() => {
     if (allResponsesGiven) {
       calculateScore();
+      fetchPortals();
     }
   }, [responses, allResponsesGiven]);
+
+  const fetchPortals = async () => {
+    try {
+      const jobiboxId = localStorage.getItem("jobiboxId");
+
+      const response = await dispatch(getJobiboxPortals({ id: jobiboxId }));
+      const portalsData = response.payload;
+
+      // Filtrer pour ne garder que les portails contenant "simulation" dans leur titre
+      const simulationPortal = portalsData.portals.find((portal) =>
+        portal.title.toLowerCase().includes("simulation")
+      );
+
+      if (simulationPortal) {
+        // Stocker le portail trouvé dans un état
+        setPortals([simulationPortal]);
+      } else {
+        console.warn("Aucun portail avec 'simulation' trouvé !");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des portails :", error);
+    }
+  };
 
   const handleResponseChange = (questionId, value) => {
     setResponses((prev) => ({ ...prev, [questionId]: value }));
@@ -76,6 +184,8 @@ export default function Evaluation() {
           dispatch(updateQuestionLists(updateResponse.data));
         }
       }
+      // Publication
+      await handlePublish();
     } catch (error) {
       console.error(
         "Erreur lors de la mise à jour de la liste des questions :",
@@ -85,6 +195,16 @@ export default function Evaluation() {
       localStorage.removeItem("beginnerInProgress");
       localStorage.removeItem("intermediateInProgress");
       localStorage.removeItem("expertInProgress");
+      localStorage.removeItem("selectedQuestions");
+      localStorage.removeItem("selectedTheme");
+      localStorage.removeItem("selectedMusic");
+      localStorage.removeItem("videoPath");
+      localStorage.removeItem("videoId");
+      localStorage.removeItem("textStyle");
+      localStorage.removeItem("examenInProgress");
+      localStorage.removeItem("isTrainExam");
+      localStorage.removeItem("selectedGreenFilter");
+      localStorage.removeItem("selectedAnimation");
       navigate("/train");
     }
   };
@@ -100,15 +220,35 @@ export default function Evaluation() {
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="text-3xl font-bold">Evaluation</h2>
-              <p className="mt-12 text-lg">
+              <p className="mt-12 mb-12 text-lg">
                 Voici la liste des questions et leurs{" "}
                 <span className="text-blue-400">réponses attendues</span>.
                 Indique si tu as bien répondu à chaque question pour voir ton
                 score final.
               </p>
 
+              {/* Video */}
+              {videoPath && (
+                <video
+                  key={videoPath}
+                  controls
+                  disablePictureInPicture
+                  controlsList="nodownload"
+                  width="100%"
+                  className="h-48 md:h-64 lg:h-96 xl:h-120"
+                  preload={"auto"}
+                  onLoadedMetadata={handleMetadata}
+                >
+                  <source
+                    src={`${AWS_BASE_URL}/${videoPath}`}
+                    type="video/mp4"
+                  />
+                  Votre navigateur ne prend pas en charge la balise vidéo.
+                </video>
+              )}
+
               {/* Liste des questions avec défilement */}
-              <div className="mt-6 max-h-96 tall:max-h-[50rem] overflow-y-auto space-y-6 p-6 bg-gray-100 dark:bg-dark_bg_1 rounded-lg shadow-inner">
+              <div className="mt-6 max-h-56 tall:max-h-96 overflow-y-auto space-y-6 p-6 bg-gray-100 dark:bg-dark_bg_1 rounded-lg shadow-inner">
                 {questions.map((question) => (
                   <div
                     key={question.id}
@@ -182,10 +322,19 @@ export default function Evaluation() {
               </div>
             ) : (
               <button
-                className="w-full flex justify-center p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg transition ease-in duration-300 bg-gray-300 text-gray-700 hover:bg-gray-400 cursor-pointer"
+                className={`w-full flex justify-center p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg transition ease-in duration-300 ${
+                  status
+                    ? "bg-gray-400 text-gray-500 opacity-50 pointer-events-none"
+                    : "bg-gray-300 text-gray-700 hover:bg-gray-400 cursor-pointer"
+                }`}
                 onClick={handleReturnToHome}
+                disabled={status}
               >
-                Retour à l'accueil
+                {status ? (
+                  <PulseLoader color="#fff" size={10} />
+                ) : (
+                  "Retour à l'accueil"
+                )}
               </button>
             )}
           </div>

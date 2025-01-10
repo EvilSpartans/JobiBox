@@ -23,7 +23,6 @@ import { getEducationLevelsByCountry } from "../../utils/EducationLevel";
 import { getContractTypesByCountry } from "../../utils/ContractTypes";
 
 export default function PostForm() {
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.post);
@@ -40,13 +39,13 @@ export default function PostForm() {
   const [studiesOptions, setStudiesOptions] = useState([]);
   const [contractOptions, setContractOptions] = useState([]);
   const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
-  const businessId = localStorage.getItem('businessId') || null;
-  const isTrainExam = localStorage.getItem('isTrainExam') || null;
+  const businessId = localStorage.getItem("businessId") || null;
+  const isTrainExam = localStorage.getItem("isTrainExam") || null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
 
   const simulationInProgress =
-  localStorage.getItem("beginnerInProgress") ||
-  localStorage.getItem("intermediateInProgress");
+    localStorage.getItem("beginnerInProgress") ||
+    localStorage.getItem("intermediateInProgress");
 
   const expertInProgress = localStorage.getItem("expertInProgress");
 
@@ -76,17 +75,22 @@ export default function PostForm() {
 
   const fetchPortals = async () => {
     try {
-      const jobiboxId = localStorage.getItem('jobiboxId');
+      const jobiboxId = localStorage.getItem("jobiboxId");
 
       if (jobiboxId === null) {
         setStudiesOptions(getEducationLevelsByCountry("France"));
         setContractOptions(getContractTypesByCountry("France"));
       }
 
-      const response = await dispatch(getJobiboxPortals({id: jobiboxId}));
+      const response = await dispatch(getJobiboxPortals({ id: jobiboxId }));
       const portalsData = response.payload;
 
-      const portalsOptions = portalsData.portals.map((portal) => ({
+      // Filtrer les portails pour exclure ceux contenant "simulation" dans le titre
+      const filteredPortals = portalsData.portals.filter(
+        (portal) => !portal.title.toLowerCase().includes("simulation")
+      );
+
+      const portalsOptions = filteredPortals.map((portal) => ({
         value: portal.id,
         label: portal.title,
       }));
@@ -95,28 +99,28 @@ export default function PostForm() {
         setVideotheque(false);
       }
 
-      if (portalsData.videotheque === false && portalsData.portals.length === 1) {
-        setPortals([portalsData.portals[0]])
-        setHidePortal(true)
+      if (portalsData.videotheque === false && filteredPortals.length === 1) {
+        setPortals([filteredPortals[0]]);
+        setHidePortal(true);
       } else {
         setHidePortal(false);
       }
 
       setPortalsOptions(portalsOptions);
 
-      const educationLevelsForCountry = getEducationLevelsByCountry(portalsData.country);
+      const educationLevelsForCountry = getEducationLevelsByCountry(
+        portalsData.country
+      );
       setStudiesOptions(educationLevelsForCountry);
 
-      const contractTypesForCountry = getContractTypesByCountry(portalsData.country);
-      setContractOptions(contractTypesForCountry);
-
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des portails :",
-        error
+      const contractTypesForCountry = getContractTypesByCountry(
+        portalsData.country
       );
+      setContractOptions(contractTypesForCountry);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des portails :", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -125,7 +129,7 @@ export default function PostForm() {
 
   const subCategoryOptions = [
     { value: "Emploi", label: "Recruteur" },
-    { value: "CV", label: "En recherche d'emploi" }
+    { value: "CV", label: "En recherche d'emploi" },
   ];
 
   const commentOptions = [
@@ -144,8 +148,8 @@ export default function PostForm() {
     { value: "100", label: "100" },
     { value: "130", label: "130" },
     { value: "160", label: "160" },
-    { value: "200", label: "200" }
-  ]
+    { value: "200", label: "200" },
+  ];
 
   // Video properties
   const videoPath = localStorage.getItem("videoPath");
@@ -155,24 +159,24 @@ export default function PostForm() {
   };
 
   const generateImageFromVideo = async () => {
-    const videoElement = document.createElement('video');
+    const videoElement = document.createElement("video");
     videoElement.src = `${BASE_URL}/${videoPath}`;
     videoElement.currentTime = 4;
 
     return new Promise((resolve) => {
-      videoElement.addEventListener('loadeddata', () => {
-        const canvas = document.createElement('canvas');
+      videoElement.addEventListener("loadeddata", () => {
+        const canvas = document.createElement("canvas");
         canvas.width = videoElement.videoWidth;
         canvas.height = videoElement.videoHeight;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
         canvas.toBlob((blob) => {
           resolve(blob);
 
-          URL.revokeObjectURL(videoElement.src); 
-          videoElement.remove(); 
+          URL.revokeObjectURL(videoElement.src);
+          videoElement.remove();
           canvas.remove();
-        }, 'image/jpeg');
+        }, "image/jpeg");
       });
       videoElement.load();
     });
@@ -188,8 +192,10 @@ export default function PostForm() {
       formattedDate = format(startDate, "yyyy-MM-dd HH:mm:ss");
     }
 
-    const imageBlob = photoFile || await generateImageFromVideo();
-    const imageFile = new File([imageBlob], 'thumbnail.jpg', { type: 'image/jpeg' });
+    const imageBlob = photoFile || (await generateImageFromVideo());
+    const imageFile = new File([imageBlob], "thumbnail.jpg", {
+      type: "image/jpeg",
+    });
 
     const postData = {
       token: token,
@@ -209,19 +215,18 @@ export default function PostForm() {
       video: videoPath,
       image: imageFile,
       businessId,
-      portal: portals.map(portal => portal.value || portal.id) || []
+      portal: portals.map((portal) => portal.value || portal.id) || [],
     };
 
     try {
-
       const res = await dispatch(createPost(postData));
       console.log(res);
       if (res?.payload?.title) {
-        localStorage.setItem('urlQrcode', res.payload.video);
+        localStorage.setItem("urlQrcode", res.payload.video);
         if (simulationInProgress || expertInProgress) {
           navigate("/evaluation");
         } else {
-          navigate("/thanks");   
+          navigate("/thanks");
         }
         sendConfirmNotification();
       }
@@ -249,7 +254,10 @@ export default function PostForm() {
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
           <h2 className="mt-6 text-3xl font-bold">Publication</h2>
-          <p className="mt-6 text-lg"><span className="text-blue-400">Complète les champs</span> suivants pour mettre en ligne ta vidéo.</p>
+          <p className="mt-6 text-lg">
+            <span className="text-blue-400">Complète les champs</span> suivants
+            pour mettre en ligne ta vidéo.
+          </p>
         </div>
 
         {/* Video */}
@@ -261,7 +269,7 @@ export default function PostForm() {
             controlsList="nodownload"
             width="100%"
             className="h-48 md:h-64 lg:h-96 xl:h-120"
-            preload={'auto'}
+            preload={"auto"}
             onLoadedMetadata={handleMetadata}
           >
             <source src={`${BASE_URL}/${videoPath}`} type="video/mp4" />
@@ -271,7 +279,6 @@ export default function PostForm() {
 
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-
           <Photo onPhotoTaken={setPhotoFile} />
 
           <Input
@@ -282,13 +289,19 @@ export default function PostForm() {
             error={errors?.title?.message}
           />
           {videotheque && (
-          <Select
-            name="subCategory"
-            placeholder="Es-tu recruteur ou en recherche d'emploi ?"
-            register={register}
-            error={showPortalCheckbox ? (!portals.length && errors.subCategory ? errors.subCategory.message : null) : errors?.subCategory?.message}
-            options={subCategoryOptions}
-          />
+            <Select
+              name="subCategory"
+              placeholder="Es-tu recruteur ou en recherche d'emploi ?"
+              register={register}
+              error={
+                showPortalCheckbox
+                  ? !portals.length && errors.subCategory
+                    ? errors.subCategory.message
+                    : null
+                  : errors?.subCategory?.message
+              }
+              options={subCategoryOptions}
+            />
           )}
           <Select
             name="category"
@@ -298,29 +311,33 @@ export default function PostForm() {
             options={categoryOptions}
           />
           {showPortalCheckbox && portalsOptions.length > 0 && (
-          <SelectMultiple
-            name="portal"
-            placeholder="Référencement"
-            register={register}
-            error={errors.subCategory && !portals.length ? errors.portal?.message : null}
-            options={portalsOptions}
-            value={portals}
-            onChange={setPortals}
-            style={{ display: !hidePortal ? 'block' : 'none' }}            
-          />
+            <SelectMultiple
+              name="portal"
+              placeholder="Référencement"
+              register={register}
+              error={
+                errors.subCategory && !portals.length
+                  ? errors.portal?.message
+                  : null
+              }
+              options={portalsOptions}
+              value={portals}
+              onChange={setPortals}
+              style={{ display: !hidePortal ? "block" : "none" }}
+            />
           )}
 
           {/* Only for CV video */}
-          {isTrainExam !== 'true' && (
+          {isTrainExam !== "true" && (
             <>
-              <div className="flex justify-between space-x-2 !mt-0">           
+              <div className="flex justify-between space-x-2 !mt-0">
                 <Input
                   name="city"
                   type="text"
                   placeholder="Ville"
                   register={register}
                   error={errors?.city?.message}
-                  style={{ minWidth: '380px' }}
+                  style={{ minWidth: "380px" }}
                 />
                 <Select
                   name="km"
@@ -346,14 +363,14 @@ export default function PostForm() {
                   options={contractOptions}
                   value={contracts}
                   onChange={setContracts}
-                  style={{ minWidth: '430px' }}
+                  style={{ minWidth: "430px" }}
                 />
                 <Checkbox
                   name="remote"
                   label="Télétravail"
                   register={register}
                   error={errors?.remote?.message}
-                  style={{ marginTop: '3.5rem' }}
+                  style={{ marginTop: "3.5rem" }}
                 />
               </div>
               <Select
@@ -389,9 +406,11 @@ export default function PostForm() {
             </div>
           ) : null}
           {/*Submit button*/}
-          <button 
+          <button
             className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
-            font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${ status ? "opacity-50 pointer-events-none" : "" }`}
+            font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+              status ? "opacity-50 pointer-events-none" : ""
+            }`}
             type="submit"
             disabled={status}
           >
