@@ -49,7 +49,7 @@ export default function ModalQuestionVideo({
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
       <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-        <p className="text-gray-800 text-lg">Ajouter une question</p>
+        <p className="text-gray-800 text-xl">Ajouter une question</p>
 
         <div className="mt-3">
           <div className="flex justify-center mt-2">

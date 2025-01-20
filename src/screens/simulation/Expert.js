@@ -134,14 +134,14 @@ export default function Expert() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Niveau expert</h2>
+              <h2 className="text-4xl font-bold">Niveau expert</h2>
               <img
                 src={expertImg}
                 alt="Welcome"
                 className="mx-auto mt-10"
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
-              <p className="mt-12 text-lg">
+              <p className="mt-12 text-xl">
                 Un seul scénario te sera proposé, regroupant toutes les
                 thématiques avec des questions de{" "}
                 <span className="text-blue-400">
@@ -157,7 +157,7 @@ export default function Expert() {
             <div className="mt-8">
               <label
                 htmlFor="new-category-select"
-                className="block text-lg dark:text-dark_text_1 mb-2"
+                className="block text-xl dark:text-dark_text_1 mb-2"
               >
                 Domaine d’activité :
               </label>
@@ -177,7 +177,7 @@ export default function Expert() {
             </div>
 
             <button
-              className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
+              className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
                 !selectedCategory ? "opacity-50 pointer-events-none" : ""
               }`}
               onClick={handleContinueClick}

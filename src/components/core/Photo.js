@@ -123,14 +123,14 @@ export default function Photo({ onPhotoTaken }) {
         <div className='z-50' style={{ marginTop: '3%' }}>
             <button
                 type="button"
-                className="w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
+                className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
                     font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
                 onClick={handleSubmit}
                 tabIndex="-1"
             >
                 <FontAwesomeIcon icon={faCamera} size="lg" /> 
                 {photoConfirmed && <FontAwesomeIcon icon={faCheckCircle} size="lg" className="ml-2 text-green-500" />}
-                &nbsp; <span className='text-sm'>Miniature vidéo</span>
+                &nbsp; <span className='text-xl'>Miniature vidéo</span>
             </button>
 
             {showModal && (
@@ -140,7 +140,7 @@ export default function Photo({ onPhotoTaken }) {
                         <button className="absolute top-2 right-2 text-gray-800" onClick={closeModal} tabIndex="-1">
                             <FontAwesomeIcon icon={faTimes} size="lg" /> 
                         </button>
-                        <p className="text-gray-800 text-lg">
+                        <p className="text-gray-800 text-xl">
                             {photo ? "Veux-tu utiliser cette photo ? (Elle apparaîtra comme miniature pour ta vidéo)" : "Fais ton plus grand sourire"}
                         </p>
                         {photo ? (

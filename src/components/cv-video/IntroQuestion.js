@@ -35,6 +35,7 @@ const IntroQuestion = ({ question, textStyle, selectedTheme, setShowIntro }) => 
     textDiv.innerText = question.title;
     textDiv.style.textAlign = "center";
     textDiv.style.overflow = "hidden";
+    textDiv.style.fontSize = `${textStyle.fontSize * 1.4}px`;
     
     contentDiv.appendChild(textDiv);
     introDiv.appendChild(contentDiv);

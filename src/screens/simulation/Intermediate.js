@@ -207,14 +207,14 @@ export default function Intermediate() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Niveau Intermédiaire</h2>
+              <h2 className="text-4xl font-bold">Niveau Intermédiaire</h2>
               <img
                 src={intermediateImg}
                 alt="Welcome"
                 className="mx-auto mt-10"
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
-              <p className="mt-12 text-lg">
+              <p className="mt-12 text-xl">
                 Choisis un domaine d'activité et une thématique parmi celles
                 proposées : les questions apparaîtront{" "}
                 <span className="text-blue-400">aléatoirement</span>. Tu pourras
@@ -227,7 +227,7 @@ export default function Intermediate() {
             <div className="mt-8">
               <label
                 htmlFor="new-category-select"
-                className="block text-lg dark:text-dark_text_1 mb-2"
+                className="block text-xl dark:text-dark_text_1 mb-2"
               >
                 Domaine d’activité :
               </label>
@@ -250,7 +250,7 @@ export default function Intermediate() {
               className="dark:text-dark_text_1"
               style={{ marginTop: "2rem" }}
             >
-              <h1 className="block text-lg dark:text-dark_text_1 mb-2">
+              <h1 className="block text-xl dark:text-dark_text_1 mb-2">
                 Thématique :
               </h1>
               <div className="flex justify-around space-x-4">
@@ -293,7 +293,7 @@ export default function Intermediate() {
             </div>
 
             <button
-              className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
+              className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg cursor-pointer transition ease-in duration-300 ${
                 !selectedCategory || !selectedNewCategory
                   ? "opacity-50 pointer-events-none"
                   : ""

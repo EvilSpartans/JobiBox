@@ -219,8 +219,8 @@ export default function Clip() {
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       {/*Heading*/}
       <div className="text-center dark:text-dark_text_1">
-        <h2 className="mt-6 text-3xl font-bold">Tableau de bord</h2>
-        <p className="mt-6 text-lg">Passe en <span className="text-blue-400">revue</span> tes différents clips.</p>
+        <h2 className="mt-6 text-4xl font-bold">Tableau de bord</h2>
+        <p className="mt-6 text-xl">Passe en <span className="text-blue-400">revue</span> tes différents clips.</p>
       </div>
       <div className="dark:text-dark_text_1">
 
@@ -229,7 +229,7 @@ export default function Clip() {
             <div className="mb-4">
               <button
                 onClick={handleAdd}
-                className="addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                className="text-xl addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
               >
                 + Ajouter une question
               </button>
@@ -247,7 +247,7 @@ export default function Clip() {
         {status !== "loading" && questions && questions.length > 0 &&
           questions.map((question, index) => (
             <div key={index} className="mb-3 flex items-center allIcons">
-              <span className="flex-grow text-lg">{question.questionTitle}</span>
+              <span className="flex-grow text-xl">{question.questionTitle}</span>
               <button
                 onClick={() => openShowModal(index)}
                 className="ml-3 showIcon bg-blue-100 hover:bg-blue-200 text-blue-500 font-semibold px-3 py-2 rounded-md mr-2"
@@ -310,7 +310,7 @@ export default function Clip() {
             ></div>
             <div className="relative flex items-center justify-center">
               <div className="modal-content bg-white p-4 rounded-lg text-center z-50 relative">
-                <p className="text-gray-800 text-lg">Raccourcir le clip</p>
+                <p className="text-gray-800 text-xl">Raccourcir le clip</p>
                 <div
                   style={{ height: "50vh" }}
                   className="modal-content bg-white p-4 rounded-lg h-screen max-h-screen overflow-hidden"
@@ -378,7 +378,7 @@ export default function Clip() {
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
             <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-              <p className="text-gray-800 text-lg">
+              <p className="text-gray-800 text-xl">
                 Veux-tu vraiment recommencer cette séquence ?
               </p>
               <div className="mt-4">
@@ -404,7 +404,7 @@ export default function Clip() {
           <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
             <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-              <p className="text-gray-800 text-lg">
+              <p className="text-gray-800 text-xl">
                 Veux-tu vraiment supprimer cette séquence ?
               </p>
               <div className="mt-4">
@@ -429,7 +429,7 @@ export default function Clip() {
       {/* Buttons */}
         {status !== "loading" &&
         <button
-          className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
+          className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
                   font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
           onClick={assembleAndStoreVideo}
         >

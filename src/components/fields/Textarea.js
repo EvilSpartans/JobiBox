@@ -13,7 +13,7 @@ export default function Textarea({
                 {placeholder}
             </label>
             <textarea
-                className="w-full dark:bg-dark_bg_3 text-lg py-2 px-4 rounded-lg outline-none"
+                className="w-full dark:bg-dark_bg_3 text-xl py-2 px-4 rounded-lg outline-none"
                 type={type}
                 placeholder={placeholder}
                 {...register(name)}

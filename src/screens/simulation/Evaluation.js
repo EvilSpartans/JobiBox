@@ -219,8 +219,8 @@ export default function Evaluation() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Evaluation</h2>
-              <p className="mt-12 mb-12 text-lg">
+              <h2 className="text-4xl font-bold">Evaluation</h2>
+              <p className="mt-12 mb-12 text-xl">
                 Voici la liste des questions et leurs{" "}
                 <span className="text-blue-400">réponses attendues</span>.
                 Indique si tu as bien répondu à chaque question pour voir ton
@@ -254,7 +254,7 @@ export default function Evaluation() {
                     key={question.id}
                     className="flex flex-col space-y-4 p-6 bg-white dark:bg-dark_bg_2 rounded-lg shadow-lg"
                   >
-                    <p className="text-lg font-semibold text-left text-gray-800 dark:text-gray-200">
+                    <p className="text-xl font-semibold text-left text-gray-800 dark:text-gray-200">
                       <span className="text-blue-500">Question : </span>{" "}
                       {question.title || "Titre non disponible"}
                     </p>
@@ -305,7 +305,7 @@ export default function Evaluation() {
             {/* Affichage du score */}
             <div className="text-center">
               {score === null ? (
-                <p className="text-lg font-medium text-gray-500 dark:text-gray-300">
+                <p className="text-xl font-medium text-gray-500 dark:text-gray-300">
                   Ton score apparaîtra ici
                 </p>
               ) : (
@@ -322,7 +322,7 @@ export default function Evaluation() {
               </div>
             ) : (
               <button
-                className={`w-full flex justify-center p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg transition ease-in duration-300 ${
+                className={`text-xl w-full flex justify-center p-4 rounded-full tracking-wide font-semibold focus:outline-none shadow-lg transition ease-in duration-300 ${
                   status
                     ? "bg-gray-400 text-gray-500 opacity-50 pointer-events-none"
                     : "bg-gray-300 text-gray-700 hover:bg-gray-400 cursor-pointer"

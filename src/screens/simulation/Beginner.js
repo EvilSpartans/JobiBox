@@ -117,21 +117,21 @@ export default function Beginner() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-                <h2 className="text-3xl font-bold">Niveau débutant</h2>
+                <h2 className="text-4xl font-bold">Niveau débutant</h2>
                 <img
                 src={beginnerImg}
                 alt="Welcome"
                 className="mx-auto mt-10"
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
                 />
-                <p className="mt-12 text-lg">
+                <p className="mt-12 text-xl">
                 Les questions de <span className="text-blue-400">difficulté facile</span>, définies par l'entreprise, te seront posées <span className="text-blue-400">aléatoirement</span>.  
                 Tu pourras te filmer à ton rythme et <span className="text-blue-400">recommencer</span> les séquences si nécessaire.
                 </p>
             </div>
 
             <button
-                className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300`}
+                className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300`}
                 onClick={handleContinueClick}
             >
                 Continuer

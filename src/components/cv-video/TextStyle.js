@@ -49,8 +49,8 @@ export default function TextStyle() {
   return (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
-        <h2 className="mt-6 text-3xl font-bold">Style des questions</h2>
-        <p className="mt-6 text-lg">
+        <h2 className="mt-6 text-4xl font-bold">Style des questions</h2>
+        <p className="mt-6 text-xl">
           Tu peux <span className="text-blue-400">ajuster la taille</span> de tes questions en faisant glisser le curseur, Tu as aussi la possibilité d'en définir la <span className="text-blue-400">couleur</span> et la <span className="text-blue-400">police</span>.
         </p>
       </div>
@@ -125,7 +125,7 @@ export default function TextStyle() {
         </div>
       </div>
       <button
-        className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
+        className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
         onClick={handleContinueClick}
       >
         Continuer

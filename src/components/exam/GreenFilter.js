@@ -238,8 +238,8 @@ export default function GreenFilter() {
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       {/* Heading */}
       <div className="text-center dark:text-dark_text_1">
-        <h2 className="mt-6 text-3xl font-bold">Liste des fonds verts</h2>
-        <p className="mt-6 text-lg">
+        <h2 className="mt-6 text-4xl font-bold">Liste des fonds verts</h2>
+        <p className="mt-6 text-xl">
           Pour finir, nous te recommandons de sélectionner un <span className="text-blue-400">fond vert</span> parmi la liste suivante. Celui-ci sera appliqué en arrière-plan dans tes séquences.
         </p>
       </div>
@@ -279,7 +279,7 @@ export default function GreenFilter() {
               />
               {selectedGreenFilterIndex === -1 && (
                 <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                  <p className="text-blue-500 text-3xl">&hearts;</p>
+                  <p className="text-blue-500 text-4xl">&hearts;</p>
                 </div>
               )}
             </div>
@@ -299,7 +299,7 @@ export default function GreenFilter() {
               />
               {selectedGreenFilterIndex === index && (
                 <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-                  <p className="text-blue-500 text-3xl">&hearts;</p>
+                  <p className="text-blue-500 text-4xl">&hearts;</p>
                 </div>
               )}
             </div>
@@ -307,7 +307,7 @@ export default function GreenFilter() {
         </Slider>
       </div>
       <button
-        className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
+        className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
         onClick={handleContinueClick}
       >
         Continuer

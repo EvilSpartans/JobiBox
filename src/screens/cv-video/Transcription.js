@@ -91,8 +91,8 @@ export default function Transcription() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="mt-6 text-3xl font-bold">Sous-titres</h2>
-              <p className="mt-6 text-lg">
+              <h2 className="mt-6 text-4xl font-bold">Sous-titres</h2>
+              <p className="mt-6 text-xl">
                 Générer les sous-titres de la vidéo
               </p>
             </div>
@@ -148,7 +148,7 @@ export default function Transcription() {
               {!generated && (
                 <button
                   onClick={fetchTranscription}
-                  className={`flex-1 bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+                  className={`text-xl flex-1 bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
                     status ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={status}
@@ -165,7 +165,7 @@ export default function Transcription() {
               {generated && !applied && (
                 <button
                   onClick={handleCreateTranscription}
-                  className={`flex-1 bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+                  className={`text-xl flex-1 bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
                     status ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={status}
@@ -180,7 +180,7 @@ export default function Transcription() {
 
               {/* Bouton "Continuer" */}
               <button
-                className={`flex-1 bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+                className={`text-xl flex-1 bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
                   status ? "opacity-50 cursor-not-allowed" : ""
                 }`}
                 onClick={() => navigate("/post")}

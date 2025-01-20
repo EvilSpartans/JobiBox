@@ -13,7 +13,7 @@ export default function Politiques() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Politique de protection des données personnelles</h2>
+              <h2 className="text-4xl font-bold">Politique de protection des données personnelles</h2>
             </div>
             <div className="dark:text-dark_text_1">
               <div className="max-h-96 tall:max-h-[50rem] overflow-y-auto">

@@ -88,8 +88,8 @@ export default function Question() {
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
       {/* Heading */}
       <div className="text-center dark:text-dark_text_1">
-        <h2 className="text-3xl font-bold">Liste des questions</h2>
-        <p className="mt-6 text-lg">
+        <h2 className="text-4xl font-bold">Liste des questions</h2>
+        <p className="mt-6 text-xl">
           Tu vas pouvoir <span className="text-blue-400">sélectionner</span> les
           questions auxquelles tu vas répondre (entre 2 et 4 maximum) dans un format de type question /
           réponse en vidéo. Si tu le souhaites, tu pourras également{" "}
@@ -98,7 +98,7 @@ export default function Question() {
         </p>
       </div>
       <div className="dark:text-dark_text_1">
-        <div className="mb-6 flex justify-center">
+        <div className="mb-6 flex justify-center text-xl">
           <button
             onClick={() => setCurrentTab("Candidat")}
             className={`px-4 py-2 border-b-2 ${
@@ -126,7 +126,7 @@ export default function Question() {
             <div className="mb-4">
               <button
                 onClick={openModal}
-                className=" addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                className="text-lg addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
               >
                 + Ajouter une question
               </button>
@@ -145,7 +145,7 @@ export default function Question() {
                 {questions
                   .filter((question) => question.type === currentTab)
                   .map((question, index) => (
-                  <div key={index} className="mb-3 flex items-center">
+                  <div key={index} className="mb-5 flex items-center">
                       <label className="inline-flex items-center">
                           <input
                               type="checkbox"
@@ -153,7 +153,7 @@ export default function Question() {
                               onChange={() => handleQuestionSelection(question)}
                               checked={selectedQuestions.includes(question)}
                           />
-                          <span className="ml-2"> &nbsp; {question.title}</span>
+                          <span className="ml-2 text-xl"> &nbsp; {question.title}</span>
                       </label>
                       {questionOrder.includes(question) && (
                           <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
@@ -163,11 +163,11 @@ export default function Question() {
                   </div>
                   ))}
                 {questions.filter((question) => question.type === currentTab).length === 0 && (
-                  <p className="text-center mt-4">Aucune question pour le moment</p>
+                  <p className="text-center text-xl mt-4">Aucune question pour le moment</p>
                 )}
               </div>
             ) : (
-              <p className="text-center mt-4">Aucune question pour le moment</p>
+              <p className="text-center text-xl mt-4">Aucune question pour le moment</p>
             )}
           </>
         )}
@@ -182,7 +182,7 @@ export default function Question() {
         />
       </div>
       <button
-        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+        className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
           selectedQuestions.length === 0 ? "opacity-50 pointer-events-none" : ""
         }`}
         onClick={handleContinueClick}

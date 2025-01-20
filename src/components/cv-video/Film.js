@@ -498,14 +498,14 @@ export default function Film() {
   ) : (
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-8 p-10 dark:bg-dark_bg_2 rounded-xl">
       <div className="text-center dark:text-dark_text_1">
-        <div className="mt-6 text-lg">
+        <div className="mt-6 text-xl">
           <p>
             C'est le moment de <span className="text-blue-400">filmer</span> ta
             séquence.
           </p>
         </div>
         {currentQuestionIndex < questions.length && (
-          <h2 className="mt-6 text-3xl font-bold">
+          <h2 className="mt-6 text-4xl font-bold">
             {questions[currentQuestionIndex].title}
           </h2>
         )}
@@ -597,7 +597,7 @@ export default function Film() {
           {videoBase64 ? (
             <button
               onClick={handleRedoRecording}
-              className={`bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+              className={`text-xl bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
                 status === "loading" ? "opacity-50 pointer-events-none" : ""
               }`}
               disabled={status === "loading"}
@@ -607,7 +607,7 @@ export default function Film() {
           ) : (
             <button
               onClick={toggleRecording}
-              className={`${
+              className={`text-xl ${
                 recording
                   ? "bg-red-500 hover:bg-red-700"
                   : "bg-green_2 hover:bg-green_1"
@@ -625,7 +625,7 @@ export default function Film() {
       </div>
 
       <button
-        className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+        className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-4 shadow-lg cursor-pointer transition ease-in duration-300 ${
           !videoBase64 || status === "loading" || isSavingVideo
             ? "opacity-50 pointer-events-none"
             : ""

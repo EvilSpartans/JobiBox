@@ -71,7 +71,7 @@ export default function Train() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Simulation d'entretien</h2>
+              <h2 className="text-4xl font-bold">Simulation d'entretien</h2>
 
               <img
                 src={TrainImage}
@@ -80,14 +80,14 @@ export default function Train() {
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
 
-              <p className="mt-6 text-lg">
+              <p className="mt-6 text-xl">
                 Dans la simulation d'entretien, choisis l'un des <span className="text-blue-400">trois niveaux de difficulté</span>, puis laisse-toi guider jusqu'à l'auto-évaluation finale pour <span className="text-blue-400">analyser ta performance</span> et identifier des axes d'amélioration.
               </p>
 
             </div>
              {/* Boutons */}
              <button
-                className={`w-full flex justify-center bg-blue_4 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-500 shadow-lg cursor-pointer transition ease-in duration-300 ${
+                className={`text-xl w-full flex justify-center bg-blue_4 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-500 shadow-lg cursor-pointer transition ease-in duration-300 ${
                   loading ? "opacity-50 pointer-events-none" : ""
                 }`}
                 onClick={() => navigate("/beginner")}
@@ -96,7 +96,7 @@ export default function Train() {
               </button>
 
               <button
-                className={`w-full flex items-center justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300 ${
+                className={`text-xl w-full flex items-center justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300 ${
                   isIntermediateLocked ? "opacity-50 pointer-events-none" : ""
                 }`}
                 onClick={() => navigate("/intermediate")}
@@ -115,7 +115,7 @@ export default function Train() {
               </button>
 
               <button
-                className={`w-full flex items-center justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300 ${
+                className={`text-xl w-full flex items-center justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300 ${
                   isExpertLocked ? "opacity-50 pointer-events-none" : ""
                 }`}
                 onClick={() => navigate("/expert")}

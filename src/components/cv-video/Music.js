@@ -59,6 +59,13 @@ export default function Music() {
     const audioPlayer = document.getElementById("music-player");
     audioPlayer.src = BASE_URL + '/' + music.music;
     audioPlayer.load();
+
+    audioPlayer.addEventListener("timeupdate", () => {
+      if (audioPlayer.currentTime > 3) {
+        audioPlayer.pause();
+        audioPlayer.currentTime = 0;
+      }
+    });
     audioPlayer.play();
   };
 
@@ -78,8 +85,8 @@ export default function Music() {
     <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-16 p-10 dark:bg-dark_bg_2 rounded-xl">
       {/*Heading*/}
       <div className="text-center dark:text-dark_text_1">
-        <h2 className="mt-6 text-3xl font-bold">Liste des musiques</h2>
-        <p className="mt-6 text-lg">Tu peux maintenant <span className="text-blue-400">sélectionner une musique</span> qui correspond le plus à ta personnalité.</p>
+        <h2 className="mt-6 text-4xl font-bold">Liste des musiques</h2>
+        <p className="mt-6 text-xl">Tu peux maintenant <span className="text-blue-400">sélectionner une musique</span> qui correspond le plus à ta personnalité.</p>
       </div>
       <div className="dark:text-dark_text_1">
         <div className="audio-player mt-4">
@@ -171,7 +178,7 @@ export default function Music() {
         /> */}
       </div>
       <button
-        className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
+        className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
 font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300
 "
         onClick={handleContinueClick}

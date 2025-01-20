@@ -77,7 +77,7 @@ export default function Logout({ position = "fixed" }) {
   return (
     <div className={position === "fixed" ? "fixed top-3 right-4 z-50" : ""}>
       <button
-        className="w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
+        className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
                     font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
         onClick={handleLogout}
       >
@@ -88,7 +88,7 @@ export default function Logout({ position = "fixed" }) {
         <div className="fixed inset-0 flex items-center justify-center z-50">
           <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
           <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
-            <p className="text-gray-800 text-lg">
+            <p className="text-gray-800 text-xl">
               Veux-tu vraiment te déconnecter ?
             </p>
             <div className="mt-4">

@@ -64,8 +64,8 @@ export default function JobiboxForm() {
       <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
-          <h2 className="mt-6 text-3xl font-bold">Configuration</h2>
-          <p className="mt-6 text-lg">Connexion à la page <span className="text-blue-400">entreprise.</span></p>
+          <h2 className="mt-6 text-4xl font-bold">Configuration</h2>
+          <p className="mt-6 text-xl">Connexion à la page <span className="text-blue-400">entreprise.</span></p>
         </div>
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
@@ -84,7 +84,7 @@ export default function JobiboxForm() {
           ) : null}
           {/*Submit button*/}
           <button
-            className="w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
+            className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
           font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300
           "
             type="submit"

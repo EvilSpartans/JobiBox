@@ -253,8 +253,8 @@ export default function PostForm() {
       <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-2 p-10 dark:bg-dark_bg_2 rounded-xl">
         {/*Heading*/}
         <div className="text-center dark:text-dark_text_1">
-          <h2 className="mt-6 text-3xl font-bold">Publication</h2>
-          <p className="mt-6 text-lg">
+          <h2 className="mt-6 text-4xl font-bold">Publication</h2>
+          <p className="mt-6 text-xl">
             <span className="text-blue-400">Complète les champs</span> suivants
             pour mettre en ligne ta vidéo.
           </p>
@@ -281,12 +281,15 @@ export default function PostForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <Photo onPhotoTaken={setPhotoFile} />
 
+          <hr />
+
           <Input
             name="title"
             type="text"
             placeholder="Nom du poste recherché"
             register={register}
             error={errors?.title?.message}
+            className="required-field"
           />
           {videotheque && (
             <Select
@@ -301,6 +304,7 @@ export default function PostForm() {
                   : errors?.subCategory?.message
               }
               options={subCategoryOptions}
+              className="required-field"
             />
           )}
           <Select
@@ -309,6 +313,7 @@ export default function PostForm() {
             register={register}
             error={errors?.category?.message}
             options={categoryOptions}
+            className="required-field"
           />
           {showPortalCheckbox && portalsOptions.length > 0 && (
             <SelectMultiple
@@ -324,8 +329,11 @@ export default function PostForm() {
               value={portals}
               onChange={setPortals}
               style={{ display: !hidePortal ? "block" : "none" }}
+              className="required-field"
             />
           )}
+
+          <hr />
 
           {/* Only for CV video */}
           {isTrainExam !== "true" && (
@@ -407,7 +415,7 @@ export default function PostForm() {
           ) : null}
           {/*Submit button*/}
           <button
-            className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
+            className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
             font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
               status ? "opacity-50 pointer-events-none" : ""
             }`}

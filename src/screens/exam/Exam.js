@@ -70,7 +70,7 @@ export default function Exam() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/* Heading */}
             <div className="text-center dark:text-dark_text_1">
-              <h2 className="text-3xl font-bold">Examen</h2>
+              <h2 className="text-4xl font-bold">Examen</h2>
 
               <img
                 src={ExamImage}
@@ -79,33 +79,33 @@ export default function Exam() {
                 style={{ maxHeight: "350px", width: "auto", height: "auto" }}
               />
 
-              <p className="mt-6 text-lg">
+              <p className="mt-6 text-xl">
                 {" "}
                 Voici le déroulement de ton{" "}
                 <span className="text-blue-400">épreuve :</span>
               </p>
 
-              <p className="mt-6 text-lg">
+              <p className="mt-6 text-xl">
                 Ton référent t'a préparé une{" "}
                 <span className="text-blue-400">série de questions</span>{" "}
                 auxquelles tu devras répondre dans un format vidéo.
               </p>
 
-              <p className="mt-6 text-lg">
+              <p className="mt-6 text-xl">
                 Pour chacune d'entre elles, tu auras la possibilité de{" "}
                 <span className="text-blue-400">visionner plusieurs fois</span>{" "}
                 la séquence de la question, avant de te lancer dans l'enregistrement
                 de ta réponse.
               </p>
 
-              <p className="mt-6 text-lg">
+              <p className="mt-6 text-xl">
                 Une fois cette étape terminée, le montage se fera{" "}
                 <span className="text-blue-400">automatiquement</span> et tu
                 arriveras sur l'écran de publication.
               </p>
             </div>
             <button
-              className={`w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
+              className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover-bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 ${
                 loading ? "opacity-50 pointer-events-none" : ""
               }`}
               onClick={handleContinueClick}
