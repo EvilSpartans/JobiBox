@@ -3,22 +3,22 @@ const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     mode: 'development',
-    entry: './src/index.js',
+    entry: './src/main.tsx',
     devtool: 'inline-source-map',
     target: 'electron-renderer',
     module: {
         rules: [
             {
-                test: /\.js$/,
+                test: /\.(js|ts|tsx)$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: [['@babel/preset-env', {
-                            targets: {
-                                esmodules: true
-                            }
-                        }], '@babel/preset-react'],
+                        presets: [
+                          ['@babel/preset-env', { targets: { esmodules: true } }],
+                          '@babel/preset-react',
+                          '@babel/preset-typescript'
+                        ],
                         plugins: ['@babel/plugin-transform-modules-commonjs']
                     }
                 }
@@ -48,10 +48,10 @@ module.exports = {
     },
     plugins: [new Dotenv()],
     resolve: {
-        extensions: ['.js'],
+        extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
         filename: 'app.js',
-        path: path.resolve(__dirname, 'build', 'js'),
+        path: path.resolve(__dirname, 'build', 'tsx'),
     },
 };
