@@ -1,0 +1,204 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera, faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+
+export default function Photo({ onPhotoTaken }) {
+
+    const [photoConfirmed, setPhotoConfirmed] = useState(false); 
+    const [showModal, setShowModal] = useState(false);
+    const [photo, setPhoto] = useState<string | null>(null);
+    const [countdown, setCountdown] = useState<number | null>(null);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const isKeyPressed = useRef(false);
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyPress);
+        window.addEventListener("keyup", handleKeyRelease);
+        return () => {
+          window.removeEventListener("keydown", handleKeyPress);
+          window.removeEventListener("keyup", handleKeyRelease);
+        };
+      }, [showModal, photo]);
+    
+      // Make Pad working
+      const handleKeyPress = (event) => {
+        if (
+          !isKeyPressed.current &&
+          /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)
+        ) {
+          isKeyPressed.current = true;
+          if (showModal && !photo) {
+            startCountdown();
+          }
+        }
+      };
+
+      const handleKeyRelease = () => {
+        isKeyPressed.current = false;
+      };
+
+    let stream;
+
+    const initializeCamera = async () => {
+        stream = await navigator.mediaDevices
+            .getUserMedia({
+                video: {
+                    facingMode: "portrait",
+                    width: { ideal: 640 },
+                    height: { ideal: 1136 },
+                },
+                audio: false, 
+            })
+            .then(stream => {
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
+            })
+            .catch(err => {
+                console.error("Error accessing the camera: ", err);
+            });
+    };
+
+    const takePhoto = () => {
+        const canvas = canvasRef.current;
+        const video = videoRef.current;
+      
+        if (!canvas || !video) return;
+      
+        const context = canvas.getContext('2d');
+        if (!context) return;
+      
+        canvas.width = 640;
+        canvas.height = 1136;
+      
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1); // effet miroir
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+        const photoDataUrl = canvas.toDataURL('image/png');
+        setPhoto(photoDataUrl);
+      
+        const stream = video.srcObject as MediaStream;
+        stream?.getTracks().forEach((track) => track.stop());
+      
+        if (onPhotoTaken) {
+          fetch(photoDataUrl)
+            .then((res) => res.blob())
+            .then((blob) => {
+              const file = new File([blob], 'photo.png', { type: 'image/png' });
+              onPhotoTaken(file);
+            });
+        }
+    };
+
+    const startCountdown = () => {
+        let countdownValue = 3;
+        setCountdown(countdownValue);
+        const countdownInterval = setInterval(() => {
+            countdownValue -= 1;
+            setCountdown(countdownValue);
+            if (countdownValue === 0) {
+                clearInterval(countdownInterval);
+                takePhoto();
+                setCountdown(null);
+            }
+        }, 1000);
+    };
+
+    const handleSubmit = async () => {
+        setShowModal(true);
+        initializeCamera();
+    };
+
+    const confirmSubmit = () => {
+        console.log('Photo confirmed:', photo);
+        setPhotoConfirmed(true);
+        setShowModal(false);
+    };
+
+    const cancelSubmit = async () => {
+        setPhoto(null);
+        setPhotoConfirmed(false);
+        initializeCamera();
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+        const video = videoRef.current;
+        if (video && video.srcObject instanceof MediaStream) {
+          video.srcObject.getTracks().forEach(track => track.stop());
+        }
+    };
+
+    return (
+        <div className='z-50' style={{ marginTop: '3%' }}>
+            <button
+                type="button"
+                className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
+                    font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
+                onClick={handleSubmit}
+                tabIndex={-1}
+            >
+                <FontAwesomeIcon icon={faCamera} size="lg" /> 
+                {photoConfirmed && <FontAwesomeIcon icon={faCheckCircle} size="lg" className="ml-2 text-green-500" />}
+                &nbsp; <span className='text-xl'>Miniature vidéo</span>
+            </button>
+
+            {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div className="modal bg-black bg-opacity-75 w-full h-full absolute"></div>
+                    <div className="modal-content bg-white w-1/2 p-4 rounded-lg text-center z-50 relative">
+                        <button className="absolute top-2 right-2 text-gray-800" onClick={closeModal} tabIndex={-1}>
+                            <FontAwesomeIcon icon={faTimes} size="lg" /> 
+                        </button>
+                        <p className="text-gray-800 text-xl">
+                            {photo ? "Veux-tu utiliser cette photo ? (Elle apparaîtra comme miniature pour ta vidéo)" : "Fais ton plus grand sourire"}
+                        </p>
+                        {photo ? (
+                            <img src={photo} alt="Captured" className="mx-auto" />
+                        ) : (
+                            <div className="relative">
+                                <video ref={videoRef} autoPlay className="w-full h-auto transform -scale-x-100" /> {/* Mirror video */}
+                                <button
+                                    type="button"
+                                    className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4"
+                                    onClick={startCountdown}
+                                >
+                                    Prendre la Photo
+                                </button>
+                                {countdown !== null && (
+                                    <div className="countdown-overlay absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 text-white text-9xl">
+                                        {countdown}
+                                        <p className="text-sm mt-3 text-center">
+                                            Souris et regarde la caméra 😉 !
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {photo && (
+                            <div className="mt-4">
+                                <button
+                                    className="bg-green-500 text-white px-4 py-2 rounded-md mr-2"
+                                    onClick={confirmSubmit}
+                                    type="button"
+                                >
+                                    Oui
+                                </button>
+                                <button
+                                    className="bg-red-500 text-white px-4 py-2 rounded-md"
+                                    onClick={cancelSubmit}
+                                    type="button"
+                                >
+                                    Non
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            <canvas ref={canvasRef} className="hidden"></canvas>
+        </div>
+    );
+}
