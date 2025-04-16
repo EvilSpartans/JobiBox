@@ -1,15 +1,12 @@
 {
   "name": "jobibox",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "description": "La cabine accoustique pour créer un cv vidéo",
   "repository": "https://github.com/EvilSpartans/JobiBox",
-  "main": "main.js",
+  "main": "electron/main.js",
   "scripts": {
-    "start": "electron .",
-    "watch": "webpack --config webpack.common.js --watch",
+    "start": "concurrently -k -n WEBPACK,ELECTRON -c magenta,cyan \"webpack --watch --config webpack.common.js\" \"electron .\"",
     "build": "webpack --config webpack.prod.js",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder",
     "make:linux": "electron-builder --linux",
     "make:macos": "electron-builder --mac",
     "make:win": "electron-builder --win --x64 --publish always"
@@ -39,10 +36,9 @@
       "assets/**/*",
       "utils/**/*",
       "index.html",
-      "splash.html",
-      "splash.css",
-      "main.js",
-      "preload.js"
+      "electron/utils/**/*",
+      "electron/main.js",
+      "electron/preload.js"
     ],
     "mac": {
       "category": "public.app-category.developer-tools",
@@ -86,11 +82,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.17",
+    "concurrently": "^9.1.2",
     "dotenv-webpack": "^8.0.1",
     "electron": "^26.2.1",
     "electron-builder": "^24.6.4",
     "file-loader": "^6.2.0",
     "tailwindcss": "^3.3.3",
+    "wait-on": "^8.0.3",
     "webpack-merge": "^5.9.0"
   },
   "dependencies": {

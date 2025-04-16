@@ -13,6 +13,7 @@ export default function Home() {
   const user = useSelector((state) => state.user.user);
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
+  const offers = localStorage.getItem("offersActivated");
   const examenInProgress = localStorage.getItem('examenInProgress');
   const beginnerInProgress = localStorage.getItem('beginnerInProgress');
   const intermediateInProgress = localStorage.getItem('intermediateInProgress');
@@ -30,13 +31,14 @@ export default function Home() {
   
         localStorage.setItem("trainingActivated", portalsData.training);
         localStorage.setItem("examActivated", portalsData.exam);
+        localStorage.setItem("offersActivated", portalsData.offers);
 
         const appVersion = await AppVersion();
         if (portalsData.version !== appVersion) {
           await dispatch(updateJobibox({ id: jobiboxId, version: appVersion }));
         }
   
-        if (!portalsData.training && !portalsData.exam) {
+        if (!portalsData.training && !portalsData.offers) {
           navigate("/cvVideo");
         } else {
           setLoading(false); 
@@ -108,12 +110,20 @@ export default function Home() {
               Simulation d'entretien
             </button>
             )}
-            {exam === "true" && (
+            {/* {exam === "true" && (
             <button
               className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
               onClick={() => navigate("/exam")}
             >
               Examen
+            </button>
+            )} */}
+            {offers === "true" && (
+            <button
+              className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
+              onClick={() => navigate("/offers")}
+            >
+              Offres d'emploi
             </button>
             )}
           </div>

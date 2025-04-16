@@ -119,16 +119,9 @@ export default function Film() {
           },
           audio: true,
         })
-        .then((stream) => (videoCameraRef.current.srcObject = stream));
+        
+      videoCameraRef.current.srcObject = stream
       setMediaStream(stream);
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          const chunks = videoBase64 ? [...videoBase64, e.data] : [e.data];
-          setVideoBase64(chunks);
-        }
-      };
 
       if (selectedGreenFilter) {
         handleApplyBackground(selectedGreenFilter);
