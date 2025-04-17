@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import axios from "axios";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addCandidacy } from "../../store/slices/userSlice";
 
-export default function ModalOffer({ offer, onClose, videos }) {
+export default function ModalOffer({ offer, onClose, videos, user }) {
   const [showSelect, setShowSelect] = useState(false);
-  const [selectedVideo, setSelectedVideo] = useState('');
+  const [selectedVideo, setSelectedVideo] = useState("");
+  const dispatch = useDispatch();
 
   const handleApply = async () => {
     setShowSelect(true);
@@ -10,16 +14,44 @@ export default function ModalOffer({ offer, onClose, videos }) {
 
   const handleCancel = () => {
     setShowSelect(false);
-    setSelectedVideo('');
+    setSelectedVideo("");
   };
 
   const handleValidate = () => {
-    console.log("Candidature envoyée avec la vidéo :", selectedVideo);
-    setShowSelect(false);
-    setSelectedVideo('');
+    createCandidacy();
+  };
+
+  const createCandidacy = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("type", "offer");
+      formData.append("offerId", offer.id);
+      formData.append("filePath", selectedVideo);
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/candidacies/new`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("✅ Candidature envoyée :", response.data);
+      dispatch(addCandidacy(offer.id));
+      setShowSelect(false);
+      setSelectedVideo("");
+      onClose();
+    } catch (error) {
+      console.error("❌ Erreur lors de l'envoi de la candidature :", error);
+    }
   };
 
   if (!offer) return null;
+
+  const hasApplied = user?.offerCandidacyIds?.includes(offer.id);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -56,11 +88,22 @@ export default function ModalOffer({ offer, onClose, videos }) {
 
         {/* INFOS */}
         <div className="text-sm space-y-3">
-          <p><strong>Contrat :</strong> {offer.contract}</p>
-          <p><strong>Salaire :</strong> {offer.salary}</p>
-          <p><strong>Domaine :</strong> {offer.jobFunction}</p>
-          <p><strong>Expérience :</strong> {offer.applicantExperience}</p>
-          <p><strong>Date limite :</strong> {new Date(offer.expirationDate).toLocaleDateString("fr-FR")}</p>
+          <p>
+            <strong>Contrat :</strong> {offer.contract}
+          </p>
+          <p>
+            <strong>Salaire :</strong> {offer.salary}
+          </p>
+          <p>
+            <strong>Domaine :</strong> {offer.jobFunction}
+          </p>
+          <p>
+            <strong>Expérience :</strong> {offer.applicantExperience}
+          </p>
+          <p>
+            <strong>Date limite :</strong>{" "}
+            {new Date(offer.expirationDate).toLocaleDateString("fr-FR")}
+          </p>
 
           <div>
             <strong>Description du poste :</strong>
@@ -74,49 +117,65 @@ export default function ModalOffer({ offer, onClose, videos }) {
 
           <div>
             <strong>À propos de l'entreprise :</strong>
-            <p className="whitespace-pre-line mt-1">{offer.companyDescription}</p>
+            <p className="whitespace-pre-line mt-1">
+              {offer.companyDescription}
+            </p>
           </div>
         </div>
 
         {/* SECTION POSTULER / VALIDATION */}
         <div className="mt-6 text-center space-y-4">
           {showSelect ? (
-            <>
-              <div>
-                <label htmlFor="videoSelect" className="block mb-2 font-semibold">
-                  Sélectionnez une vidéo pour postuler :
-                </label>
-                <select
-                  id="videoSelect"
-                  value={selectedVideo}
-                  onChange={(e) => setSelectedVideo(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2"
-                >
-                  <option value="">-- Choisissez une vidéo --</option>
-                  {videos.map((video) => (
-                    <option key={video.id} value={video.id}>
-                      {video.title}
-                    </option>
-                  ))}
-                </select>
+            videos.length === 0 ? (
+              <div className="text-red-600 font-medium">
+                ❌ Vous devez d'abord créer un CV vidéo pour pouvoir postuler à
+                une offre.
               </div>
+            ) : (
+              <>
+                <div>
+                  <label
+                    htmlFor="videoSelect"
+                    className="block mb-2 font-semibold"
+                  >
+                    Sélectionnez une vidéo pour postuler :
+                  </label>
+                  <select
+                    id="videoSelect"
+                    value={selectedVideo}
+                    onChange={(e) => setSelectedVideo(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                  >
+                    <option value="">-- Choisissez une vidéo --</option>
+                    {videos.map((video) => (
+                      <option key={video.id} value={video.video}>
+                        {video.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="flex justify-center gap-4">
-                <button
-                  className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
-                  onClick={handleCancel}
-                >
-                  Annuler
-                </button>
-                <button
-                  className="bg-blue_4 text-white px-4 py-2 rounded-md"
-                  onClick={handleValidate}
-                  disabled={!selectedVideo}
-                >
-                  Valider
-                </button>
-              </div>
-            </>
+                <div className="flex justify-center gap-4">
+                  <button
+                    className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+                    onClick={handleCancel}
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    className="bg-blue_4 text-white px-4 py-2 rounded-md"
+                    onClick={handleValidate}
+                    disabled={!selectedVideo}
+                  >
+                    Valider
+                  </button>
+                </div>
+              </>
+            )
+          ) : hasApplied ? (
+            <p className="text-green-600 font-medium">
+              ✅ Vous avez déjà postulé à cette offre
+            </p>
           ) : (
             <button
               className="bg-blue_4 text-gray-100 hover:bg-blue-500 px-6 py-2 rounded-md text-sm font-medium"

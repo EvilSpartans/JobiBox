@@ -13,7 +13,8 @@ const initialState = {
         email: "",
         avatar: "",
         token: "",
-        questionLists: []
+        questionLists: [],
+        offerCandidacyIds: []
     }
 }
 
@@ -54,7 +55,8 @@ export const userSlice = createSlice({
                 email: "",
                 avatar: "",
                 token: "",
-                questionLists: []
+                questionLists: [],
+                offerCandidacyIds: []
             };
         },
         changeStatus: (state, action) => {
@@ -79,6 +81,12 @@ export const userSlice = createSlice({
                 if (!exists) {
                     state.user.questionLists.push(newElement);
                 }
+            }
+        },
+        addCandidacy: (state, action) => {
+            const newOfferId = action.payload;
+            if (!state.user.offerCandidacyIds.includes(newOfferId)) {
+                state.user.offerCandidacyIds.push(newOfferId);
             }
         },
     },
@@ -116,5 +124,5 @@ export const userSlice = createSlice({
     }
 })
 
-export const { logout, changeStatus, updateQuestionLists } = userSlice.actions;
+export const { logout, changeStatus, updateQuestionLists, addCandidacy } = userSlice.actions;
 export default userSlice.reducer;

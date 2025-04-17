@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PulseLoader from "react-spinners/PulseLoader";
 import ModalOffer from "../modals/ModalOffer";
 import { useSelector } from "react-redux";
@@ -10,27 +10,58 @@ export default function Offers() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState(null);
+
   const user = useSelector((state) => state.user.user);
   const { token } = user;
   const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const scrollContainerRef = useRef(null);
+
   useEffect(() => {
-    fetchOffers();
+    const container = scrollContainerRef.current;
+  
+    const handleScroll = () => {
+      if (!container) return;
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore && !loadingMore) {
+        fetchOffers(page);
+      }
+    };
+  
+    container?.addEventListener("scroll", handleScroll);
+    return () => container?.removeEventListener("scroll", handleScroll);
+  }, [page, hasMore, loadingMore]);
+  
+
+  useEffect(() => {
+    setOffers([]);
+    setPage(1);
+    setHasMore(true);
+    fetchOffers(1);
+  
     if (user?.id) {
       fetchVideos();
     }
   }, [user?.id]);
 
-  const fetchOffers = async () => {
+  const fetchOffers = async (currentPage = 1) => {
     try {
-      setLoading(true);
-      const response = await axios.get(`${BASE_URL}/offers`);
-      const payload = response.data.offers;
-      setOffers(payload);
+      setLoadingMore(true);
+      const response = await axios.get(`${BASE_URL}/offers?page=${currentPage}`);
+      const { offers: newOffers, countPage } = response.data;
+  
+      setOffers((prev) => [...prev, ...newOffers]);
+      setHasMore(currentPage < countPage);
+      setPage(currentPage + 1);
     } catch (error) {
       console.error("Erreur lors de la récupération des offres :", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -68,10 +99,9 @@ export default function Offers() {
       </button>
 
       {/* Liste des offres */}
-      <div className="flex flex-wrap mt-4 max-h-[350px] tall:max-h-[34rem] gap-4 overflow-y-auto pr-2">
+      <div ref={scrollContainerRef} className="flex flex-wrap mt-4 max-h-[350px] tall:max-h-[34rem] gap-4 overflow-y-auto pr-2">
         {offers.map((offer) => (
           <div
-            onClick={() => setSelectedOffer(offer)}
             key={offer.id}
             className="w-full sm:w-[48%] md:w-[30%] lg:w-[23%] bg-white dark:bg-dark_bg_1 rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md flex flex-col text-sm"
           >
@@ -111,6 +141,7 @@ export default function Offers() {
           offer={selectedOffer}
           onClose={() => setSelectedOffer(null)}
           videos={videos}
+          user={user}
         />
       </div>
     </>
