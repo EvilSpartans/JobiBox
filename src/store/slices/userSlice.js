@@ -18,9 +18,9 @@ const initialState = {
     }
 }
 
-export const registerUser = createAsyncThunk("api/signup", async (values, { rejectWithValue }) => {
+export const registerUser = createAsyncThunk("api/register", async (values, { rejectWithValue }) => {
     try {
-        const { data } = await axios.post(`${BASE_URL}/signup`, { ... values});
+        const { data } = await axios.post(`${BASE_URL}/register`, { ... values});
         return data;
     } catch (error) {
         return rejectWithValue(error.response);
@@ -28,10 +28,10 @@ export const registerUser = createAsyncThunk("api/signup", async (values, { reje
 })
 
 export const loginUser = createAsyncThunk(
-    "api/signin",
+    "api/login",
     async (values, { rejectWithValue }) => {
         try {
-            const { data } = await axios.post(`${BASE_URL}/signin`, {
+            const { data } = await axios.post(`${BASE_URL}/login`, {
                 ...values,
             });
             return data;

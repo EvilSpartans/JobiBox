@@ -92,7 +92,7 @@ export default function GreenFilter() {
   const fetchGreenFilters = async () => {
     try {
       const response = await dispatch(getGreenFilters(token));
-      const greenFiltersData = response.payload;
+      const greenFiltersData = response.payload.items;
       setGreenFilters(greenFiltersData);
     } catch (error) {
       console.error("Erreur lors de la récupération des filtres :", error);

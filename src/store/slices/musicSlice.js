@@ -14,7 +14,11 @@ export const getMusics = createAsyncThunk(
     async (token, { rejectWithValue }) => {
         try {
             const businessId = localStorage.getItem("businessId");
-            const url = businessId ? `${BASE_URL}/musics?businessId=${businessId}` : `${BASE_URL}/musics`;
+            const isValidBusinessId = businessId && businessId !== "null";
+
+            const url = isValidBusinessId
+                ? `${BASE_URL}/musics?businessId=${businessId}&limit=20`
+                : `${BASE_URL}/musics?limit=20`;
             const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,

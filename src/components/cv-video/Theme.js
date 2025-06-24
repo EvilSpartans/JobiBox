@@ -46,7 +46,7 @@ export default function Theme() {
   const fetchThemes = async () => {
     try {
       const response = await dispatch(getThemes(token));
-      const themesData = response.payload;
+      const themesData = response.payload.items;
       setThemes(themesData);
     } catch (error) {
       console.error("Erreur lors de la récupération des thèmes :", error);

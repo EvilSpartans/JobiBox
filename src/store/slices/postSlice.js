@@ -19,7 +19,7 @@ export const createPost = createAsyncThunk(
             description, 
             category,
             subCategory,
-            city, 
+            place, 
             salary,
             contracts,
             hmy,
@@ -40,10 +40,12 @@ export const createPost = createAsyncThunk(
             const formData = new FormData();
             formData.append("title", title);
             formData.append("description", description);
-            formData.append("category", category);
-            formData.append("subCategory", subCategory);
-            formData.append("city", city);
-            formData.append("contracts", contracts);
+            formData.append("categories[]", category);
+            formData.append("postTypes[]", subCategory);
+            formData.append("place", place);
+            contracts.forEach((c) => {
+                formData.append("contracts[]", c);
+            });
             formData.append("km", km);
             formData.append("activateComments", activateComments);
             formData.append("formation", formation);
@@ -52,7 +54,9 @@ export const createPost = createAsyncThunk(
             formData.append("video", video);
             formData.append("date", date);
             formData.append("businessId", businessId);
-            formData.append("portal", portal);
+            portal.forEach((p) => {
+                formData.append("portals[]", p);
+            });
             formData.append("diploma", diploma);
             formData.append("createdFrom", createdFrom);
 

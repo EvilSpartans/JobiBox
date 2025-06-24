@@ -28,7 +28,6 @@ export default function PostForm() {
   const { status, error } = useSelector((state) => state.post);
   const user = useSelector((state) => state.user.user);
   const { token } = user;
-  const [videotheque, setVideotheque] = useState([]);
   const [contracts, setContracts] = useState([]);
   const [hidePortal, setHidePortal] = useState([]);
   const [portals, setPortals] = useState([]);
@@ -42,6 +41,7 @@ export default function PostForm() {
   const businessId = localStorage.getItem("businessId") || null;
   const isTrainExam = localStorage.getItem("isTrainExam") || null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
+  const [formError, setFormError] = useState("");
 
   const simulationInProgress =
     localStorage.getItem("beginnerInProgress") ||
@@ -62,7 +62,7 @@ export default function PostForm() {
   const fetchCategories = async () => {
     try {
       const response = await dispatch(getCategories(token));
-      const categoriesData = response.payload;
+      const categoriesData = response.payload.items;
       const updatedCategoryOptions = categoriesData.map((category) => ({
         value: category.name,
         label: category.name,
@@ -95,11 +95,7 @@ export default function PostForm() {
         label: portal.title,
       }));
 
-      if (portalsData.videotheque === false) {
-        setVideotheque(false);
-      }
-
-      if (portalsData.videotheque === false && filteredPortals.length === 1) {
+      if (filteredPortals.length === 1) {
         setPortals([filteredPortals[0]]);
         setHidePortal(true);
       } else {
@@ -184,6 +180,11 @@ export default function PostForm() {
 
   // Submit Form
   const onSubmit = async (data) => {
+    if (businessId && portalsOptions.length > 1 && portals.length === 0) {
+      setFormError("Tu dois sélectionner au moins un portail.");
+      return;
+    }
+
     dispatch(changeStatus("loading"));
     const selectedContracts = contracts.map((contract) => contract.value);
 
@@ -203,7 +204,7 @@ export default function PostForm() {
       description: data.description,
       category: data.category,
       subCategory: data.subCategory || "Portail",
-      city: data.city,
+      place: data.city,
       activateComments: true,
       formation: data.formation === "Oui",
       remote: data.remote,
@@ -215,7 +216,10 @@ export default function PostForm() {
       video: videoPath,
       image: imageFile,
       businessId,
-      portal: portals.map((portal) => portal.value || portal.id) || [],
+      portal:
+        hidePortal && portals.length === 1
+          ? [portals[0].id] // auto sélection si un seul portail
+          : portals.map((portal) => portal.value || portal.id),
     };
 
     try {
@@ -291,22 +295,14 @@ export default function PostForm() {
             error={errors?.title?.message}
             className="required-field"
           />
-          {videotheque && (
-            <Select
-              name="subCategory"
-              placeholder="Es-tu recruteur ou en recherche d'emploi ?"
-              register={register}
-              error={
-                showPortalCheckbox
-                  ? !portals.length && errors.subCategory
-                    ? errors.subCategory.message
-                    : null
-                  : errors?.subCategory?.message
-              }
-              options={subCategoryOptions}
-              className="required-field"
-            />
-          )}
+          <Select
+            name="subCategory"
+            placeholder="Es-tu recruteur ou en recherche d'emploi ?"
+            register={register}
+            error={errors?.subCategory?.message}
+            options={subCategoryOptions}
+            className="required-field"
+          />
           <Select
             name="category"
             placeholder="Domaine d'activité"
@@ -315,16 +311,12 @@ export default function PostForm() {
             options={categoryOptions}
             className="required-field"
           />
-          {showPortalCheckbox && portalsOptions.length > 0 && (
+          {showPortalCheckbox && portalsOptions.length > 1 && (
             <SelectMultiple
               name="portal"
               placeholder="Référencement"
               register={register}
-              error={
-                errors.subCategory && !portals.length
-                  ? errors.portal?.message
-                  : null
-              }
+              error={errors?.portal?.message}
               options={portalsOptions}
               value={portals}
               onChange={setPortals}
@@ -413,6 +405,7 @@ export default function PostForm() {
               <p className="text-red-400">{error}</p>
             </div>
           ) : null}
+          {formError && <p className="text-red-400">{formError}</p>}
           {/*Submit button*/}
           <button
             className={`text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide

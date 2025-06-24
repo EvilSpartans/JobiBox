@@ -26,7 +26,7 @@ export default function Question() {
   const fetchQuestions = async () => {
     try {
       const response = await dispatch(getQuestions(token));
-      const payload = response.payload;
+      const payload = response.payload.items;
       setQuestions(payload);
     } catch (error) {
       console.error("Erreur lors de la récupération des questions :", error);

@@ -32,7 +32,7 @@ export default function JobiboxForm() {
   const fetchJobibox = async () => {
     try {
       const response = await dispatch(getJobibox());
-      const data = response.payload;
+      const data = response.payload.items;
       setJobiboxData(data);
       const updatedJobiboxOptions = data.map((jobibox) => ({
         value: jobibox.id,
@@ -40,7 +40,7 @@ export default function JobiboxForm() {
       }));
       setJobiboxOptions(updatedJobiboxOptions);
     } catch (error) {
-      console.error("Erreur lors de la récupération des portails :", error);
+      console.error("Erreur lors de la récupération des jobiboxs :", error);
     }
   };
 

@@ -14,15 +14,23 @@ export const getThemes = createAsyncThunk(
     async (token, { rejectWithValue }) => {
         try {
             const businessId = localStorage.getItem("businessId");
-            const url = businessId ? `${BASE_URL}/themes?businessId=${businessId}` : `${BASE_URL}/themes`;
+            const isValidBusinessId = businessId && businessId !== "null";
+
+            const url = isValidBusinessId
+                ? `${BASE_URL}/themes?businessId=${businessId}&limit=20`
+                : `${BASE_URL}/themes?limit=20`;
+
             const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
             return data;
         } catch (error) {
-            return rejectWithValue(error.response.data.error.message);
+            return rejectWithValue(
+                error?.response?.data?.error?.message || "Erreur lors de la récupération des thèmes."
+            );
         }
     }
 );

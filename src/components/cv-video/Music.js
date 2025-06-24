@@ -24,7 +24,7 @@ export default function Music() {
   const fetchMusics = async () => {
     try {
       const response = await dispatch(getMusics(token));
-      const musicsData = response.payload;
+      const musicsData = response.payload.items;
       setMusics(musicsData);
       if (musicsData && musicsData.length > 0) {
         setSelectedMusic(musicsData[0]);

@@ -14,7 +14,12 @@ export const getGreenFilters = createAsyncThunk(
     async (token, { rejectWithValue }) => {
         try {
             const businessId = localStorage.getItem("businessId");
-            const url = businessId ? `${BASE_URL}/greenFilters?businessId=${businessId}` : `${BASE_URL}/greenFilters`;
+            const isValidBusinessId = businessId && businessId !== "null";
+
+            const url = isValidBusinessId
+                ? `${BASE_URL}/greenFilters?businessId=${businessId}&limit=20`
+                : `${BASE_URL}/greenFilters?limit=20`;
+                
             const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,
