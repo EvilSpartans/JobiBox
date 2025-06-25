@@ -13,8 +13,9 @@ export const getQuestionVideos = createAsyncThunk(
     "api/questionVideos",
     async (token, { rejectWithValue }) => {
         try {
-            const businessId = localStorage.getItem("businessId");
-            const url = businessId ? `${BASE_URL}/questionVideos?businessId=${businessId}` : `${BASE_URL}/questionVideos`;
+            // const businessId = localStorage.getItem("businessId");
+            const businessId = 1;
+            const url = businessId ? `${BASE_URL}/questionVideos?businessId=${businessId}&limit=800` : `${BASE_URL}/questionVideos&limit=800`;
             const { data } = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`,

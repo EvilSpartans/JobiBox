@@ -72,8 +72,16 @@ export const createPost = createAsyncThunk(
             );
             return data;
         } catch (error) {
-            return rejectWithValue(error.response);
+            const message =
+                error?.response?.data?.detail ||
+                error?.response?.data?.message ||
+                error?.message ||
+                "Une erreur est survenue";
+
+            console.error("Erreur Axios createPost:", message, error); // 👀
+            return rejectWithValue({ message });
         }
+
     }
 );
 
@@ -96,7 +104,8 @@ export const postSlice = createSlice({
             })
             .addCase(createPost.rejected, (state, action) => {
                 state.status = "failed";
-                state.error = action.payload.data.detail;
+                console.error("Erreur postSlice:", action.payload);
+                state.error = action.payload?.data?.detail || "Une erreur est survenue";
             });
     },
 });

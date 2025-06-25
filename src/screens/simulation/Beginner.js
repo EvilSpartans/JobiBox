@@ -34,7 +34,7 @@ export default function Beginner() {
           if (!response.ok) {
               throw new Error("Erreur lors de la récupération des thématiques");
           }
-          const themes = await response.json();
+          const { items: themes } = await response.json();
           const beginnerTheme = themes.find((theme) => theme.title === "Débutant");
           if (beginnerTheme && beginnerTheme.mainQuestionVideo) {
               setMainQuestion(beginnerTheme.mainQuestionVideo);
@@ -55,7 +55,7 @@ export default function Beginner() {
     const fetchQuestionVideos = async () => {
     try {
         const response = await dispatch(getQuestionVideos(token));
-        const payload = response.payload;
+        const payload = response.payload.items;
         setQuestions(payload);
         return payload;
     } catch (error) {

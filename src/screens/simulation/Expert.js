@@ -27,7 +27,7 @@ export default function Expert() {
   const fetchCategories = async () => {
     try {
       const response = await dispatch(getCategories(token));
-      const categoriesData = response.payload;
+      const categoriesData = response.payload.items;
       const updatedCategoryOptions = categoriesData.map((category) => ({
         value: category.name,
         label: category.name,
@@ -58,7 +58,7 @@ export default function Expert() {
   const fetchQuestionVideos = async () => {
     try {
       const response = await dispatch(getQuestionVideos(token));
-      const payload = response.payload;
+      const payload = response.payload.items;
       setQuestions(payload);
       return payload;
     } catch (error) {
@@ -97,7 +97,7 @@ export default function Expert() {
   
       const isNotMainQuestion = question.id !== mainQuestion.id;
   
-      const hasMatchingCategory = question.category.some(
+      const hasMatchingCategory = question.categories.some(
         (cat) => cat.name === selectedCategory
       );
   

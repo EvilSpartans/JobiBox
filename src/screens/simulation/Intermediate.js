@@ -34,7 +34,7 @@ export default function Intermediate() {
   const fetchCategories = async () => {
     try {
       const response = await dispatch(getCategories(token));
-      const categoriesData = response.payload;
+      const categoriesData = response.payload.items;
       const updatedCategoryOptions = categoriesData.map((category) => ({
         value: category.name,
         label: category.name,
@@ -67,7 +67,7 @@ export default function Intermediate() {
         console.log("Données avant filtrage :", data);
 
         // Filtrer pour retirer "Débutant"
-        const filteredData = data.filter(
+        const filteredData = data.items.filter(
           (category) => category.title.trim().toLowerCase() !== "débutant"
         );
 
@@ -120,7 +120,7 @@ export default function Intermediate() {
   const fetchQuestionVideos = async () => {
     try {
       const response = await dispatch(getQuestionVideos(token));
-      const payload = response.payload;
+      const payload = response.payload.items;
       setQuestions(payload);
       return payload;
     } catch (error) {
@@ -145,6 +145,7 @@ export default function Intermediate() {
     setLoading(true);
 
     const fetchedQuestions = await fetchQuestionVideos();
+    // console.log("Questions récupérées :", fetchedQuestions);
 
     // Trouver le thème sélectionné
     const selectedCategoryObject = categories.find(
@@ -162,7 +163,7 @@ export default function Intermediate() {
       const isFromSelectedCategory =
         question.questionList &&
         question.questionList.id === selectedCategoryObject.id;
-      const hasMatchingActivity = question.category.some(
+      const hasMatchingActivity = question.categories.some(
         (cat) => cat.name === selectedNewCategory
       );
       return (
@@ -191,7 +192,7 @@ export default function Intermediate() {
       JSON.stringify(finalQuestions)
     );
 
-    console.log("Liste finale des questions :", finalQuestions);
+    // console.log("Liste finale des questions :", finalQuestions);
 
     // Naviguer vers la page suivante
     navigate("/recordS");

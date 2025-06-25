@@ -75,17 +75,23 @@ export default function Evaluation() {
     const postData = {
       token: token,
       title: uniqueTitle,
-      category: selectedActivity,
-      subCategory: "Portail",
+      category: selectedActivity || 'Autre',
+      subCategory: "Simulation",
+      contracts: ["Simulation"],
       createdFrom: "jobibox",
       video: videoPath,
       image: imageFile,
       businessId: businessId,
       portal: portals.length > 0 ? portals.map((portal) => portal.id) : [],
       date: "",
+      place: "",
+      salary: "",
+      hmy: "",
+      activateComments: false,
+      formation: "",
+      remote: false,
+      diploma: "",
     };
-
-    console.log("Données envoyées à l'API :", postData);
 
     try {
       const res = await dispatch(createPost(postData));
@@ -105,8 +111,6 @@ export default function Evaluation() {
       JSON.parse(localStorage.getItem("beginnerInProgress")) ||
       JSON.parse(localStorage.getItem("intermediateInProgress")) ||
       JSON.parse(localStorage.getItem("expertInProgress"));
-
-    console.log("Questions récupérées :", selectedQuestions);
 
     if (Array.isArray(selectedQuestions) && selectedQuestions.length > 0) {
       setQuestions(selectedQuestions);
@@ -176,11 +180,7 @@ export default function Evaluation() {
           }
         );
 
-        if (updateResponse.status === 201) {
-          console.log(
-            "Liste des questions mise à jour avec succès :",
-            updateResponse.data
-          );
+        if (updateResponse.status === 200) {
           dispatch(updateQuestionLists(updateResponse.data));
         }
       }
