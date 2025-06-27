@@ -42,7 +42,7 @@ export const createPost = createAsyncThunk(
             formData.append("description", description);
             formData.append("categories[]", category);
             formData.append("postTypes[]", subCategory);
-            formData.append("place", place);
+            formData.append("city", place);
             contracts.forEach((c) => {
                 formData.append("contracts[]", c);
             });
