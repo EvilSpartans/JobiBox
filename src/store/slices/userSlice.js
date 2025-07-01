@@ -97,11 +97,19 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        const userData = action.payload.data;
         state.status = "succeeded";
-        state.error = action.payload.data;
+        state.error = "";
+
         state.user = {
-          ...action.payload.user,
+          id: userData.id,
+          firstname: userData.firstname,
+          lastname: userData.lastname,
+          email: userData.email,
+          avatar: userData.avatar || "",
           token: action.payload.token,
+          questionLists: userData.questionLists || [],
+          offerCandidacyIds: userData.offerCandidacyIds || [],
         };
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -112,11 +120,19 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        const userData = action.payload.data;
         state.status = "succeeded";
-        state.error = action.payload.data.message;
+        state.error = "";
+
         state.user = {
-          ...action.payload.data,
+          id: userData.id,
+          firstname: userData.firstname,
+          lastname: userData.lastname,
+          email: userData.email,
+          avatar: userData.avatar || "",
           token: action.payload.token,
+          questionLists: userData.questionLists || [],
+          offerCandidacyIds: userData.offerCandidacyIds || [],
         };
       })
       .addCase(loginUser.rejected, (state, action) => {
