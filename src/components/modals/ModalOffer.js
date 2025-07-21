@@ -26,10 +26,10 @@ export default function ModalOffer({ offer, onClose, videos, user }) {
       const formData = new FormData();
       formData.append("type", "offer");
       formData.append("offerId", offer.id);
-      formData.append("filePath", selectedVideo);
+      formData.append("cv", selectedVideo);
 
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/candidacies/new`,
+        `${process.env.REACT_APP_BASE_URL}/candidacy/create`,
         formData,
         {
           headers: {

@@ -8,6 +8,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 export default function Input({
   name,
   type,
+  label,
   placeholder,
   register,
   error,
@@ -24,7 +25,7 @@ export default function Input({
       <div className={`mt-8 content-center dark:text-dark_text_1 space-y-1 ${className}`}>
         <div className="flex flex-col"> 
           <label htmlFor={name} className="text-base font-bold tracking-wide py-1">
-            {placeholder}
+            {label}
           </label>
           <DatePicker
             className="w-full dark:bg-dark_bg_3 text-xl py-2 px-4 rounded-lg outline-none"
@@ -41,7 +42,7 @@ export default function Input({
     return (
       <div className={`mt-8 content-center dark:text-dark_text_1 space-y-1 ${className}`} style={style}>
         <label htmlFor={name} className="text-base font-bold tracking-wide">
-          {placeholder}
+          {label}
         </label>
         <div className="relative">
           <input

@@ -3,6 +3,7 @@ import Select from "react-select";
 
 export default function SelectMultiple({
     name,
+    label,
     placeholder,
     options,
     value,
@@ -46,7 +47,7 @@ export default function SelectMultiple({
     return (
         <div className={`mt-8 content-center dark:text-dark_text_1 space-y-1 ${className}`} style={style}>
             <label htmlFor={name} className="text-base font-bold tracking-wide">
-                {placeholder}
+                {label}
             </label>
             <Select
                 name={name}

@@ -290,7 +290,8 @@ export default function PostForm() {
           <Input
             name="title"
             type="text"
-            placeholder="Nom du poste recherché"
+            label="Nom du poste recherché"
+            placeholder="Ex : Conseiller en vente, Assistant RH.."
             register={register}
             error={errors?.title?.message}
             className="required-field"
@@ -334,7 +335,8 @@ export default function PostForm() {
                 <Input
                   name="city"
                   type="text"
-                  placeholder="Ville"
+                  label="Ville"
+                  placeholder="Ex : Paris, Lille.."
                   register={register}
                   error={errors?.city?.message}
                   style={{ minWidth: "380px" }}
@@ -357,7 +359,8 @@ export default function PostForm() {
               <div className="flex justify-between space-x-2 !mt-0">
                 <SelectMultiple
                   name="contracts"
-                  placeholder="Contrats"
+                  label="Contrats"
+                  placeholder="Sélectionner un ou plusieurs contrats"
                   register={register}
                   error={errors?.contracts?.message}
                   options={contractOptions}
@@ -383,7 +386,8 @@ export default function PostForm() {
               <Input
                 name="date"
                 type="text"
-                placeholder="Date de début"
+                label="Date de début"
+                placeholder="jj/mm/aaaa"
                 register={register}
                 error={errors?.date?.message}
                 selected={startDate}
@@ -392,7 +396,8 @@ export default function PostForm() {
               <Textarea
                 name="description"
                 type="text"
-                placeholder="Résumé du cv, téléphone et email"
+                label="Résumé du cv"
+                placeholder="Ex : Plombier expérimenté, 06 12 34 56 78, jean@mail.com.."
                 register={register}
                 error={errors?.description?.message}
               />

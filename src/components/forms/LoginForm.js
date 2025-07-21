@@ -54,14 +54,16 @@ export default function LoginForm() {
           <Input
             name="email"
             type="text"
-            placeholder="Adresse e-mail"
+            label="Adresse e-mail"
+            placeholder="Ex : john@gmail.com.."
             register={register}
             error={errors?.email?.message}
           />
           <Input
             name="password"
             type="password"
-            placeholder="Mot de passe"
+            label="Mot de passe"
+            placeholder="*****"
             register={register}
             error={errors?.password?.message}
             toggleVisibility={togglePasswordVisibility}

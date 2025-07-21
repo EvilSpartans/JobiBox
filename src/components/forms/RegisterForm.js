@@ -55,28 +55,32 @@ export default function RegisterForm() {
           <Input
             name="lastname"
             type="text"
-            placeholder="Nom"
+            label="Nom"
+            placeholder="John"
             register={register}
             error={errors?.lastname?.message}
           />
           <Input
             name="firstname"
             type="text"
-            placeholder="Prénom"
+            label="Prénom"
+            placeholder="Doe"
             register={register}
             error={errors?.firstname?.message}
           />
           <Input
             name="email"
             type="text"
-            placeholder="Adresse e-mail"
+            label="Adresse e-mail"
+            placeholder="Ex : john@gmail.com.."
             register={register}
             error={errors?.email?.message}
           />
           <Input
             name="password"
             type="password"
-            placeholder="Mot de passe"
+            label="Mot de passe"
+            placeholder="*****"
             register={register}
             error={errors?.password?.message}
             toggleVisibility={togglePasswordVisibility}
@@ -85,7 +89,8 @@ export default function RegisterForm() {
           <Input
             name="confirmPassword"
             type="password"
-            placeholder="Confirmer mot de passe"
+            label="Confirmer mot de passe"
+            placeholder="*****"
             register={register}
             error={errors?.confirmPassword?.message}
             toggleVisibility={togglePasswordVisibility}

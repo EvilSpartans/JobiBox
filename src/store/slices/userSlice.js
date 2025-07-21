@@ -8,6 +8,7 @@ const initialState = {
   error: "",
   user: {
     id: "",
+    username: "",
     firstname: "",
     lastname: "",
     email: "",
@@ -53,6 +54,7 @@ export const userSlice = createSlice({
         (state.error = ""),
         (state.user = {
           id: "",
+          username: "",
           firstname: "",
           lastname: "",
           email: "",
@@ -103,6 +105,7 @@ export const userSlice = createSlice({
 
         state.user = {
           id: userData.id,
+          username: userData.username,
           firstname: userData.firstname,
           lastname: userData.lastname,
           email: userData.email,
@@ -126,6 +129,7 @@ export const userSlice = createSlice({
 
         state.user = {
           id: userData.id,
+          username: userData.username,
           firstname: userData.firstname,
           lastname: userData.lastname,
           email: userData.email,
