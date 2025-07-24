@@ -75,6 +75,18 @@ export default function ModalFilter({ onClose, onApply, currentFilters }) {
               className="w-full border border-gray-300 px-3 py-2 rounded-md mt-1"
             />
           </div>
+          
+          <div>
+            <label className="font-medium">Ville</label>
+            <input
+              type="text"
+              name="location"
+              placeholder="Ex : Lille, Lyon, Marseille..."
+              value={filters.location}
+              onChange={handleChange}
+              className="w-full border border-gray-300 px-3 py-2 rounded-md mt-1"
+            />
+          </div>
 
           <div>
             <label className="font-medium">Contrat</label>
@@ -94,17 +106,6 @@ export default function ModalFilter({ onClose, onApply, currentFilters }) {
             </select>
           </div>
 
-          <div>
-            <label className="font-medium">Ville</label>
-            <input
-              type="text"
-              name="location"
-              placeholder="Ex : Lille, Lyon, Marseille..."
-              value={filters.location}
-              onChange={handleChange}
-              className="w-full border border-gray-300 px-3 py-2 rounded-md mt-1"
-            />
-          </div>
         </div>
 
         <div className="flex justify-end mt-6 gap-4">
