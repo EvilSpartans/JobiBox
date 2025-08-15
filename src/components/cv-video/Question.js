@@ -1,32 +1,58 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getQuestions } from "../../store/slices/questionSlice";
+import { getGroupQuestions } from "../../store/slices/groupQuestionSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 import ModalQuestion from "../modals/ModalQuestion";
 import { useNavigate } from "react-router-dom";
+import Select from "../fields/Select";
 
 export default function Question() {
-  
   const user = useSelector((state) => state.user.user);
   const { token } = user;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentTab, setCurrentTab] = useState("Candidat");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [questionOrder, setQuestionOrder] = useState([]);
-  const [selectedQuestionsCandidat, setSelectedQuestionsCandidat] = useState([]);
-  const [selectedQuestionsRecruteur, setSelectedQuestionsRecruteur] = useState([]);
+
+  const [groups, setGroups] = useState([]);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [selectedQuestionsByGroup, setSelectedQuestionsByGroup] = useState({});
 
   useEffect(() => {
-    fetchQuestions();
+    const fetchGroups = async () => {
+      const res = await dispatch(getGroupQuestions({ token }));
+      const items = res.payload.items || [];
+      setGroups(items);
+      if (items.length > 0) {
+        setSelectedGroupId(items[0].id);
+      }
+    };
+    fetchGroups();
   }, [dispatch, token]);
 
-  const fetchQuestions = async () => {
+  useEffect(() => {
+    if (!selectedGroupId) return;
+
+    // Reset when change group
+    setQuestionOrder([]);
+      setSelectedQuestionsByGroup(prev => ({
+    ...prev,
+    [selectedGroupId]: []
+  }));
+
+    fetchQuestions(selectedGroupId);
+  }, [selectedGroupId]);
+
+  const fetchQuestions = async (groupId) => {
     try {
-      const response = await dispatch(getQuestions(token));
+      const response = await dispatch(
+        getQuestions({ token, groupQuestionId: groupId })
+      );
       const payload = response.payload.items;
+      console.log(response)
       setQuestions(payload);
     } catch (error) {
       console.error("Erreur lors de la récupération des questions :", error);
@@ -45,41 +71,43 @@ export default function Question() {
 
   // Handle question selection
   const handleQuestionSelection = (question) => {
-    const updateOrder = (selectedQuestions, setSelectedQuestions) => {
-        if (selectedQuestions.includes(question)) {
-            const newOrder = questionOrder.filter(q => q !== question);
-            setQuestionOrder(newOrder);
-            setSelectedQuestions(selectedQuestions.filter(q => q !== question));
-        } else {
-            setSelectedQuestions([...selectedQuestions, question]);
-            setQuestionOrder([...questionOrder, question]);
-        }
-    };
+    setSelectedQuestionsByGroup((prev) => {
+      const currentSelected = prev[selectedGroupId] || [];
+      let newSelected;
+      let newOrder = [...questionOrder];
 
-    if (currentTab === "Candidat") {
-        updateOrder(selectedQuestionsCandidat, setSelectedQuestionsCandidat);
-        setSelectedQuestionsRecruteur([]);
-    } else if (currentTab === "Recruteur") {
-        updateOrder(selectedQuestionsRecruteur, setSelectedQuestionsRecruteur);
-        setSelectedQuestionsCandidat([]);
-    }
+      if (currentSelected.includes(question)) {
+        newSelected = currentSelected.filter((q) => q !== question);
+        newOrder = newOrder.filter((q) => q !== question);
+      } else {
+        newSelected = [...currentSelected, question];
+        newOrder = [...newOrder, question];
+      }
+
+      setQuestionOrder(newOrder);
+
+      return {
+        ...prev,
+        [selectedGroupId]: newSelected,
+      };
+    });
   };
 
   // Determine the selected questions based on the current tab
-  const selectedQuestions =
-    currentTab === "Candidat"
-      ? selectedQuestionsCandidat
-      : selectedQuestionsRecruteur;
+  const selectedQuestions = selectedQuestionsByGroup[selectedGroupId] || [];
 
   // Save to localStorage
   const handleContinueClick = () => {
-    const allSelectedQuestions = [...selectedQuestionsCandidat, ...selectedQuestionsRecruteur];
+    const allSelectedQuestions = Object.values(selectedQuestionsByGroup).flat();
     const existingSelectedQuestions = localStorage.getItem("selectedQuestions");
     if (existingSelectedQuestions) {
-        localStorage.removeItem("selectedQuestions");
-        localStorage.removeItem("questionOrder");
+      localStorage.removeItem("selectedQuestions");
+      localStorage.removeItem("questionOrder");
     }
-    localStorage.setItem("selectedQuestions", JSON.stringify(allSelectedQuestions));
+    localStorage.setItem(
+      "selectedQuestions",
+      JSON.stringify(allSelectedQuestions)
+    );
     localStorage.setItem("questionOrder", JSON.stringify(questionOrder));
     navigate("/themes");
   };
@@ -91,34 +119,28 @@ export default function Question() {
         <h2 className="text-4xl font-bold">Liste des questions</h2>
         <p className="mt-6 text-xl">
           Tu vas pouvoir <span className="text-blue-400">sélectionner</span> les
-          questions auxquelles tu vas répondre (entre 2 et 4 maximum) dans un format de type question /
-          réponse en vidéo. Si tu le souhaites, tu pourras également{" "}
-          <span className="text-blue-400">créer</span> des questions afin de
-          personnaliser ton CV vidéo du mieux possible.
+          questions auxquelles tu vas répondre (entre 2 et 4 maximum) dans un
+          format de type question / réponse en vidéo. Si tu le souhaites, tu
+          pourras également <span className="text-blue-400">créer</span> des
+          questions afin de personnaliser ton CV vidéo du mieux possible.
         </p>
       </div>
       <div className="dark:text-dark_text_1">
-        <div className="mb-6 flex justify-center text-xl">
-          <button
-            onClick={() => setCurrentTab("Candidat")}
-            className={`px-4 py-2 border-b-2 ${
-              currentTab === "Candidat"
-                ? "border-primary bg-primary text-white"
-                : "border-transparent bg-transparent text-gray-500"
-            }`}
-          >
-            Candidat
-          </button>
-          <button
-            onClick={() => setCurrentTab("Recruteur")}
-            className={`px-4 py-2 border-b-2 ${
-              currentTab === "Recruteur"
-                ? "border-primary bg-primary text-white"
-                : "border-transparent bg-transparent text-gray-500"
-            }`}
-          >
-            Recruteur
-          </button>
+        <div className="flex justify-center text-xl">
+          <Select
+            name="groupSelect"
+            // placeholder="Sélectionner un groupe"
+            register={() => ({
+              onChange: (e) => setSelectedGroupId(Number(e.target.value)),
+            })}
+            options={groups.map((group) => ({
+              value: group.id,
+              label: group.title,
+            }))}
+            value={selectedGroupId || ""} 
+            className="mb-4"
+            error={null}
+          />
         </div>
 
         <div className="mb-2">
@@ -142,32 +164,31 @@ export default function Question() {
           <>
             {questions && questions.length > 0 ? (
               <div className="max-h-56 tall:max-h-96 overflow-y-auto">
-                {questions
-                  .filter((question) => question.type === currentTab)
-                  .map((question, index) => (
+                {questions.map((question, index) => (
                   <div key={index} className="mb-5 flex items-center">
-                      <label className="inline-flex items-center">
-                          <input
-                              type="checkbox"
-                              className="form-checkbox text-primary border-primary"
-                              onChange={() => handleQuestionSelection(question)}
-                              checked={selectedQuestions.includes(question)}
-                          />
-                          <span className="ml-2 text-xl"> &nbsp; {question.title}</span>
-                      </label>
-                      {questionOrder.includes(question) && (
-                          <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                              {questionOrder.indexOf(question) + 1}
-                          </span>
-                      )}
+                    <label className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox text-primary border-primary"
+                        onChange={() => handleQuestionSelection(question)}
+                        checked={selectedQuestions.includes(question)}
+                      />
+                      <span className="ml-2 text-xl">
+                        &nbsp;{question.title}
+                      </span>
+                    </label>
+                    {questionOrder.includes(question) && (
+                      <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+                        {questionOrder.indexOf(question) + 1}
+                      </span>
+                    )}
                   </div>
-                  ))}
-                {questions.filter((question) => question.type === currentTab).length === 0 && (
-                  <p className="text-center text-xl mt-4">Aucune question pour le moment</p>
-                )}
+                ))}
               </div>
             ) : (
-              <p className="text-center text-xl mt-4">Aucune question pour le moment</p>
+              <p className="text-center text-xl mt-4">
+                Aucune question pour le moment
+              </p>
             )}
           </>
         )}
@@ -176,9 +197,8 @@ export default function Question() {
           isOpen={isModalOpen}
           onClose={closeModal}
           fetchQuestions={fetchQuestions}
-          currentTab={currentTab}
-          setSelectedQuestionsCandidat={setSelectedQuestionsCandidat}
-          setSelectedQuestionsRecruteur={setSelectedQuestionsRecruteur}
+          selectedGroupId={selectedGroupId}
+          setSelectedQuestionsByGroup={setSelectedQuestionsByGroup}
         />
       </div>
       <button
@@ -190,22 +210,6 @@ export default function Question() {
       >
         Continuer
       </button>
-
-      {/* <Tuto
-        steps={[
-          {
-            element: ".form-checkbox",
-            intro:
-              "Tu vas pouvoir sélectionner les questions auxquelles tu vas répondre dans un format de type question / réponse en vidéo.",
-          },
-          {
-            element: ".addButton",
-            intro:
-              "Si tu le souhaites, tu pourras également créer des questions afin de personnaliser ton CV vidéo du mieux possible.",
-          },
-        ]}
-        tutorialKey="questionTuto"
-      /> */}
     </div>
   );
 }

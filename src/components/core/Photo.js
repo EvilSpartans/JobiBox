@@ -120,7 +120,7 @@ export default function Photo({ onPhotoTaken }) {
     };
 
     return (
-        <div className='z-50' style={{ marginTop: '3%' }}>
+        <div className='z-50'>
             <button
                 type="button"
                 className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-4 rounded-full tracking-wide
@@ -130,8 +130,13 @@ export default function Photo({ onPhotoTaken }) {
             >
                 <FontAwesomeIcon icon={faCamera} size="lg" /> 
                 {photoConfirmed && <FontAwesomeIcon icon={faCheckCircle} size="lg" className="ml-2 text-green-500" />}
-                &nbsp; <span className='text-xl'>Miniature vidéo</span>
+                &nbsp; <span className='text-xl'>Choisir l'image de couverture</span>
             </button>
+
+            <p className="text-center mt-2 text-lg text-white italic">
+    Cette image sera affichée comme <strong className="text-blue-400"> miniature </strong> 
+    de votre vidéo lorsqu'elle sera publiée.
+</p>
 
             {showModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -140,7 +145,7 @@ export default function Photo({ onPhotoTaken }) {
                         <button className="absolute top-2 right-2 text-gray-800" onClick={closeModal} tabIndex="-1">
                             <FontAwesomeIcon icon={faTimes} size="lg" /> 
                         </button>
-                        <p className="text-gray-800 text-xl">
+                        <p className="text-gray-800 text-xl mb-2">
                             {photo ? "Veux-tu utiliser cette photo ? (Elle apparaîtra comme miniature pour ta vidéo)" : "Fais ton plus grand sourire"}
                         </p>
                         {photo ? (
