@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,7 @@ import { PostSchema } from "../../utils/Validation";
 import Photo from "../core/Photo";
 import { getEducationLevelsByCountry } from "../../utils/EducationLevel";
 import { getContractTypesByCountry } from "../../utils/ContractTypes";
+import Modal from "../modals/Modal";
 
 export default function PostForm() {
   const dispatch = useDispatch();
@@ -42,6 +43,10 @@ export default function PostForm() {
   const isTrainExam = localStorage.getItem("isTrainExam") || null;
   const showPortalCheckbox = businessId !== null && businessId !== 0;
   const [formError, setFormError] = useState("");
+
+  // Suggestion de photo
+  const [showPhotoReminder, setShowPhotoReminder] = useState(false);
+  const photoRef = useRef(null);
 
   const simulationInProgress =
     localStorage.getItem("beginnerInProgress") ||
@@ -179,7 +184,7 @@ export default function PostForm() {
   };
 
   // Submit Form
-  const onSubmit = async (data) => {
+  const actuallySubmit = async (data) => {
     if (businessId && portalsOptions.length > 1 && portals.length === 0) {
       setFormError("Tu dois sélectionner au moins un portail.");
       return;
@@ -251,6 +256,14 @@ export default function PostForm() {
     }
   };
 
+  const onSubmit = async (data) => {
+    if (!photoFile) {
+      setShowPhotoReminder(true);
+      return;
+    }
+    await actuallySubmit(data);
+  };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
       {/* Container */}
@@ -283,7 +296,7 @@ export default function PostForm() {
 
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <Photo onPhotoTaken={setPhotoFile} />
+          <Photo ref={photoRef} onPhotoTaken={setPhotoFile} />
 
           <hr />
 
@@ -424,6 +437,26 @@ export default function PostForm() {
           </button>
         </form>
       </div>
+
+      {/* Modal photo suggestion */}
+      {showPhotoReminder && (
+        <Modal
+          isOpen={showPhotoReminder}
+          title="Ajouter une photo sur votre CV ?"
+          description="Cette photo servira pour enrichir votre CV, elle ne sera pas visible par le grand public. Les vidéos sont uniquement référencées dans des portails accessibles à votre organisme et aux recruteurs autorisés."
+          onConfirm={() => {
+            setShowPhotoReminder(false);
+            photoRef.current?.open(); // => Oui = Prendre une photo
+          }}
+          onClose={async () => {
+            setShowPhotoReminder(false);
+            // => Non = Continuer sans photo (submit quand même)
+            await actuallySubmit(
+              await new Promise((resolve) => handleSubmit((d) => resolve(d))())
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

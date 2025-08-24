@@ -27,6 +27,7 @@ export default function Offers() {
     company: "",
     contract: "",
     location: "",
+    radiusKm: 0,
   });
 
   useEffect(() => {
@@ -63,10 +64,9 @@ export default function Offers() {
     try {
       setLoadingMore(true);
 
-      const params = {
-        page: currentPage,
-        ...customFilters,
-      };
+      const { radiusKm, ...rest } = customFilters || {};
+      const params = { page: currentPage, ...rest };
+      if (customFilters?.location) params.radiusKm = Number(radiusKm) || 0;
 
       const response = await axios.get(`${BASE_URL}/offers`, { params });
 
@@ -119,58 +119,65 @@ export default function Offers() {
   return (
     <>
       {/* Bouton Filtrer désactivé */}
-<button
-  onClick={() => setShowFilterModal(true)}
-  className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white text-gray-700 border border-gray-300 px-5 h-14 rounded-full shadow-lg flex items-center gap-2 hover:shadow-xl transition-all"
-  title="Filtrer"
->
-  <span className="text-2xl">🔍</span>
-  <span className="text-sm font-medium">Filtrer les offres</span>
-</button>
-
+      <button
+        onClick={() => setShowFilterModal(true)}
+        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white text-gray-700 border border-gray-300 px-5 h-14 rounded-full shadow-lg flex items-center gap-2 hover:shadow-xl transition-all"
+        title="Filtrer"
+      >
+        <span className="text-2xl">🔍</span>
+        <span className="text-sm font-medium">Filtrer les offres</span>
+      </button>
 
       {/* Liste des offres */}
       <div
         ref={scrollContainerRef}
         className="flex flex-wrap mt-4 max-h-[350px] tall:max-h-[34rem] gap-4 overflow-y-auto pr-2"
       >
-        {offers.map((offer) => (
-          <div
-            key={offer.id}
-            className="w-full sm:w-[48%] md:w-[30%] lg:w-[23%] bg-white dark:bg-dark_bg_1 rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md flex flex-col text-sm"
-          >
-            <div className="relative">
-              {offer.logo && (
-                <img
-                  src={offer.logo}
-                  alt={offer.company}
-                  className="w-full h-24 object-contain bg-white p-2 border-b"
-                />
-              )}
-              <span className="absolute top-2 right-2 text-xs font-semibold bg-black/60 text-white px-2 py-0.5 rounded-full backdrop-blur-sm shadow">
-                {offer.contract}
-              </span>
-            </div>
-
-            <div className="flex-1 flex flex-col justify-between p-3">
-              <div className="text-center space-y-1">
-                <h2 className="text-base font-semibold text-gray-900 dark:text-white truncate">
-                  {offer.title}
-                </h2>
-                <p className="text-xs text-gray-600 dark:text-neutral-300">
-                  {offer.company} • {offer.location}, {offer.locationCountry}
-                </p>
+        {offers.length === 0 ? (
+          <div className="w-full text-base py-10 text-center text-gray-500 dark:text-neutral-300">
+            Aucune offre ne correspond à votre recherche.
+          </div>
+        ) : (
+          offers.map((offer) => (
+            <div
+              key={offer.id}
+              className="w-full sm:w-[48%] md:w-[30%] lg:w-[23%] bg-white dark:bg-dark_bg_1 rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md flex flex-col text-sm"
+            >
+              <div className="relative">
+                {offer.logo && (
+                  <img
+                    src={offer.logo}
+                    alt={offer.company}
+                    className="w-full h-24 object-contain bg-white p-2 border-b"
+                  />
+                )}
+                <span className="absolute top-2 right-2 text-xs font-semibold bg-black/60 text-white px-2 py-0.5 rounded-full backdrop-blur-sm shadow">
+                  {offer.contract}
+                </span>
               </div>
 
-              <button
-                className="mt-2 bg-blue_3 hover:bg-pink-500 transition-colors text-white font-medium py-1.5 rounded-lg text-sm"
-                onClick={() => setSelectedOffer(offer)}
-              >
-                Voir l'offre
-              </button>
+              <div className="flex-1 flex flex-col justify-between p-3">
+                <div className="text-center space-y-1">
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                    {offer.title}
+                  </h2>
+                  <p className="text-xs text-gray-600 dark:text-neutral-300">
+                    {offer.company} • {offer.location.name},{" "}
+                    {offer.locationCountry}
+                  </p>
+                </div>
+
+                <button
+                  className="mt-2 bg-blue_3 hover:bg-pink-500 transition-colors text-white font-medium py-1.5 rounded-lg text-sm"
+                  onClick={() => setSelectedOffer(offer)}
+                >
+                  Voir l'offre
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
+
         <ModalOffer
           offer={selectedOffer}
           onClose={() => setSelectedOffer(null)}
@@ -189,6 +196,7 @@ export default function Offers() {
               fetchOffers(1, newFilters);
             }}
             currentFilters={filters}
+            baseUrl={BASE_URL}
           />
         )}
       </div>

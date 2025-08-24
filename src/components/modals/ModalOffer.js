@@ -83,7 +83,7 @@ export default function ModalOffer({ offer, onClose, videos, user }) {
         {/* TITRE */}
         <h2 className="text-2xl font-bold text-center mb-2">{offer.title}</h2>
         <p className="text-center text-sm text-gray-600 mb-4">
-          {offer.company} • {offer.location}, {offer.locationCountry}
+          {offer.company} • {offer.location.name}
         </p>
 
         {/* INFOS */}
