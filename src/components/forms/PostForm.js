@@ -229,7 +229,7 @@ export default function PostForm() {
 
     try {
       const res = await dispatch(createPost(postData));
-      console.log(res);
+      // console.log(res);
       if (res?.payload?.title) {
         localStorage.setItem("urlQrcode", res.payload.video);
         if (simulationInProgress || expertInProgress) {

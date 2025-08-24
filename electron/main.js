@@ -61,7 +61,7 @@ if (isDev) {
   const jsPath = path.join(__dirname, "..", "build", "js", "app.js");
 
   fs.watch(jsPath, () => {
-    console.log("🔁 Changement détecté dans app.js, rechargement de la fenêtre...");
+    // console.log("🔁 Changement détecté dans app.js, rechargement de la fenêtre...");
     if (mainApp) {
       mainApp.reload();
     }

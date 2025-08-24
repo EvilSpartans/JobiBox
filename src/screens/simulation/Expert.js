@@ -44,7 +44,7 @@ export default function Expert() {
 
     // Sauvegarde dans le localStorage
     localStorage.setItem("selectedActivity", selectedValue);
-    console.log("Nouvelle catégorie sélectionnée :", selectedValue);
+    // console.log("Nouvelle catégorie sélectionnée :", selectedValue);
   };
 
   const shuffleArray = (array) => {

@@ -18,7 +18,7 @@ export default function Train() {
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
-    console.log(user);
+    // console.log(user);
 
     if (!user || !user.questionLists) {
       console.warn("L'objet 'user' ou 'user.questionLists' est indéfini");
@@ -63,7 +63,7 @@ export default function Train() {
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-      <GoBack />
+      <GoBack to="/welcome" />
       <Logout />
       <div className="flex w-full mx-auto h-full">
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">

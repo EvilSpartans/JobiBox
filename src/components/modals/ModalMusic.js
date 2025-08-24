@@ -24,7 +24,7 @@ export default function ModalMusic({ isOpen, onClose, fetchMusics }) {
                 title: newMusicTitle,
                 file: newMusicFile,
             }));
-            console.log(response);
+            // console.log(response);
             fetchMusics();
         } catch (error) {
             console.error("Erreur lors de l'ajout de la musique :", error);

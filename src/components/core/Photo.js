@@ -110,7 +110,7 @@ const Photo = forwardRef(function Photo({ onPhotoTaken }, ref) {
   };
 
   const confirmSubmit = () => {
-    console.log("Photo confirmed:", photo);
+    // console.log("Photo confirmed:", photo);
     setPhotoConfirmed(true);
     setShowModal(false);
   };

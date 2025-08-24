@@ -51,7 +51,7 @@ export default function Intermediate() {
 
     // Sauvegarde dans le localStorage
     localStorage.setItem("selectedActivity", selectedValue);
-    console.log("Nouvelle catégorie sélectionnée :", selectedValue);
+    // console.log("Nouvelle catégorie sélectionnée :", selectedValue);
   };
 
   const fetchQuestionTypes = async () => {
@@ -64,14 +64,14 @@ export default function Intermediate() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Données avant filtrage :", data);
+        // console.log("Données avant filtrage :", data);
 
         // Filtrer pour retirer "Débutant"
         const filteredData = data.items.filter(
           (category) => category.title.trim().toLowerCase() !== "débutant"
         );
 
-        console.log("Données après filtrage :", filteredData);
+        // console.log("Données après filtrage :", filteredData);
         setCategories(filteredData);
       } else {
         console.error(

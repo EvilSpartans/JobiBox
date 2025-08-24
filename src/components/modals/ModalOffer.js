@@ -39,7 +39,7 @@ export default function ModalOffer({ offer, onClose, videos, user }) {
         }
       );
 
-      console.log("✅ Candidature envoyée :", response.data);
+      // console.log("✅ Candidature envoyée :", response.data);
       dispatch(addCandidacy(offer.id));
       setShowSelect(false);
       setSelectedVideo("");

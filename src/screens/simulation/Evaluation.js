@@ -65,7 +65,7 @@ export default function Evaluation() {
 
     // Générer un titre court et unique
     const generateUniqueTitle = () => {
-      const timestamp = Date.now(); 
+      const timestamp = Date.now();
       const baseTitle = selectedActivity || "Uncategorized";
       return `${baseTitle}-${timestamp}`;
     };
@@ -75,7 +75,7 @@ export default function Evaluation() {
     const postData = {
       token: token,
       title: uniqueTitle,
-      category: selectedActivity || 'Autre',
+      category: selectedActivity || "Autre",
       subCategory: "Simulation",
       contracts: ["Simulation"],
       createdFrom: "jobibox",
@@ -95,7 +95,7 @@ export default function Evaluation() {
 
     try {
       const res = await dispatch(createPost(postData));
-      console.log(res);
+      // console.log(res);
       if (res?.payload?.title) {
       }
     } catch (error) {
@@ -112,12 +112,17 @@ export default function Evaluation() {
       JSON.parse(localStorage.getItem("intermediateInProgress")) ||
       JSON.parse(localStorage.getItem("expertInProgress"));
 
-    if (Array.isArray(selectedQuestions) && selectedQuestions.length > 0) {
+    if (
+      Array.isArray(selectedQuestions) &&
+      selectedQuestions.length > 0 &&
+      videoPath
+    ) {
       setQuestions(selectedQuestions);
     } else {
       console.error("Aucune question trouvée dans le localStorage.");
+      navigate("/train", { replace: true });
     }
-  }, []);
+  }, [navigate, videoPath]);
 
   useEffect(() => {
     if (allResponsesGiven) {

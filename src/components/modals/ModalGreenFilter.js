@@ -24,7 +24,7 @@ export default function ModalGreenFilter({ isOpen, onClose, fetchGreenFilters })
                 title: newGreenFilterTitle,
                 file: newGreenFilterImage,
             }));
-            console.log(response);
+            // console.log(response);
             fetchGreenFilters();
         } catch (error) {
             console.error("Erreur lors de la création de l'écran vert :", error);

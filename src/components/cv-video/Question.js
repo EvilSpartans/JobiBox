@@ -52,7 +52,7 @@ export default function Question() {
         getQuestions({ token, groupQuestionId: groupId })
       );
       const payload = response.payload.items;
-      console.log(response)
+      // console.log(response)
       setQuestions(payload);
     } catch (error) {
       console.error("Erreur lors de la récupération des questions :", error);

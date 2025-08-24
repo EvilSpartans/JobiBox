@@ -24,7 +24,7 @@ export default function ModalTheme({ isOpen, onClose, fetchThemes }) {
                 title: newThemeTitle,
                 file: newThemeImage,
             }));
-            console.log(response);
+            // console.log(response);
             fetchThemes();
         } catch (error) {
             console.error("Erreur lors de la création du thème :", error);

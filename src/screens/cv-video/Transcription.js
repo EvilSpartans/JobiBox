@@ -63,7 +63,7 @@ export default function Transcription() {
           transcription: JSON.stringify(formattedTranscription),
         })
       );
-      console.log(response);
+      // console.log(response);
     } catch (error) {
       console.error("Erreur lors de l'application des sous-titres:", error);
     } finally {
