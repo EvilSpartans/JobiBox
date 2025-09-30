@@ -10,9 +10,9 @@ function installRustDesk() {
 
  const rustDeskPath = path.join(
   __dirname,
-  "extras",
+  "extra-packages",
   "rustdesk",
-  "rustdesk.exe"
+  "rustdesk-1.4.2-x86_64.exe"
  );
 
  execFile(
