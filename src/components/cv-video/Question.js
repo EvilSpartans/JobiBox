@@ -52,6 +52,7 @@ export default function Question() {
    const response = await dispatch(
     getQuestions({ token, groupQuestionId: groupId })
    );
+   if (groupId !== selectedGroupId) return;
    const payload = response.payload.items || [];
    setQuestions(payload);
   } catch (error) {
