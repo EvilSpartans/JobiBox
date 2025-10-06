@@ -36,12 +36,18 @@ export const getJobiboxPortals = createAsyncThunk(
 export const updateJobibox = createAsyncThunk(
     "jobibox/update",
     async (values, { rejectWithValue }) => {
-        const { id, version } = values;
+        const { id, version, rustdeskId, rustdeskPassword } = values;
+
+        const payload = { version };
+
+    if (rustdeskId) payload.rustdeskId = rustdeskId;
+    if (rustdeskPassword) payload.rustdeskPassword = rustdeskPassword;
+
         try {
             const { data } = await axios.put(
                 `${BASE_URL}/jobibox/${id}`,
                 {
-                    version,
+                    payload
                 },
             );
             return data;

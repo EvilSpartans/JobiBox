@@ -2,13 +2,27 @@ const { execFile } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
+(async () => {
+  const Store = (await import('electron-store')).default;
+  const store = new Store();
+
+  store.set("rustdeskConfig", { rustdeskId: "abc", rustdeskPassword: "123" });
+})();
+
+
+const generatePassword = require(path.join(
+ __dirname,
+ "..",
+ "src",
+ "utils",
+ "GeneratePasswordRustDesk"
+));
+
 function installRustDesk() {
  if (process.platform !== "win32") {
   console.log("RustDesk installation skipped: not Windows");
   return;
  }
-
- const businessId = 1; // businessId jobissim
 
  const rustDeskPath = path.join(
   __dirname,
@@ -20,6 +34,8 @@ function installRustDesk() {
  const installDir = "C:\\Program Files\\RustDesk";
  const configDir = path.join(installDir, "config");
 
+ const passwordAccess = generatePassword();
+
  execFile(
   rustDeskPath,
   [
@@ -27,7 +43,7 @@ function installRustDesk() {
    installDir,
    "--start-with-win",
    "--set-password",
-   "Jb9$4kP!qR7vX2mZ", // password
+   passwordAccess,
    "--silent",
   ],
   (err) => {
@@ -38,19 +54,20 @@ function installRustDesk() {
 
    console.log("RustDesk installed successfully!");
 
-   const rustDeskIdPath = path.join(configDir, "id_ed25519.pub");
-   let rustDeskId = null;
-   if (fs.existsSync(rustDeskIdPath)) {
-    rustDeskId = fs.readFileSync(rustDeskIdPath, "utf8").trim();
+   const rustdeskIdPath = path.join(configDir, "id_ed25519.pub");
+   let rustdeskId = null;
+   if (fs.existsSync(rustdeskIdPath)) {
+    rustdeskId = fs.readFileSync(rustdeskIdPath, "utf8").trim();
    }
 
    const data = {
-    businessId,
-    rustDeskId,
-    password: "Jb9$4kP!qR7vX2mZ",
+    rustdeskId,
+    rustdeskPassword: passwordAccess,
    };
 
-   console.log("Jobibox config :", data); // Ideally, save it in the backend
+   if (data) {
+    store.set("rustdeskConfig", data);
+   }
   }
  );
 }
