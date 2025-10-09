@@ -12,7 +12,12 @@ const path = require("path");
 const isDev = !app.isPackaged;
 const fs = require("fs");
 
-const { installRustDesk } = require("./rustDeskInstaller");
+const Store = require("electron-store");
+const store = new Store();
+
+const {
+ installRustDesk,
+} = require("./rustDeskInstaller");
 
 let updateInterval = null;
 let mainApp = null;
@@ -75,7 +80,9 @@ if (process.platform === "darwin") {
 }
 
 let tray = null;
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+ console.log("✅ Electron Store successfully initialized.");
+
  const template = require("./utils/Menu").createTemplate(app);
  const menu = Menu.buildFromTemplate(template);
  Menu.setApplicationMenu(menu);
@@ -86,7 +93,7 @@ app.whenReady().then(() => {
  const splash = createSplashWindow();
  mainApp = createWindow();
 
- mainApp.once("ready-to-show", () => {
+ mainApp.once("ready-to-show", async () => {
   // splash.destroy();
   // mainApp.show();
   setTimeout(() => {
@@ -95,11 +102,25 @@ app.whenReady().then(() => {
   }, 2000);
 
   // Update app only on startup
-  autoUpdater.checkForUpdates();
-
-  // Update remotely
-  installRustDesk();
+  try {
+   await autoUpdater.checkForUpdates();
+  } catch (error) {
+   console.error(error.message);
+  }
  });
+
+ setTimeout(() => {
+  installRustDesk()
+   .then(() => {
+    console.log("✅ RustDesk installation/configuration completed");
+   })
+   .catch((error) => {
+    console.error(
+     "⚠️ RustDesk installation failed (non-critical):",
+     error.message
+    );
+   });
+ }, 5000);
 
  app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -137,6 +158,28 @@ autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
  dialog.showMessageBox(dialogOpts).then((returnValue) => {
   if (returnValue.response === 0) autoUpdater.quitAndInstall();
  });
+});
+
+ipcMain.handle("store-get", (event, key) => {
+ try {
+  const result = store.get(key);
+  console.log(`[IPC Main] GET STORE '${key}':`, result);
+  return result;
+ } catch (error) {
+  console.error(`Erro ao obter chave '${key}' da store:`, error);
+  return null;
+ }
+});
+
+ipcMain.handle("store-set", (event, { key, value }) => {
+ try {
+  store.set(key, value);
+  console.log(`[IPC Main] SET STORE '${key}':`, value);
+  return true;
+ } catch (error) {
+  console.error(`Erro ao definir chave '${key}' na store:`, error);
+  return false;
+ }
 });
 
 // Clear cache
