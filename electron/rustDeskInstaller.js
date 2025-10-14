@@ -216,81 +216,70 @@ async function installRustDesk() {
   rustDeskId = await waitForRustDeskId(rustDeskPath);
   if (!rustDeskId) return;
  } else if (platform === "win32") {
-  const possiblePaths = [
-   path.join(
-    process.env["ProgramFiles"] || "C:\\Program Files",
-    "RustDesk",
-    "rustdesk.exe"
-   ),
-   path.join(
-    process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)",
-    "RustDesk",
-    "rustdesk.exe"
-   ),
-   path.join(
-    process.env.LOCALAPPDATA || "",
-    "Programs",
-    "RustDesk",
-    "rustdesk.exe"
-   ),
-  ];
+  const rustDeskPath = `"C:\\Program Files\\RustDesk\\rustdesk.exe"`;
+  const appData =
+   process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming");
+  const rustDeskDir = path.join(appData, "RustDesk");
+  const rustDeskConfPath = path.join(rustDeskDir, "RustDesk.toml");
 
-  let rustDeskPath = possiblePaths.find((p) => fs.existsSync(p));
-  const rustDeskConfPath = path.join(
-   process.env.APPDATA || "",
-   "RustDesk",
-   "RustDesk.toml"
-  );
-  const installerPath = getResourcePath(
-   "rustdesk",
-   "rustdesk-1.4.2-x86_64.msi"
-  );
+  if (!fs.existsSync("C:\\Program Files\\RustDesk\\rustdesk.exe")) {
+   console.error("❌ RustDesk not found in C:\\Program Files\\RustDesk\\");
+   return;
+  }
 
-  if (!rustDeskPath) {
-   try {
-    execSync(`start "" /wait msiexec /i "${installerPath}" /qn`, {
-     shell: "cmd.exe",
-     stdio: "inherit",
-    });
+  startRustDesk(rustDeskPath, true);
 
-    console.log("✅ RustDesk instalado com sucesso via instalador do Windows.");
-   } catch (err) {
-    console.error(
-     "❌ Falha ao instalar RustDesk automaticamente:",
-     err.message
-    );
-    return;
-   }
+  await new Promise((resolve) => setTimeout(resolve, 15000));
 
-   rustDeskPath = possiblePaths.find((p) => fs.existsSync(p));
-   if (!rustDeskPath) {
-    console.error("❌ RustDesk.exe não encontrado após instalação.");
-    return;
-   }
+  try {
+   execSync(`msiexec /i "${installerPath}" /qn /norestart`, {
+    stdio: "inherit",
+    shell: true,
+   });
+  } catch {}
+
+  if (!fs.existsSync(rustDeskConfPath)) {
+   console.error(
+    "❌ RustDesk.toml was not created. Run RustDesk manually once and then close it."
+   );
+   return;
   }
 
   try {
-   execSync("taskkill /F /IM rustdesk-1.4.2-x86_64.msi /T", {
-    timeout: 5000,
-    stdio: "ignore",
-   });
-   await new Promise((resolve) => setTimeout(resolve, 2000));
-  } catch {}
+   console.log("Unlocking parameters and setting password...");
+   let toml = fs.readFileSync(rustDeskConfPath, "utf8");
 
-  try {
-   execSync(`"${rustDeskPath}" --password "${fixedPassword}"`, {
-    timeout: 15000,
-    stdio: "pipe",
-   });
-   console.log("🔐 Permanent password set via CLI on stopped binary (Windows)");
+   if (!toml.includes("[options]")) {
+    toml += "\n[options]\n";
+   }
+
+   toml = toml.replace(/password\s*=\s*".*"/g, "");
+   toml = toml.replace(/allow-remote-config-modification\s*=\s*".*"/g, "");
+
+   toml += `password = "${fixedPassword}"\nallow-remote-config-modification = "Y"\n`;
+
+   fs.writeFileSync(rustDeskConfPath, toml, "utf8");
+   console.log("✅ Password and unlock applied successfully.");
   } catch (err) {
-   console.error("❌ Failed to set password (Windows):", err.message);
+   console.error("❌ Failed to edit RustDesk.toml:", err.message);
+   return;
   }
 
   startRustDesk(rustDeskPath);
 
-  rustDeskId = await waitForRustDeskId(rustDeskPath);
+  const rustDeskId = await waitForRustDeskId(rustDeskPath);
   if (!rustDeskId) return;
+
+  store.set("rustdeskConfig", {
+   rustdeskId: rustDeskId,
+   rustdeskPassword: fixedPassword,
+   timestamp: new Date().toISOString(),
+   passwordSetByAutomation: true,
+  });
+  console.log("✅ RustDesk credentials saved:", {
+   rustdeskId: rustDeskId,
+   rustdeskPassword: fixedPassword,
+  });
  } else {
   return console.error("❌ Unsupported platform:", platform);
  }
