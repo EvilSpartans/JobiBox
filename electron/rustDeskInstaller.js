@@ -1,19 +1,31 @@
 const { execSync, spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 const { app } = require("electron");
 
 let store = null;
 async function getStore() {
  if (!store) {
-  const Store = (await import("electron-store")).default;
-  store = new Store();
+  try {
+   const Store = (await import("electron-store")).default;
+   store = new Store();
+  } catch (e) {
+   console.error(
+    "❌ Failed to load electron-store. Config saving disabled.",
+    e
+   );
+   store = {
+    get: () => ({}),
+    set: () => {},
+   };
+  }
  }
  return store;
 }
 
 function getResourcePath(...relativePath) {
- if (process.mainModule.filename.includes("app.asar")) {
+ if (process.mainModule && process.mainModule.filename.includes("app.asar")) {
   return path.join(process.resourcesPath, "extra-packages", ...relativePath);
  }
  return path.join(__dirname, "..", "src", "extra-packages", ...relativePath);
@@ -22,17 +34,16 @@ function getResourcePath(...relativePath) {
 function startRustDesk(rustDeskPath, env = {}) {
  try {
   const platform = process.platform;
-  if (platform === "linux") {
+
+  if (platform === "linux" && fs.existsSync("/usr/bin/rustdesk")) {
    try {
-    const process = spawn("/usr/bin/rustdesk", {
-     detached: true,
+    execSync("systemctl start rustdesk.service || true", {
+     timeout: 5000,
      stdio: "ignore",
     });
-    process.unref();
-    console.log("🚀 RustDesk started via systemd/fallback");
-    return;
-   } catch {
-    console.log("⚠️ Failed systemd start, using spawn directly...");
+    console.log("🚀 RustDesk service started via systemctl.");
+   } catch (e) {
+    console.log("⚠️ systemctl start failed, falling back to user spawn...");
    }
   }
 
@@ -42,7 +53,7 @@ function startRustDesk(rustDeskPath, env = {}) {
    env: { ...process.env, ...env },
   });
   child.unref();
-  console.log("🚀 RustDesk started in background:", rustDeskPath);
+  console.log("🚀 RustDesk user application spawned:", rustDeskPath);
  } catch (err) {
   console.error("❌ Error starting RustDesk:", err.message);
  }
@@ -89,16 +100,24 @@ async function tryManualDebInstall(rustDeskDebPath) {
   });
   console.log("✅ RustDesk installed via sudo");
   return true;
- } catch {
-  execSync(
-   `pkexec env DEBIAN_FRONTEND=noninteractive dpkg -i "${rustDeskDebPath}"`,
-   {
-    timeout: 90000,
-    stdio: "inherit",
-   }
+ } catch (e) {
+  console.warn(
+   "⚠️ Sudo installation failed or required password. Trying pkexec fallback..."
   );
-  console.log("✅ RustDesk installed via pkexec");
-  return true;
+  try {
+   execSync(
+    `pkexec env DEBIAN_FRONTEND=noninteractive dpkg -i "${rustDeskDebPath}"`,
+    {
+     timeout: 90000,
+     stdio: "inherit",
+    }
+   );
+   console.log("✅ RustDesk installed via pkexec (user interaction required).");
+   return true;
+  } catch (e2) {
+   console.error("❌ pkexec installation also failed:", e2.message);
+   return false;
+  }
  }
 }
 
@@ -106,15 +125,17 @@ async function installRustDesk() {
  const platform = process.platform;
  const store = await getStore();
 
- const fixedPassword = "Jobibox@Remote";
+ const fixedPassword = "Jobibox@Remote12";
  let rustDeskPath,
   rustDeskConfPath,
   rustDeskId = null;
 
  if (platform === "linux") {
   rustDeskPath = "/usr/bin/rustdesk";
-  const configDir = path.join(process.env.HOME, ".config", "rustdesk");
-  rustDeskConfPath = path.join(configDir, "RustDesk.toml");
+  const configDir = path.join(os.homedir(), ".config", "rustdesk");
+
+  const RUSTDESK_TOML_NAME = "RustDesk.toml";
+  rustDeskConfPath = path.join(configDir, RUSTDESK_TOML_NAME);
 
   if (!fs.existsSync(rustDeskPath)) {
    console.log("⚠️ RustDesk binary not found, attempting installation...");
@@ -129,54 +150,65 @@ async function installRustDesk() {
   try {
    execSync("pkill -9 rustdesk || true", { timeout: 5000, stdio: "ignore" });
    console.log("🛑 Existing RustDesk processes killed.");
-   // Aguarda um pouco para garantir que o processo foi encerrado
    await new Promise((resolve) => setTimeout(resolve, 2000));
-  } catch {
-   console.log("ℹ️ No RustDesk service running.");
+  } catch {}
+
+  let cliFailed = false;
+  try {
+   console.log("🔐 Attempting to set permanent password using SUDO CLI...");
+   execSync(`sudo -n "${rustDeskPath}" --password "${fixedPassword}"`, {
+    timeout: 15000,
+    stdio: "pipe",
+   });
+   console.log(`🔐 Permanent password set via SUDO CLI on stopped binary.`);
+  } catch (err) {
+   console.error(
+    "❌ Primary password CLI method failed (Linux SUDO required or failed):",
+    err.message
+   );
+   cliFailed = true;
   }
 
+  console.warn(
+   "⚠️ CLI failed. Attempting manual TOML edit for CORRECT PASSWORD LOCATION and UNLOCK..."
+  );
   try {
-   execSync(`"${rustDeskPath}" --password "${fixedPassword}"`, {
-    timeout: 5000,
-   });
-   console.log("🔐 Permanent password set via CLI on stopped binary (Linux)");
+   let tomlContent = fs.existsSync(rustDeskConfPath)
+    ? fs.readFileSync(rustDeskConfPath, "utf8")
+    : "";
 
-   let tomlContent = fs.readFileSync(rustDeskConfPath, "utf8");
-   if (
-    tomlContent.includes("password = ''") ||
-    !tomlContent.includes("password")
-   ) {
-    console.warn(
-     "⚠️ Primary password command failed to persist in TOML. Trying '--set-password' fallback..."
+   tomlContent = tomlContent.replace(/password\s*=\s*("|').*("|')/g, "").trim();
+   tomlContent = tomlContent.replace(/password\s*=\s*''/g, "").trim();
+   tomlContent = tomlContent
+    .replace(/allow-remote-config-modification\s*=\s*.*/g, "")
+    .trim();
+
+   let newTomlContent = tomlContent;
+
+   if (newTomlContent.includes("enc_id")) {
+    newTomlContent = newTomlContent.replace(
+     /(enc_id\s*=\s*['"].*['"])/,
+     `$1\npassword = "${fixedPassword}"`
     );
-    try {
-     execSync(`"${rustDeskPath}" --password "${fixedPassword}"`, {
-      timeout: 45000,
-     });
-     console.log("🔐 Password set via '--set-password' fallback.");
-     await new Promise((resolve) => setTimeout(resolve, 2000));
-
-     tomlContent = fs.readFileSync(rustDeskConfPath, "utf8");
-     if (
-      tomlContent.includes("password = ''") ||
-      !tomlContent.includes("password")
-     ) {
-      console.error(
-       "❌ Fallback also failed to persist password. Manual intervention may be needed."
-      );
-     } else {
-      console.log("✅ Fallback successful: Password key found in TOML.");
-     }
-    } catch (err2) {
-     console.error("❌ Fallback password command failed:", err2.message);
-    }
    } else {
-    console.log(
-     "✅ Password setting check passed (found 'password' key in TOML)."
-    );
+    newTomlContent = `password = "${fixedPassword}"\n` + newTomlContent;
    }
-  } catch (err) {
-   console.error("❌ Primary password CLI method failed (Linux):", err.message);
+
+   let optionsContent = "";
+
+   if (newTomlContent.includes("[options]")) {
+    optionsContent = `\nallow-remote-config-modification = "Y"\n`;
+   } else {
+    optionsContent = `\n[options]\nallow-remote-config-modification = "Y"\n`;
+   }
+
+   const finalContent = newTomlContent.trim() + optionsContent;
+   fs.writeFileSync(rustDeskConfPath, finalContent, "utf8");
+   console.log(
+    `🛠️ Manually set 'password' in main body and UNLOCKED configurations in ${RUSTDESK_TOML_NAME}.`
+   );
+  } catch (err3) {
+   console.error("❌ Manual TOML edit failed:", err3.message);
   }
 
   startRustDesk(rustDeskPath);
@@ -184,16 +216,61 @@ async function installRustDesk() {
   rustDeskId = await waitForRustDeskId(rustDeskPath);
   if (!rustDeskId) return;
  } else if (platform === "win32") {
-  const appData =
-   process.env.LOCALAPPDATA || path.join(process.env.APPDATA, "..", "Local");
-  rustDeskPath = path.join(appData, "RustDesk", "RustDesk.exe");
-  rustDeskConfPath = path.join(appData, "RustDesk", "RustDesk.toml");
+  const possiblePaths = [
+   path.join(
+    process.env["ProgramFiles"] || "C:\\Program Files",
+    "RustDesk",
+    "rustdesk.exe"
+   ),
+   path.join(
+    process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)",
+    "RustDesk",
+    "rustdesk.exe"
+   ),
+   path.join(
+    process.env.LOCALAPPDATA || "",
+    "Programs",
+    "RustDesk",
+    "rustdesk.exe"
+   ),
+  ];
 
-  if (!fs.existsSync(rustDeskPath))
-   return console.error("❌ RustDesk executable not found.");
+  let rustDeskPath = possiblePaths.find((p) => fs.existsSync(p));
+  const rustDeskConfPath = path.join(
+   process.env.APPDATA || "",
+   "RustDesk",
+   "RustDesk.toml"
+  );
+  const installerPath = getResourcePath(
+   "rustdesk",
+   "rustdesk-1.4.2-x86_64.msi"
+  );
+
+  if (!rustDeskPath) {
+   try {
+    execSync(`start "" /wait msiexec /i "${installerPath}" /qn`, {
+     shell: "cmd.exe",
+     stdio: "inherit",
+    });
+
+    console.log("✅ RustDesk instalado com sucesso via instalador do Windows.");
+   } catch (err) {
+    console.error(
+     "❌ Falha ao instalar RustDesk automaticamente:",
+     err.message
+    );
+    return;
+   }
+
+   rustDeskPath = possiblePaths.find((p) => fs.existsSync(p));
+   if (!rustDeskPath) {
+    console.error("❌ RustDesk.exe não encontrado após instalação.");
+    return;
+   }
+  }
 
   try {
-   execSync("taskkill /F /IM rustdesk.exe /T", {
+   execSync("taskkill /F /IM rustdesk-1.4.2-x86_64.msi /T", {
     timeout: 5000,
     stdio: "ignore",
    });
@@ -201,7 +278,7 @@ async function installRustDesk() {
   } catch {}
 
   try {
-   execSync(`"${rustDeskPath}" --password "${fixedPassword}" --password`, {
+   execSync(`"${rustDeskPath}" --password "${fixedPassword}"`, {
     timeout: 15000,
     stdio: "pipe",
    });
@@ -235,7 +312,10 @@ async function installRustDesk() {
 
  try {
   const finalToml = fs.readFileSync(rustDeskConfPath, "utf8");
-  console.log("📋 Final RustDesk.toml content:\n", finalToml);
+  console.log(
+   `📋 Final ${path.basename(rustDeskConfPath)} content:\n`,
+   finalToml
+  );
  } catch (err) {
   console.warn("⚠️ Could not read final TOML:", err.message);
  }
@@ -256,7 +336,9 @@ async function launchRustDeskOnStartup() {
  else if (platform === "win32") {
   const appData =
    process.env.LOCALAPPDATA || path.join(process.env.APPDATA, "..", "Local");
-  rustDeskPath = path.join(appData, "RustDesk", "RustDesk.exe");
+  rustDeskPath = path.join(appData, "RustDesk", "rustdesk-1.4.2-x86_64.msi");
+ } else {
+  return;
  }
 
  startRustDesk(rustDeskPath);
