@@ -6,7 +6,7 @@ import { Store } from './store/Store';
 import { HashRouter as Router, Routes, Navigate } from "react-router-dom";
 import OnlineStatus from "./components/core/OnlineStatus";
 import AuthRoutes from "./routes/AuthRoutes";
-import CvVideoRoutes from "./routes/CVVideoRoutes";
+import CvVideoRoutes from "./routes/CvVideoRoutes";
 import CoreRoutes from "./routes/CoreRoutes";
 import SimulationRoutes from "./routes/SimulationRoutes";
 import ExamRoutes from "./routes/ExamRoutes";
