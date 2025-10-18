@@ -49,7 +49,7 @@
   },
   "extraResources": [
    {
-    "from": "src/extra-packages",
+    "from": "electron/extra-packages",
     "to": "extra-packages",
     "filter": [
      "**/*"
