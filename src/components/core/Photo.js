@@ -12,7 +12,7 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Photo = forwardRef(function Photo({ onPhotoTaken }, ref) {
+const Photo = forwardRef(function Photo({ onPhotoTaken, user }, ref) {
   const [photoConfirmed, setPhotoConfirmed] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [photo, setPhoto] = useState(null);
@@ -90,6 +90,36 @@ const Photo = forwardRef(function Photo({ onPhotoTaken }, ref) {
     }
   };
 
+  const uploadAvatar = async (file) => {
+    if (!file || !user?.token || !user?.id) return;
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BASE_URL}/user/${user.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        console.error(
+          "❌ Erreur lors de la mise à jour de l’avatar :",
+          await response.text()
+        );
+      } else {
+        console.log("✅ Avatar mis à jour avec succès !");
+      }
+    } catch (error) {
+      console.error("Erreur réseau :", error);
+    }
+  };
+
   const startCountdown = () => {
     let countdownValue = 3;
     setCountdown(countdownValue);
@@ -113,6 +143,14 @@ const Photo = forwardRef(function Photo({ onPhotoTaken }, ref) {
     // console.log("Photo confirmed:", photo);
     setPhotoConfirmed(true);
     setShowModal(false);
+    if (photo) {
+      fetch(photo)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const file = new File([blob], "avatar.png", { type: "image/png" });
+          uploadAvatar(file);
+        });
+    }
   };
 
   const cancelSubmit = async () => {

@@ -336,7 +336,7 @@ export default function Clip() {
                     controls
                     disablePictureInPicture
                     controlsList="nodownload"
-                    className="w-full h-full object-cover hide-video-controls"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <p className="text-gray-500 text-sm">

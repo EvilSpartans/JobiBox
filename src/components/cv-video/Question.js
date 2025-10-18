@@ -38,10 +38,10 @@ export default function Question() {
 
     // Reset when change group
     setQuestionOrder([]);
-      setSelectedQuestionsByGroup(prev => ({
-    ...prev,
-    [selectedGroupId]: []
-  }));
+    setSelectedQuestionsByGroup((prev) => ({
+      ...prev,
+      [selectedGroupId]: [],
+    }));
 
     fetchQuestions(selectedGroupId);
   }, [selectedGroupId]);
@@ -125,7 +125,7 @@ export default function Question() {
           questions afin de personnaliser ton CV vidéo du mieux possible.
         </p>
       </div>
-      <div className="dark:text-dark_text_1">
+      <div className="dark:text-dark_text_1 mt-fix-0">
         <div className="flex justify-center text-xl">
           <Select
             name="groupSelect"
@@ -137,20 +137,44 @@ export default function Question() {
               value: group.id,
               label: group.title,
             }))}
-            value={selectedGroupId || ""} 
+            value={selectedGroupId || ""}
             className="mb-4"
             error={null}
           />
         </div>
 
-        <div className="mb-2">
+        <div className="mb-2 mt-8">
           {loading ? null : (
-            <div className="mb-4">
+            <div className="flex justify-between items-center gap-4 mb-6">
               <button
                 onClick={openModal}
-                className="text-lg addButton bg-gray-200 hover-bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+                className="text-lg addButton bg-gray-200 hover:bg-gray-300 text-gray-500 font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
               >
                 + Ajouter une question
+              </button>
+
+              <button
+                onClick={() => {
+                  setLoading(true);
+                  setQuestionOrder([]);
+                  setSelectedQuestionsByGroup((prev) => ({
+                    ...prev,
+                    [selectedGroupId]: [],
+                  }));
+
+                  dispatch(getGroupQuestions({ token })).then((res) => {
+                    const items = res.payload.items || [];
+                    setGroups(items);
+                    if (selectedGroupId) {
+                      fetchQuestions(selectedGroupId);
+                    } else if (items.length > 0) {
+                      setSelectedGroupId(items[0].id);
+                    }
+                  });
+                }}
+                className="text-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+              >
+                🔄 Actualiser
               </button>
             </div>
           )}
@@ -163,28 +187,33 @@ export default function Question() {
         ) : (
           <>
             {questions && questions.length > 0 ? (
-              <div className="max-h-56 tall:max-h-96 overflow-y-auto">
-                {questions.map((question, index) => (
-                  <div key={index} className="mb-5 flex items-center">
-                    <label className="inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox text-primary border-primary"
-                        onChange={() => handleQuestionSelection(question)}
-                        checked={selectedQuestions.includes(question)}
-                      />
-                      <span className="ml-2 text-xl">
-                        &nbsp;{question.title}
-                      </span>
-                    </label>
-                    {questionOrder.includes(question) && (
-                      <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-                        {questionOrder.indexOf(question) + 1}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <>
+                {/* espace ajouté avant la liste */}
+                <div className="h-5"></div>
+
+                <div className="max-h-56 tall:max-h-96 overflow-y-auto">
+                  {questions.map((question, index) => (
+                    <div key={index} className="mb-5 flex items-center">
+                      <label className="inline-flex items-center">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox text-primary border-primary"
+                          onChange={() => handleQuestionSelection(question)}
+                          checked={selectedQuestions.includes(question)}
+                        />
+                        <span className="ml-2 text-xl">
+                          &nbsp;{question.title}
+                        </span>
+                      </label>
+                      {questionOrder.includes(question) && (
+                        <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+                          {questionOrder.indexOf(question) + 1}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <p className="text-center text-xl mt-4">
                 Aucune question pour le moment

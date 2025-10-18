@@ -296,7 +296,7 @@ export default function PostForm() {
 
         {/*Form*/}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <Photo ref={photoRef} onPhotoTaken={setPhotoFile} />
+          <Photo ref={photoRef} onPhotoTaken={setPhotoFile} user={user} />
 
           <hr />
 
