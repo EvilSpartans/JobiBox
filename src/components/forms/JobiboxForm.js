@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
 import { businessSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getJobibox } from "../../store/slices/jobiboxSlice";
+import { getJobibox, updateJobibox } from "../../store/slices/jobiboxSlice";
 import Select from "../fields/Select";
 
 export default function JobiboxForm() {
@@ -53,9 +53,9 @@ export default function JobiboxForm() {
    return;
   }
   
-  const savedRustdeskConfig = window.electron.storeApi.get("rustdeskConfig");
-  const rustdeskId = savedRustdeskConfig?.rustdeskId;
-  const rustdeskPassword = savedRustdeskConfig?.rustdeskPassword;
+//   const savedRustdeskConfig = window.electron.storeApi.get("rustdeskConfig");
+//   const rustdeskId = savedRustdeskConfig?.rustdeskId;
+//   const rustdeskPassword = savedRustdeskConfig?.rustdeskPassword;
 
   localStorage.setItem("businessId", selectedJobibox.business.id);
   localStorage.setItem("jobiboxId", selectedJobibox.id);
@@ -63,8 +63,8 @@ export default function JobiboxForm() {
   localStorage.setItem("examActivated", selectedJobibox.exam);
 
   const payload = { id: selectedJobibox.id };
-  if (rustdeskId) payload.rustdeskId = rustdeskId;
-  if (rustdeskPassword) payload.rustdeskPassword = rustdeskPassword;
+//   if (rustdeskId) payload.rustdeskId = rustdeskId;
+//   if (rustdeskPassword) payload.rustdeskPassword = rustdeskPassword;
 
   await dispatch(updateJobibox(payload));
 
