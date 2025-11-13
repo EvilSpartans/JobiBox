@@ -369,18 +369,21 @@ export default function PostForm() {
          placeholder="Ex : Paris, Lille..."
          error={errors?.city?.message}
          className="required-field"
-         cityValue={cityQuery} 
-         setCityValue={setCityQuery} 
-         cities={cities} 
-         cityLoading={cityStatus === "loading"} 
+         cityValue={cityQuery}
+         setCityValue={(value) => {
+          setCityQuery(value);
+          setValue("city", value);
+         }}
+         cities={cities}
+         cityLoading={cityStatus === "loading"}
          onCitySelect={(city) => {
           const cityName = city.name || city;
           setCityQuery(cityName);
           setValue("city", cityName);
          }}
          style={{ minWidth: "380px" }}
-         {...register("city")}
         />
+
         <Select
          name="km"
          placeholder="Rayon de Km"
