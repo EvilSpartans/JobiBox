@@ -104,8 +104,8 @@ async function installRustDesk() {
     debugLog("Sélection de l’installateur...");
 
     let installerPath = null;
-    if (fs.existsSync(msiPath)) installerPath = msiPath;
-    else if (fs.existsSync(exePath)) installerPath = exePath;
+    if (fs.existsSync(exePath)) installerPath = exePath;
+    else if (fs.existsSync(msiPath)) installerPath = msiPath;
 
     debugLog("installerPath=" + installerPath);
 
