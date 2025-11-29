@@ -97,42 +97,44 @@ app.whenReady().then(async () => {
   mainApp = createWindow();
 
   mainApp.once("ready-to-show", async () => {
+    // Affichage : splash → app
     setTimeout(() => {
       splash.destroy();
       mainApp.show();
     }, 2000);
 
-    // Vérification de mise à jour (inchangé)
+    // Vérification de mise à jour
     try {
       await autoUpdater.checkForUpdates();
     } catch (error) {
       console.error(error.message);
     }
-  });
 
-  // ---- RustDesk : installation ou lancement (désactivé en dev) ----
-  setTimeout(async () => {
-    if (isDev) {
-      console.log("⏭️ Mode dev : RustDesk non installé, non lancé.");
-      return;
-    }
-
-    try {
-      const rustdeskConfig = store.get("rustdeskConfig");
-      if (!rustdeskConfig || !rustdeskConfig.installed) {
-        console.log("🧩 RustDesk non installé — installation silencieuse...");
-        await installRustDesk();
-      } else {
-        console.log("✅ RustDesk déjà présent — lancement automatique...");
-        await launchRustDeskOnStartup();
+    // ---- INSTALLATION / LANCEMENT RUSTDESK ----
+    setTimeout(async () => {
+      if (isDev) {
+        console.log("⏭️ Mode dev : RustDesk non installé, non lancé.");
+        return;
       }
-    } catch (error) {
-      console.error(
-        "⚠️ RustDesk installation failed (non-critical):",
-        error.message
-      );
-    }
-  }, 5000);
+
+      try {
+        const rustdeskConfig = store.get("rustdeskConfig");
+
+        if (!rustdeskConfig || !rustdeskConfig.installed) {
+          console.log("🧩 RustDesk non installé — installation silencieuse...");
+          await installRustDesk();
+        } else {
+          console.log("✅ RustDesk déjà présent — lancement automatique...");
+          await launchRustDeskOnStartup();
+        }
+      } catch (error) {
+        console.error(
+          "⚠️ RustDesk installation failed (non-critical):",
+          error.message
+        );
+      }
+    }, 5000);
+  });
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
