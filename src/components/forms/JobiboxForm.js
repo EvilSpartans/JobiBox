@@ -53,9 +53,9 @@ export default function JobiboxForm() {
    return;
   }
   
-//   const savedRustdeskConfig = window.electron.storeApi.get("rustdeskConfig");
-//   const rustdeskId = savedRustdeskConfig?.rustdeskId;
-//   const rustdeskPassword = savedRustdeskConfig?.rustdeskPassword;
+  const savedRustdeskConfig = window.electron.storeApi.get("rustdeskConfig");
+  const rustdeskId = savedRustdeskConfig?.rustdeskId;
+  const rustdeskPassword = savedRustdeskConfig?.rustdeskPassword;
 
   localStorage.setItem("businessId", selectedJobibox.business.id);
   localStorage.setItem("jobiboxId", selectedJobibox.id);
@@ -63,8 +63,8 @@ export default function JobiboxForm() {
   localStorage.setItem("examActivated", selectedJobibox.exam);
 
   const payload = { id: selectedJobibox.id };
-//   if (rustdeskId) payload.rustdeskId = rustdeskId;
-//   if (rustdeskPassword) payload.rustdeskPassword = rustdeskPassword;
+  if (rustdeskId) payload.rustdeskId = rustdeskId;
+  if (rustdeskPassword) payload.rustdeskPassword = rustdeskPassword;
 
   await dispatch(updateJobibox(payload));
 

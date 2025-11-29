@@ -1,6 +1,6 @@
 {
  "name": "jobibox",
- "version": "1.8.4",
+ "version": "1.8.5",
  "description": "La cabine accoustique pour créer un cv vidéo",
  "repository": "https://github.com/EvilSpartans/JobiBox",
  "main": "electron/main.js",
@@ -40,6 +40,10 @@
    "electron/main.js",
    "electron/preload.js",
    "electron/rustDeskInstaller.js"
+  ],
+  "asarUnpack": [
+    "electron/rustDeskInstaller.js",
+    "electron/extra-packages/**/*"
   ],
   "nsis": {
    "include": "electron/windows-post-install.nsh"

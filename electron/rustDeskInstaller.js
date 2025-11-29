@@ -10,7 +10,10 @@ async function getStore() {
       const Store = (await import("electron-store")).default;
       store = new Store();
     } catch (e) {
-      console.error("❌ Failed to load electron-store. Config saving disabled.", e);
+      console.error(
+        "❌ Failed to load electron-store. Config saving disabled.",
+        e
+      );
       store = { get: () => ({}), set: () => {} };
     }
   }
@@ -84,7 +87,11 @@ async function installRustDesk() {
       return;
     }
 
-    console.log(`🔧 Installation silencieuse de RustDesk (${path.basename(installerPath)})...`);
+    console.log(
+      `🔧 Installation silencieuse de RustDesk (${path.basename(
+        installerPath
+      )})...`
+    );
 
     try {
       if (installerPath.endsWith(".msi")) {
@@ -106,7 +113,8 @@ async function installRustDesk() {
   }
 
   // ✅ Créer le dossier config
-  if (!fs.existsSync(rustDeskDir)) fs.mkdirSync(rustDeskDir, { recursive: true });
+  if (!fs.existsSync(rustDeskDir))
+    fs.mkdirSync(rustDeskDir, { recursive: true });
 
   // 📝 Config TOML
   try {
@@ -128,12 +136,24 @@ async function installRustDesk() {
     console.error("❌ Erreur d’écriture RustDesk.toml :", err.message);
   }
 
+  // 🔹 Récupération automatique de l'ID RustDesk
+  let rustdeskId = null;
+  try {
+    const idFile = path.join(process.env.APPDATA, "RustDesk", "id_ed25519.pub");
+    if (fs.existsSync(idFile)) {
+      rustdeskId = fs.readFileSync(idFile, "utf8").trim();
+    }
+  } catch (e) {
+    console.error("❌ Impossible de lire l'ID RustDesk :", e);
+  }
+
   // 🚀 Lancement RustDesk
   startRustDesk(rustDeskExe);
 
   // 💾 Sauvegarde état
   store.set("rustdeskConfig", {
     installed: true,
+    rustdeskId: rustdeskId || null,
     rustdeskPassword: fixedPassword,
     jobiboxId,
     timestamp: new Date().toISOString(),

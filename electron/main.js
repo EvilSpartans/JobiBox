@@ -16,7 +16,10 @@ const Store = require("electron-store");
 const store = new Store();
 
 // Import du module RustDesk (ajout)
-const { installRustDesk, launchRustDeskOnStartup } = require("./rustDeskInstaller");
+const {
+  installRustDesk,
+  launchRustDeskOnStartup,
+} = require("./rustDeskInstaller");
 
 let updateInterval = null;
 let mainApp = null;
@@ -107,8 +110,13 @@ app.whenReady().then(async () => {
     }
   });
 
-  // ---- RustDesk : installation ou lancement si déjà installé ----
+  // ---- RustDesk : installation ou lancement (désactivé en dev) ----
   setTimeout(async () => {
+    if (isDev) {
+      console.log("⏭️ Mode dev : RustDesk non installé, non lancé.");
+      return;
+    }
+
     try {
       const rustdeskConfig = store.get("rustdeskConfig");
       if (!rustdeskConfig || !rustdeskConfig.installed) {
@@ -119,7 +127,10 @@ app.whenReady().then(async () => {
         await launchRustDeskOnStartup();
       }
     } catch (error) {
-      console.error("⚠️ RustDesk installation failed (non-critical):", error.message);
+      console.error(
+        "⚠️ RustDesk installation failed (non-critical):",
+        error.message
+      );
     }
   }, 5000);
 
