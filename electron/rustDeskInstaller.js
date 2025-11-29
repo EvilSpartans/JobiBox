@@ -2,6 +2,20 @@ const { execSync, spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const { app } = require("electron");
+const logFile = path.join(
+  process.env.APPDATA,
+  "Jobibox",
+  "rustdesk-install.log"
+);
+
+function debugLog(message) {
+  try {
+    fs.appendFileSync(
+      logFile,
+      new Date().toISOString() + " - " + message + "\n"
+    );
+  } catch (e) {}
+}
 
 let store = null;
 async function getStore() {
@@ -56,6 +70,10 @@ function startRustDesk(rustDeskPath) {
  * Installe RustDesk s’il n’est pas présent
  */
 async function installRustDesk() {
+  debugLog("---- installRustDesk() called ----");
+  debugLog("platform=" + process.platform);
+  debugLog("app.isPackaged=" + app.isPackaged);
+
   const platform = process.platform;
   if (platform !== "win32") {
     console.warn("⚠️ Installation RustDesk ignorée (plateforme non Windows).");
@@ -73,14 +91,23 @@ async function installRustDesk() {
   const fixedPassword = "Jobibox@Remote12";
   const jobiboxId = store.get("jobibox_id") || null;
 
+  debugLog("basePath=" + basePath);
+  debugLog("exePath=" + exePath + " exists=" + fs.existsSync(exePath));
+  debugLog("msiPath=" + msiPath + " exists=" + fs.existsSync(msiPath));
+
   // ✅ Si déjà installé
   if (isRustDeskInstalled()) {
     console.log("✅ RustDesk déjà installé, vérification config...");
   } else {
     // ⚙️ Choisir le bon installeur
+
+    debugLog("Sélection de l’installateur...");
+
     let installerPath = null;
     if (fs.existsSync(msiPath)) installerPath = msiPath;
     else if (fs.existsSync(exePath)) installerPath = exePath;
+
+    debugLog("installerPath=" + installerPath);
 
     if (!installerPath) {
       console.error("❌ Aucun installeur RustDesk trouvé dans :", basePath);
@@ -94,6 +121,8 @@ async function installRustDesk() {
     );
 
     try {
+      debugLog("Début installation : " + installerPath);
+
       if (installerPath.endsWith(".msi")) {
         execSync(`msiexec /i "${installerPath}" /qn /norestart`, {
           stdio: "ignore",
@@ -106,7 +135,9 @@ async function installRustDesk() {
         });
       }
       console.log("✅ RustDesk installé avec succès.");
+      debugLog("Installation RustDesk OK");
     } catch (err) {
+      debugLog("EXEC ERROR : " + err.message);
       console.error("❌ Échec installation RustDesk :", err.message);
       return;
     }
