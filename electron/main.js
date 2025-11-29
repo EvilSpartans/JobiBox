@@ -108,20 +108,20 @@ app.whenReady().then(async () => {
   });
 
   // ---- RustDesk : installation ou lancement si déjà installé ----
-  // setTimeout(async () => {
-  //   try {
-  //     const rustdeskConfig = store.get("rustdeskConfig");
-  //     if (!rustdeskConfig || !rustdeskConfig.installed) {
-  //       console.log("🧩 RustDesk non installé — installation silencieuse...");
-  //       await installRustDesk();
-  //     } else {
-  //       console.log("✅ RustDesk déjà présent — lancement automatique...");
-  //       await launchRustDeskOnStartup();
-  //     }
-  //   } catch (error) {
-  //     console.error("⚠️ RustDesk installation failed (non-critical):", error.message);
-  //   }
-  // }, 5000);
+  setTimeout(async () => {
+    try {
+      const rustdeskConfig = store.get("rustdeskConfig");
+      if (!rustdeskConfig || !rustdeskConfig.installed) {
+        console.log("🧩 RustDesk non installé — installation silencieuse...");
+        await installRustDesk();
+      } else {
+        console.log("✅ RustDesk déjà présent — lancement automatique...");
+        await launchRustDeskOnStartup();
+      }
+    } catch (error) {
+      console.error("⚠️ RustDesk installation failed (non-critical):", error.message);
+    }
+  }, 5000);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
