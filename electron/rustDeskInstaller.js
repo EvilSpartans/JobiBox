@@ -1,214 +1,193 @@
-const { execSync, spawn } = require("child_process");
+const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
-const { app } = require("electron");
-const logFile = path.join(
-  process.env.APPDATA,
-  "Jobibox",
-  "rustdesk-install.log"
-);
 
-function debugLog(message) {
-  try {
-    fs.appendFileSync(
-      logFile,
-      new Date().toISOString() + " - " + message + "\n"
-    );
-  } catch (e) {}
-}
-
+// ----------------------------------------------------------
+// Electron Store
+// ----------------------------------------------------------
 let store = null;
 async function getStore() {
   if (!store) {
-    try {
-      const Store = (await import("electron-store")).default;
-      store = new Store();
-    } catch (e) {
-      console.error(
-        "❌ Failed to load electron-store. Config saving disabled.",
-        e
-      );
-      store = { get: () => ({}), set: () => {} };
-    }
+    const Store = (await import("electron-store")).default;
+    store = new Store();
   }
   return store;
 }
 
-/**
- * Retourne le chemin vers un fichier embarqué,
- * compatible dev et prod (packagé)
- */
-function getResourcePath(...relativePath) {
-  if (app.isPackaged) {
-    return path.join(process.resourcesPath, "extra-packages", ...relativePath);
-  }
-  return path.join(__dirname, "extra-packages", ...relativePath);
-}
-
-/**
- * Vérifie si RustDesk est installé sur Windows
- */
+// ----------------------------------------------------------
+// Vérifier installation RustDesk
+// ----------------------------------------------------------
 function isRustDeskInstalled() {
-  const rustDeskExe = "C:\\Program Files\\RustDesk\\RustDesk.exe";
-  return fs.existsSync(rustDeskExe);
+  return fs.existsSync("C:\\Program Files\\RustDesk\\RustDesk.exe");
 }
 
-/**
- * Lance RustDesk sans bloquer l’app
- */
-function startRustDesk(rustDeskPath) {
-  try {
-    const child = spawn(rustDeskPath, [], { detached: true, stdio: "ignore" });
-    child.unref();
-    console.log("🚀 RustDesk lancé :", rustDeskPath);
-  } catch (err) {
-    console.error("❌ Erreur lancement RustDesk:", err.message);
-  }
+// ----------------------------------------------------------
+// Écrire le mot de passe dans RustDesk.toml
+// ----------------------------------------------------------
+function writeRustDeskConfig(password) {
+  const dir = path.join(process.env.APPDATA, "RustDesk", "config");
+  const file = path.join(dir, "RustDesk.toml");
+
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+  fs.writeFileSync(
+    file,
+    `password="${password}"
+allow-remote-config-modification="Y"
+`,
+    "utf8"
+  );
 }
 
-/**
- * Installe RustDesk s’il n’est pas présent
- */
-async function installRustDesk() {
-  debugLog("---- installRustDesk() called ----");
-  debugLog("platform=" + process.platform);
-  debugLog("app.isPackaged=" + app.isPackaged);
+// ----------------------------------------------------------
+// Extraction ID via logs RustDesk
+// ----------------------------------------------------------
+const rustdeskLogDir = path.join(process.env.APPDATA, "RustDesk", "log");
 
-  const platform = process.platform;
-  if (platform !== "win32") {
-    console.warn("⚠️ Installation RustDesk ignorée (plateforme non Windows).");
-    return;
-  }
+function extractLatestRustDeskId() {
+  if (!fs.existsSync(rustdeskLogDir)) return null;
 
-  const store = await getStore();
-  const rustDeskExe = "C:\\Program Files\\RustDesk\\RustDesk.exe";
-  const basePath = getResourcePath("rustdesk");
-  const exePath = path.join(basePath, "rustdesk_installer.exe");
-  const msiPath = path.join(basePath, "rustdesk_installer.msi");
-  const rustDeskDir = path.join(process.env.APPDATA, "RustDesk", "config");
-  const rustDeskConfPath = path.join(rustDeskDir, "RustDesk.toml");
+  const files = fs
+    .readdirSync(rustdeskLogDir)
+    .filter((f) => f.endsWith(".log"))
+    .map((f) => path.join(rustdeskLogDir, f));
 
-  const fixedPassword = "Jobibox@Remote12";
-  const jobiboxId = store.get("jobibox_id") || null;
+  let lastId = null;
+  let lastTimestamp = 0;
 
-  debugLog("basePath=" + basePath);
-  debugLog("exePath=" + exePath + " exists=" + fs.existsSync(exePath));
-  debugLog("msiPath=" + msiPath + " exists=" + fs.existsSync(msiPath));
+  for (const file of files) {
+    const content = fs.readFileSync(file, "utf8");
 
-  // ✅ Si déjà installé
-  if (isRustDeskInstalled()) {
-    console.log("✅ RustDesk déjà installé, vérification config...");
-  } else {
-    // ⚙️ Choisir le bon installeur
+    const regex = /\[([0-9\-: ]+)[^\]]*] INFO .* id updated from \d+ to (\d+)/g;
 
-    debugLog("Sélection de l’installateur...");
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+      const timestamp = new Date(match[1]).getTime();
+      const newId = match[2];
 
-    let installerPath = null;
-    if (fs.existsSync(exePath)) installerPath = exePath;
-    else if (fs.existsSync(msiPath)) installerPath = msiPath;
-
-    debugLog("installerPath=" + installerPath);
-
-    if (!installerPath) {
-      console.error("❌ Aucun installeur RustDesk trouvé dans :", basePath);
-      return;
-    }
-
-    console.log(
-      `🔧 Installation silencieuse de RustDesk (${path.basename(
-        installerPath
-      )})...`
-    );
-
-    try {
-      debugLog("Début installation : " + installerPath);
-
-      if (installerPath.endsWith(".msi")) {
-        execSync(`msiexec /i "${installerPath}" /qn /norestart`, {
-          stdio: "ignore",
-          shell: true,
-        });
-      } else {
-        execSync(`"${installerPath}" /VERYSILENT /NORESTART`, {
-          stdio: "ignore",
-          shell: true,
-        });
+      if (timestamp > lastTimestamp) {
+        lastTimestamp = timestamp;
+        lastId = newId;
       }
-      console.log("✅ RustDesk installé avec succès.");
-      debugLog("Installation RustDesk OK");
-    } catch (err) {
-      debugLog("EXEC ERROR : " + err.message);
-      console.error("❌ Échec installation RustDesk :", err.message);
-      return;
     }
   }
 
-  // ✅ Créer le dossier config
-  if (!fs.existsSync(rustDeskDir))
-    fs.mkdirSync(rustDeskDir, { recursive: true });
+  return lastId;
+}
 
-  // 📝 Config TOML
-  try {
-    let toml = fs.existsSync(rustDeskConfPath)
-      ? fs.readFileSync(rustDeskConfPath, "utf8")
-      : "";
+// ----------------------------------------------------------
+// Sync final (ID + mot de passe → Electron Store)
+// ----------------------------------------------------------
+async function syncRustDeskState() {
+  const store = await getStore();
 
-    toml = toml
-      .replace(/password\s*=\s*".*"/g, "")
-      .replace(/allow-remote-config-modification\s*=\s*".*"/g, "")
-      .trim();
+  const password = "Jobibox@Remote12";
+  writeRustDeskConfig(password);
 
-    toml += `\npassword = "${fixedPassword}"\nallow-remote-config-modification = "Y"\n`;
-    if (jobiboxId) toml += `jobibox_id = "${jobiboxId}"\n`;
+  let id = extractLatestRustDeskId();
 
-    fs.writeFileSync(rustDeskConfPath, toml, "utf8");
-    console.log("✅ RustDesk.toml mis à jour avec mot de passe et ID.");
-  } catch (err) {
-    console.error("❌ Erreur d’écriture RustDesk.toml :", err.message);
-  }
-
-  // 🔹 Récupération automatique de l'ID RustDesk
-  let rustdeskId = null;
-  try {
-    const idFile = path.join(process.env.APPDATA, "RustDesk", "id_ed25519.pub");
-    if (fs.existsSync(idFile)) {
-      rustdeskId = fs.readFileSync(idFile, "utf8").trim();
-    }
-  } catch (e) {
-    console.error("❌ Impossible de lire l'ID RustDesk :", e);
-  }
-
-  // 🚀 Lancement RustDesk
-  startRustDesk(rustDeskExe);
-
-  // 💾 Sauvegarde état
   store.set("rustdeskConfig", {
     installed: true,
-    rustdeskId: rustdeskId || null,
-    rustdeskPassword: fixedPassword,
-    jobiboxId,
+    rustdeskId: id || null,
+    rustdeskPassword: password,
     timestamp: new Date().toISOString(),
   });
 
-  console.log("✅ RustDesk installé et configuré avec succès.");
+  console.log("💾 syncRustDeskState()", { id, password });
+  return { id, password };
 }
 
-/**
- * Lance RustDesk au démarrage
- */
+// ----------------------------------------------------------
+// Lancement RustDesk et attente du nouvel ID dans les logs
+// ----------------------------------------------------------
 async function launchRustDeskOnStartup() {
-  if (process.platform !== "win32") return;
+  console.log("🚀 Lancement RustDesk…");
 
-  const store = await getStore();
-  const config = store.get("rustdeskConfig");
-
-  if (!config || !config.installed || !isRustDeskInstalled()) {
-    console.log("⏭️ RustDesk non encore installé, démarrage ignoré.");
+  const exe = "C:\\Program Files\\RustDesk\\RustDesk.exe";
+  if (!fs.existsSync(exe)) {
+    console.log("❌ RustDesk non installé.");
     return;
   }
 
-  console.log("🚀 Lancement automatique de RustDesk...");
-  startRustDesk("C:\\Program Files\\RustDesk\\RustDesk.exe");
+  try {
+    const child = spawn(exe, [], { detached: true, stdio: "ignore" });
+    child.unref();
+    // Réduire la fenetre
+    setTimeout(() => {
+      const ps = spawn(
+        "powershell.exe",
+        [
+          "-Command",
+          `
+Add-Type @"
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+
+public class WinAPI {
+    public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+    [DllImport("user32.dll")] 
+    public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+    [DllImport("user32.dll")] 
+    public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+    [DllImport("user32.dll")] 
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+}
+"@
+
+$SW_MINIMIZE = 6
+
+for ($i = 0; $i -lt 40; $i++) {
+    $found = $false
+
+    [WinAPI]::EnumWindows({
+        param($hWnd, $lParam)
+
+        $sb = New-Object System.Text.StringBuilder 1024
+        [WinAPI]::GetWindowText($hWnd, $sb, $sb.Capacity) | Out-Null
+        $title = $sb.ToString()
+
+        if ($title -like "RustDesk*") {
+            [WinAPI]::ShowWindow($hWnd, $SW_MINIMIZE) | Out-Null
+            $script:found = $true
+            return $false
+        }
+
+        return $true
+    }, [IntPtr]::Zero)
+
+    if ($found) { break }
+
+    Start-Sleep -Milliseconds 250
+}
+`,
+        ],
+        { windowsHide: true }
+      );
+    }, 400);
+  } catch (err) {
+    console.error("❌ Erreur lancement RustDesk :", err.message);
+  }
+
+  for (let i = 0; i < 15; i++) {
+    await new Promise((r) => setTimeout(r, 1000));
+
+    const id = extractLatestRustDeskId();
+    if (id) {
+      console.log("🔥 NEW RustDesk ID detected:", id);
+      break;
+    }
+  }
+
+  await syncRustDeskState();
 }
 
-module.exports = { installRustDesk, launchRustDeskOnStartup };
+// ----------------------------------------------------------
+module.exports = {
+  launchRustDeskOnStartup,
+  syncRustDeskState,
+  isRustDeskInstalled,
+};

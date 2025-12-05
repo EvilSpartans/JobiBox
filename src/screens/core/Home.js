@@ -3,75 +3,111 @@ import { useNavigate } from "react-router-dom";
 import Logout from "../../components/core/Logout";
 import { useDispatch, useSelector } from "react-redux";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getJobiboxPortals, updateJobibox } from "../../store/slices/jobiboxSlice";
+import {
+  getJobiboxPortals,
+  updateJobibox,
+} from "../../store/slices/jobiboxSlice";
 import { AppVersion } from "../../components/core/AppVersion";
 
 export default function Home() {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
   const offers = localStorage.getItem("offersActivated");
-  const examenInProgress = localStorage.getItem('examenInProgress');
-  const beginnerInProgress = localStorage.getItem('beginnerInProgress');
-  const intermediateInProgress = localStorage.getItem('intermediateInProgress');
-  const expertInProgress = localStorage.getItem('expertInProgress');
-  const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
+  const examenInProgress = localStorage.getItem("examenInProgress");
+  const beginnerInProgress = localStorage.getItem("beginnerInProgress");
+  const intermediateInProgress = localStorage.getItem("intermediateInProgress");
+  const expertInProgress = localStorage.getItem("expertInProgress");
+  const existingSelectedGreenFilter = localStorage.getItem(
+    "selectedGreenFilter"
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    
     const fetchJobibox = async () => {
       try {
-        const jobiboxId = localStorage.getItem('jobiboxId');
+        const jobiboxId = localStorage.getItem("jobiboxId");
         const response = await dispatch(getJobiboxPortals({ id: jobiboxId }));
         const portalsData = response.payload;
-  
+
         localStorage.setItem("trainingActivated", portalsData.training);
         localStorage.setItem("examActivated", portalsData.exam);
         localStorage.setItem("offersActivated", portalsData.offers);
 
+        // ---- Version + RustDesk Sync ----
         const appVersion = await AppVersion();
-        if (portalsData.version !== appVersion) {
-          await dispatch(updateJobibox({ id: jobiboxId, version: appVersion }));
-        }
-  
+        const rustdesk = await window.electron.storeApi.get("rustdeskConfig");
+
+        console.log("🔎 AppVersion:", appVersion);
+        console.log("🔎 RustDesk config interne:", rustdesk);
+        console.log(
+          "🧪 Test lecture RustDesk → ID:",
+          rustdesk?.rustdeskId,
+          "MDP:",
+          rustdesk?.rustdeskPassword
+        );
+
+        const updatePayload = {
+          id: jobiboxId,
+          version:
+            portalsData.version !== appVersion
+              ? appVersion
+              : portalsData.version,
+        };
+
+        // Ajout conditionnel sécurisé
+        if (rustdesk?.rustdeskId)
+          updatePayload.rustdeskId = rustdesk.rustdeskId;
+        if (rustdesk?.rustdeskPassword)
+          updatePayload.rustdeskPassword = rustdesk.rustdeskPassword;
+
+        console.log("📡 Payload envoyé à updateJobibox:", updatePayload);
+
+        // 👉 Une seule requête clean
+        await dispatch(updateJobibox(updatePayload));
+
         if (!portalsData.training && !portalsData.offers) {
           navigate("/cvVideo");
         } else {
-          setLoading(false); 
+          setLoading(false);
         }
-  
       } catch (error) {
         console.error("Erreur lors de la récupération des portails :", error);
       }
     };
-  
+
     fetchJobibox();
-  
-    if (examenInProgress === 'true') {
-      localStorage.removeItem('examenInProgress');
+
+    if (examenInProgress === "true") {
+      localStorage.removeItem("examenInProgress");
     }
 
     if (beginnerInProgress) {
-      localStorage.removeItem('beginnerInProgress');
+      localStorage.removeItem("beginnerInProgress");
     }
 
     if (intermediateInProgress) {
-      localStorage.removeItem('intermediateInProgress');
+      localStorage.removeItem("intermediateInProgress");
     }
 
     if (expertInProgress) {
-      localStorage.removeItem('expertInProgress');
+      localStorage.removeItem("expertInProgress");
     }
-  
+
     if (existingSelectedGreenFilter) {
-      localStorage.removeItem('selectedGreenFilter');
+      localStorage.removeItem("selectedGreenFilter");
     }
-  
-  }, [navigate, dispatch, examenInProgress, existingSelectedGreenFilter, expertInProgress, intermediateInProgress, beginnerInProgress]);
+  }, [
+    navigate,
+    dispatch,
+    examenInProgress,
+    existingSelectedGreenFilter,
+    expertInProgress,
+    intermediateInProgress,
+    beginnerInProgress,
+  ]);
 
   if (loading) {
     return (
@@ -83,7 +119,7 @@ export default function Home() {
 
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
-        <Logout />
+      <Logout />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
@@ -92,8 +128,12 @@ export default function Home() {
           <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
-            <h2 className="mt-6 text-4xl font-bold"><span className="text-blue_3">J</span>obiBox</h2>
-            <p className="mt-12 text-xl">Bonjour <span className="text-blue-400">{user.username}</span></p>
+              <h2 className="mt-6 text-4xl font-bold">
+                <span className="text-blue_3">J</span>obiBox
+              </h2>
+              <p className="mt-12 text-xl">
+                Bonjour <span className="text-blue-400">{user.username}</span>
+              </p>
             </div>
             {/*Buttons*/}
             <button
@@ -103,12 +143,12 @@ export default function Home() {
               CV Vidéo
             </button>
             {training === "true" && (
-            <button
-              className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/train")}
-            >
-              Simulation d'entretien
-            </button>
+              <button
+                className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
+                onClick={() => navigate("/train")}
+              >
+                Simulation d'entretien
+              </button>
             )}
             {/* {exam === "true" && (
             <button
@@ -119,12 +159,12 @@ export default function Home() {
             </button>
             )} */}
             {offers === "true" && (
-            <button
-              className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/offers")}
-            >
-              Offres d'emploi
-            </button>
+              <button
+                className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
+                onClick={() => navigate("/offers")}
+              >
+                Offres d'emploi
+              </button>
             )}
           </div>
         </div>

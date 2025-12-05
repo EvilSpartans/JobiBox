@@ -15,12 +15,6 @@ const fs = require("fs");
 const Store = require("electron-store");
 const store = new Store();
 
-// Import du module RustDesk (ajout)
-const {
-  installRustDesk,
-  launchRustDeskOnStartup,
-} = require("./rustDeskInstaller");
-
 let updateInterval = null;
 let mainApp = null;
 
@@ -110,28 +104,33 @@ app.whenReady().then(async () => {
       console.error(error.message);
     }
 
-    // ---- INSTALLATION / LANCEMENT RUSTDESK ----
+    // ---- RUSTDESK : installation uniquement si absent ----
     setTimeout(async () => {
-      if (isDev) {
-        console.log("⏭️ Mode dev : RustDesk non installé, non lancé.");
-        return;
+      if (isDev) return;
+
+      const { isRustDeskInstalled } = require("./rustDeskInstaller");
+
+      // 1. Si RustDesk n’est PAS installé → proposer installation manuelle, puis STOP.
+      if (!isRustDeskInstalled()) {
+        console.log(
+          "🧩 RustDesk non installé → l'utilisateur doit l’installer manuellement."
+        );
+        return; 
       }
 
-      try {
-        const rustdeskConfig = store.get("rustdeskConfig");
+      // 2. RustDesk est déjà installé → on peut le lancer et lire ID/MDP.
+      console.log("✅ RustDesk installé → lancement + lecture ID/MDP…");
 
-        if (!rustdeskConfig || !rustdeskConfig.installed) {
-          console.log("🧩 RustDesk non installé — installation silencieuse...");
-          await installRustDesk();
-        } else {
-          console.log("✅ RustDesk déjà présent — lancement automatique...");
-          await launchRustDeskOnStartup();
-        }
-      } catch (error) {
-        console.error(
-          "⚠️ RustDesk installation failed (non-critical):",
-          error.message
-        );
+      try {
+        const {
+          launchRustDeskOnStartup,
+          syncRustDeskState,
+        } = require("./rustDeskInstaller");
+
+        await launchRustDeskOnStartup();
+        await syncRustDeskState();
+      } catch (err) {
+        console.error("⚠️ Erreur RustDesk:", err);
       }
     }, 5000);
   });

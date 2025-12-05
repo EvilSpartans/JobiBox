@@ -45,9 +45,6 @@
     "electron/rustDeskInstaller.js",
     "electron/extra-packages/**/*"
   ],
-  "nsis": {
-   "include": "electron/windows-post-install.nsh"
-  },
   "deb": {
    "afterInstall": "electron/linux-post-install.sh"
   },

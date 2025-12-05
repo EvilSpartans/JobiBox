@@ -34,27 +34,25 @@ export const getJobiboxPortals = createAsyncThunk(
 );
 
 export const updateJobibox = createAsyncThunk(
-    "jobibox/update",
-    async (values, { rejectWithValue }) => {
-        const { id, version, rustdeskId, rustdeskPassword } = values;
+  "jobibox/update",
+  async (values, { rejectWithValue }) => {
+    const { id, version, rustdeskId, rustdeskPassword } = values;
 
-        const payload = { version };
-
+    const payload = {};
+    if (version) payload.version = version;
     if (rustdeskId) payload.rustdeskId = rustdeskId;
     if (rustdeskPassword) payload.rustdeskPassword = rustdeskPassword;
 
-        try {
-            const { data } = await axios.put(
-                `${BASE_URL}/jobibox/${id}`,
-                {
-                    payload
-                },
-            );
-            return data;
-        } catch (error) {
-            return rejectWithValue(error.response);
-        }
+    try {
+      const { data } = await axios.put(
+        `${BASE_URL}/jobibox/${id}`,
+        payload
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response);
     }
+  }
 );
 
 export const jobiboxSlice = createSlice({
