@@ -210,7 +210,12 @@ export default function Film({ onStartSequence }) {
       }
     } else {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-        mediaRecorder.stop();
+        setTimeout(() => {
+          if (mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+          }
+        }, 1000);
+
         clearInterval(timerIntervalId);
       }
     }
@@ -594,6 +599,7 @@ export default function Film({ onStartSequence }) {
           )}
         </div>
 
+        {/*
         <div className="mt-4 flex items-center justify-center">
           {videoBase64 ? (
             <button
@@ -623,6 +629,7 @@ export default function Film({ onStartSequence }) {
             </button>
           )}
         </div>
+        */}
       </div>
 
       <button
