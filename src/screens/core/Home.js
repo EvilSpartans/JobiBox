@@ -36,18 +36,9 @@ export default function Home() {
         localStorage.setItem("examActivated", portalsData.exam);
         localStorage.setItem("offersActivated", portalsData.offers);
 
-        // ---- Version + RustDesk Sync ----
+        // ---- Version + AnyDesk Sync ----
         const appVersion = await AppVersion();
-        const rustdesk = await window.electron.storeApi.get("rustdeskConfig");
-
-        console.log("🔎 AppVersion:", appVersion);
-        console.log("🔎 RustDesk config interne:", rustdesk);
-        console.log(
-          "🧪 Test lecture RustDesk → ID:",
-          rustdesk?.rustdeskId,
-          "MDP:",
-          rustdesk?.rustdeskPassword
-        );
+        const anydeskId = await window.electron.anydeskApi.getFreshId();
 
         const updatePayload = {
           id: jobiboxId,
@@ -58,10 +49,9 @@ export default function Home() {
         };
 
         // Ajout conditionnel sécurisé
-        if (rustdesk?.rustdeskId)
-          updatePayload.rustdeskId = rustdesk.rustdeskId;
-        if (rustdesk?.rustdeskPassword)
-          updatePayload.rustdeskPassword = rustdesk.rustdeskPassword;
+        if (anydeskId) {
+          updatePayload.rustdeskId = anydeskId;
+        }
 
         console.log("📡 Payload envoyé à updateJobibox:", updatePayload);
 

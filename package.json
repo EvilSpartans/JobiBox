@@ -39,10 +39,10 @@
    "electron/utils/**/*",
    "electron/main.js",
    "electron/preload.js",
-   "electron/rustDeskInstaller.js"
+   "electron/anyDeskInstaller.js"
   ],
   "asarUnpack": [
-    "electron/rustDeskInstaller.js",
+    "electron/anyDeskInstaller.js",
     "electron/extra-packages/**/*"
   ],
   "deb": {

@@ -13,7 +13,7 @@ const isDev = !app.isPackaged;
 const fs = require("fs");
 
 const Store = require("electron-store");
-const store = new Store();
+const store = new Store({ name: "jobibox-store" });
 
 let updateInterval = null;
 let mainApp = null;
@@ -104,35 +104,34 @@ app.whenReady().then(async () => {
       console.error(error.message);
     }
 
-    // ---- RUSTDESK : installation uniquement si absent ----
+    // ---- ANYDESK ----
+    const {
+      isAnyDeskPresent,
+      ensureAnyDeskRunningAndSynced,
+    } = require("./anyDeskInstaller");
+
     setTimeout(async () => {
-      if (isDev) return;
+      // if (isDev) return;
 
-      const { isRustDeskInstalled } = require("./rustDeskInstaller");
-
-      // 1. Si RustDesk n’est PAS installé → proposer installation manuelle, puis STOP.
-      if (!isRustDeskInstalled()) {
-        console.log(
-          "🧩 RustDesk non installé → l'utilisateur doit l’installer manuellement."
-        );
-        return; 
+      if (!isAnyDeskPresent()) {
+        console.log("🧩 AnyDesk absent → copie sur Desktop + lancement…");
       }
-
-      // 2. RustDesk est déjà installé → on peut le lancer et lire ID/MDP.
-      console.log("✅ RustDesk installé → lancement + lecture ID/MDP…");
 
       try {
-        const {
-          launchRustDeskOnStartup,
-          syncRustDeskState,
-        } = require("./rustDeskInstaller");
+        const { id } = await ensureAnyDeskRunningAndSynced();
+        console.log("✅ AnyDesk OK → ID:", id);
 
-        await launchRustDeskOnStartup();
-        await syncRustDeskState();
+        setTimeout(() => {
+          try {
+            if (mainApp && !mainApp.isDestroyed()) {
+              mainApp.focus();
+            }
+          } catch {}
+        }, 1500);
       } catch (err) {
-        console.error("⚠️ Erreur RustDesk:", err);
+        console.error("❌ AnyDesk error:", err);
       }
-    }, 5000);
+    }, 3000);
   });
 
   app.on("activate", () => {
@@ -168,6 +167,13 @@ autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) autoUpdater.quitAndInstall();
   });
+});
+
+// ---- IPC ANYDESK ----
+ipcMain.handle("anydesk:getFreshId", async () => {
+  const { ensureAnyDeskRunningAndSynced } = require("./anyDeskInstaller");
+  const { id } = await ensureAnyDeskRunningAndSynced();
+  return id || null;
 });
 
 // ---- IPC Store ----
