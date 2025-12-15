@@ -11,6 +11,7 @@ import CoreRoutes from "./routes/CoreRoutes";
 import SimulationRoutes from "./routes/SimulationRoutes";
 import ExamRoutes from "./routes/ExamRoutes";
 import OfferRoutes from "./routes/OfferRoutes";
+import ResumeRoutes from './routes/ResumeRoutes';
 
 export default function App() {
     const user = useSelector((state) => state.user.user);
@@ -25,6 +26,7 @@ export default function App() {
                         <Routes>
                             {AuthRoutes({ token })}
                             {CvVideoRoutes({ token })}
+                            {ResumeRoutes({ token })}
                             {SimulationRoutes({ token })}
                             {ExamRoutes({ token })}
                             {CoreRoutes({ token })}

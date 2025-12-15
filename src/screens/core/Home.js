@@ -15,6 +15,8 @@ export default function Home() {
   const user = useSelector((state) => state.user.user);
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
+  // const resume = localStorage.getItem("resumeActivated");
+  const resume = "true"
   const offers = localStorage.getItem("offersActivated");
   const examenInProgress = localStorage.getItem("examenInProgress");
   const beginnerInProgress = localStorage.getItem("beginnerInProgress");
@@ -34,6 +36,7 @@ export default function Home() {
 
         localStorage.setItem("trainingActivated", portalsData.training);
         localStorage.setItem("examActivated", portalsData.exam);
+        // localStorage.setItem("resumeActivated", portalsData.resume);
         localStorage.setItem("offersActivated", portalsData.offers);
 
         // ---- Version + AnyDesk Sync ----
@@ -140,14 +143,14 @@ export default function Home() {
                 Simulation d'entretien
               </button>
             )}
-            {/* {exam === "true" && (
+            {resume === "true" && (
             <button
-              className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/exam")}
+              className="text-xl w-full flex justify-center bg-emerald-600 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-emerald-700 shadow-lg cursor-pointer transition ease-in duration-300"
+              onClick={() => navigate("/resume")}
             >
-              Examen
+              CV papier
             </button>
-            )} */}
+            )}
             {offers === "true" && (
               <button
                 className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"

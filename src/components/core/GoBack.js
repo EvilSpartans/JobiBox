@@ -19,7 +19,7 @@ const GoBack = ({ itemsToRemove = [], to }) => {
   };
 
   return (
-    <div className="fixed top-4 left-4">
+    <div className="fixed top-4 left-4 z-50">
       <button
         className="text-xl flex items-center hover:text-blue-700 focus:outline-none text-xl font-bold p-2 blinking"
         onClick={handleBack}

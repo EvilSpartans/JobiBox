@@ -16,43 +16,45 @@ import musicSlice from "./slices/musicSlice";
 import themeSlice from "./slices/themeSlice";
 import subCategorySlice from "./slices/subCategorySlice";
 import citySlice from "./slices/citySlice";
+import ResumeSlice from "./slices/resumeSlice";
 
 // saveUserOnlyFilter
 const saveUserOnlyFilter = createFilter("user", ["user"]);
 
 // persist config
 const persistConfig = {
- key: "user",
- storage,
- whitelist: ["user"],
- transforms: [saveUserOnlyFilter],
+  key: "user",
+  storage,
+  whitelist: ["user"],
+  transforms: [saveUserOnlyFilter],
 };
 
 const rootReducer = combineReducers({
- user: userSlice,
- post: postSlice,
- videoProcess: videoProcessSlice,
- questionVideo: questionVideoSlice,
- jobibox: jobiboxSlice,
- question: questionSlice,
- groupQuestions: groupQuestionSlice,
- category: categorySlice,
- greenFilter: greenFilterSlice,
- music: musicSlice,
- theme: themeSlice,
- subCategory: subCategorySlice,
- city: citySlice,
+  user: userSlice,
+  post: postSlice,
+  videoProcess: videoProcessSlice,
+  questionVideo: questionVideoSlice,
+  jobibox: jobiboxSlice,
+  question: questionSlice,
+  groupQuestions: groupQuestionSlice,
+  category: categorySlice,
+  greenFilter: greenFilterSlice,
+  music: musicSlice,
+  theme: themeSlice,
+  subCategory: subCategorySlice,
+  city: citySlice,
+  resume: ResumeSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const Store = configureStore({
- reducer: persistedReducer,
- middleware: (getDefaultMiddleware) =>
-  getDefaultMiddleware({
-   serializableCheck: false,
-  }),
- devTools: true,
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+  devTools: true,
 });
 
 export const persistor = persistStore(Store);
