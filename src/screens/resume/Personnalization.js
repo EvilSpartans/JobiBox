@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
@@ -12,7 +12,11 @@ import template5 from "../../../assets/images/resume/template5.png";
 import template6 from "../../../assets/images/resume/template6.png";
 import template7 from "../../../assets/images/resume/template7.png";
 import { useDispatch, useSelector } from "react-redux";
-import { createResume } from "../../store/slices/resumeSlice";
+import {
+  createResume,
+  getResume,
+  updateResume,
+} from "../../store/slices/resumeSlice";
 
 export default function Personnalization() {
   const user = useSelector((state) => state.user.user);
@@ -20,21 +24,36 @@ export default function Personnalization() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { status } = useSelector((state) => state.resume);
+  const { status, resume } = useSelector((state) => state.resume);
   const loading = status === "loading";
 
   const [title, setTitle] = useState("");
   const [selectedDesign, setSelectedDesign] = useState(null);
   const [selectedColor, setSelectedColor] = useState("#10b981");
 
+  useEffect(() => {
+    const resumeId = localStorage.getItem("resumeId");
+    if (!resumeId || !user?.token) return;
+
+    dispatch(getResume({ token: user.token, id: resumeId }));
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (!resume) return;
+
+    if (resume.title) setTitle(resume.title);
+    if (resume.template) setSelectedDesign(resume.template);
+    if (resume.mainColor) setSelectedColor(resume.mainColor);
+  }, [resume]);
+
   const designs = [
-    { id: 1, image: template1 },
-    { id: 2, image: template2 },
-    { id: 3, image: template3 },
-    { id: 4, image: template4 },
-    { id: 5, image: template5 },
-    { id: 6, image: template6 },
-    { id: 7, image: template7 },
+    { key: "template1", image: template1 },
+    { key: "template2", image: template2 },
+    { key: "template3", image: template3 },
+    { key: "template4", image: template4 },
+    { key: "template5", image: template5 },
+    { key: "template6", image: template6 },
+    { key: "template7", image: template7 },
   ];
 
   const colors = [
@@ -43,7 +62,7 @@ export default function Personnalization() {
     { name: "Violet", value: "#6d28d9" },
     { name: "Rouge", value: "#dc2626" },
     { name: "Orange", value: "#ea580c" },
-    { name: "Jaune", value: "#facc15" }, 
+    { name: "Jaune", value: "#facc15" },
     { name: "Noir", value: "#111827" },
   ];
 
@@ -51,11 +70,48 @@ export default function Personnalization() {
     if (!title || !selectedDesign || loading) return;
 
     try {
+      const resumeId = localStorage.getItem("resumeId");
+
+      // 👉 CAS 1 : le CV existe déjà → UPDATE (pas de recréation)
+      if (resumeId) {
+        await dispatch(
+          updateResume({
+            token,
+            id: resumeId,
+payload: {
+  // 🔒 on garde tout
+  title: resume?.title,
+  template: resume?.template,
+  mainColor: resume?.mainColor,
+  personalInfo: resume?.personalInfo,
+  contractType: resume?.contractType || [],
+  languages: resume?.languages || [],
+  skills: resume?.skills || [],
+  trainings: resume?.trainings || [],
+  experiences: resume?.experiences || [],
+  presentation: resume?.presentation || "",
+  alternanceDuration: resume?.alternanceDuration || "",
+  alternanceStartDate: resume?.alternanceStartDate || "",
+
+  // ✏️ on écrase CE QUI CHANGE ICI
+  title,
+  template: selectedDesign,
+  mainColor: selectedColor,
+}
+          })
+        ).unwrap();
+
+        navigate("/personalInfo");
+        return;
+      }
+
+      // 👉 CAS 2 : premier passage → CREATE
       const action = await dispatch(
         createResume({
           token,
           title,
-          template: `template${selectedDesign}`,
+          template: selectedDesign,
+          mainColor: selectedColor,
         })
       );
 
@@ -67,7 +123,7 @@ export default function Personnalization() {
         console.error("Création du CV échouée :", action);
       }
     } catch (error) {
-      console.error("Erreur lors de la création du CV :", error);
+      console.error("Erreur handleNext :", error);
     }
   };
 
@@ -75,16 +131,17 @@ export default function Personnalization() {
     <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
       {/* Actions fixes */}
       <Logout />
-      <GoBack />
+      <GoBack itemsToRemove={["resumeId"]} />
       {/* Background glow */}
       <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 h-full flex items-center justify-center px-4">
+      <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
         {/* Carte */}
         <div
           className="flex flex-col w-full max-w-6xl
-                   min-h-[80vh]
+                   min-h-[85vh] max-h-[90vh]
+                   overflow-y-auto scrollbar-none
                    p-6 sm:p-8 md:p-10
                    rounded-3xl
                    bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
@@ -130,21 +187,20 @@ export default function Personnalization() {
             </h3>
 
             {/* Zone scrollable */}
-            <div className="h-[38vh] overflow-y-auto scrollbar-none px-2">
+            <div className="max-h-[30vh] overflow-y-auto scrollbar-none px-2">
               <div className="grid grid-cols-4 gap-6">
                 {designs.map((design) => (
                   <button
                     key={design.id}
-                    onClick={() => setSelectedDesign(design.id)}
+                    onClick={() => setSelectedDesign(design.key)}
                     className={`relative rounded-xl overflow-hidden transition-all duration-200
-                    ${
-                      selectedDesign === design.id
-                        ? "ring-4 ring-emerald-500 bg-emerald-500/10 scale-[1.03]"
-                        : "border border-white/10 hover:border-emerald-400"
-                    }`}
+    ${
+      selectedDesign === design.key
+        ? "ring-2 ring-inset ring-emerald-500 bg-emerald-500/10"
+        : "border border-white/10 hover:border-emerald-400"
+    }`}
                   >
-                    {/* Preview 1024x1024 non déformée */}
-                    <div className="aspect-square bg-black/20 flex items-center justify-center">
+                    <div className="h-[140px] bg-black/20 flex items-center justify-center">
                       <img
                         src={design.image}
                         alt=""
@@ -152,8 +208,8 @@ export default function Personnalization() {
                       />
                     </div>
 
-                    {selectedDesign === design.id && (
-                      <div className="absolute inset-0 bg-emerald-600/35 flex items-center justify-center">
+                    {selectedDesign === design.key && (
+                      <div className="absolute inset-0 bg-emerald-600/30 flex items-center justify-center">
                         <span className="bg-black/50 px-3 py-1 rounded-full text-sm font-semibold text-white">
                           Sélectionné
                         </span>
@@ -165,8 +221,14 @@ export default function Personnalization() {
             </div>
           </div>
 
+          {/* Séparateur stylé */}
+          <div className="relative flex items-center justify-center my-10">
+            <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+            <div className="relative z-10 w-4 h-4 rounded-full bg-emerald-500/30 ring-1 ring-emerald-400/40 shadow-[0_0_12px_rgba(16,185,129,0.35)]" />
+          </div>
+
           {/* Sélection de la couleur */}
-          <div className="mt-10">
+          <div className="mt-6">
             <h3 className="text-lg font-semibold text-emerald-300 text-center mb-4">
               Couleur principale du CV
             </h3>

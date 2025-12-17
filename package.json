@@ -42,8 +42,8 @@
    "electron/anyDeskInstaller.js"
   ],
   "asarUnpack": [
-    "electron/anyDeskInstaller.js",
-    "electron/extra-packages/**/*"
+   "electron/anyDeskInstaller.js",
+   "electron/extra-packages/**/*"
   ],
   "deb": {
    "afterInstall": "electron/linux-post-install.sh"

@@ -59,6 +59,34 @@ export default function SkillsAndLanguages() {
     dispatch(getCategories(user.token));
   }, [dispatch, user]);
 
+  useEffect(() => {
+    if (!resume) return;
+
+    if (Array.isArray(resume.languages)) {
+      setLanguages(resume.languages);
+    }
+
+    if (Array.isArray(resume.skills)) {
+      setSelectedSkills(resume.skills);
+    }
+  }, [resume]);
+
+  useEffect(() => {
+    if (!resume || !categories.length) return;
+    if (!resume.skills || resume.skills.length === 0) return;
+
+    // on essaie de retrouver la catégorie à partir des skills
+    const skillNames = resume.skills;
+
+    const matchedCategory = categories.find((cat) =>
+      cat.technicalSkills?.some((s) => skillNames.includes(s.name))
+    );
+
+    if (matchedCategory) {
+      setCategoryId(matchedCategory.id);
+    }
+  }, [resume, categories]);
+
   /* ---------- FETCH SKILLS PAR CATÉGORIE ---------- */
 
   useEffect(() => {
@@ -75,6 +103,7 @@ export default function SkillsAndLanguages() {
   /* ---------- HANDLERS ---------- */
 
   const addLanguage = () => {
+    if (languages.length >= 5) return;
     if (!selectedLang || !selectedLevel) return;
     if (languages.some((l) => l.label === selectedLang)) return;
 
@@ -102,27 +131,58 @@ export default function SkillsAndLanguages() {
   };
 
   useEffect(() => {
-    if (availableSkills.length > 0) {
+    if (availableSkills.length > 0 && selectedSkills.length === 0) {
       setSelectedSkills(availableSkills.slice(0, 3).map((s) => s.name));
     }
   }, [availableSkills]);
 
-//   const addCustomSkill = () => {
-//     if (!customSkill.trim()) return;
-//     if (selectedSkills.includes(customSkill.trim())) return;
-//     if (selectedSkills.length >= 5) return;
+  const addCustomSkill = () => {
+    const value = customSkill.trim();
+    if (!value) return;
 
-//     setSelectedSkills((prev) => [...prev, customSkill.trim()]);
-//     setCustomSkill("");
-//   };
+    // déjà sélectionnée
+    if (selectedSkills.includes(value)) {
+      setCustomSkill("");
+      return;
+    }
+
+    // limite 5 compétences
+    if (selectedSkills.length >= 5) return;
+
+    // ajout en tête de la liste visible
+    setAvailableSkills((prev) => [
+      { id: `custom-${value}`, name: value },
+      ...prev,
+    ]);
+
+    // sélection immédiate
+    setSelectedSkills((prev) => [value, ...prev]);
+
+    setCustomSkill("");
+  };
 
   const handleNext = async () => {
-    if (languages.length === 0 || selectedSkills.length === 0) return;
+    if (languages.length === 0 || selectedSkills.length === 0 || loading)
+      return;
 
     const resumeId = localStorage.getItem("resumeId");
     if (!resumeId) return;
 
     const payload = {
+      // 🔒 TOUT ce qui existe déjà
+      title: resume?.title,
+      template: resume?.template,
+      mainColor: resume?.mainColor,
+      qrcodePostId: resume?.qrcodePostId,
+      personalInfo: resume?.personalInfo,
+      contractType: resume?.contractType || [],
+      alternanceDuration: resume?.alternanceDuration || "",
+      alternanceStartDate: resume?.alternanceStartDate || "",
+      presentation: resume?.presentation || "",
+      trainings: resume?.trainings || [],
+      experiences: resume?.experiences || [],
+
+      // ✅ CE QUE CET ÉCRAN MODIFIE
       languages,
       skills: selectedSkills,
     };
@@ -135,7 +195,7 @@ export default function SkillsAndLanguages() {
       })
     );
 
-    // navigate("/resume/experiences");
+    navigate("/smartGeneration");
   };
 
   /* ---------- RENDER ---------- */
@@ -144,12 +204,13 @@ export default function SkillsAndLanguages() {
     <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
       <Logout />
       <GoBack />
-      {/* Glow */}
+
+      {/* Glow background */}
       <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 h-full flex items-center justify-center px-4">
-        <div className="flex flex-col w-full max-w-5xl min-h-[82vh] max-h-[90vh] overflow-y-auto scrollbar-none p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
+        <div className="flex flex-col w-full max-w-5xl min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
           {/* HEADER */}
           <div className="text-center space-y-4">
             <span className="inline-block px-4 py-1 rounded-full text-sm font-semibold bg-emerald-900/40 text-emerald-300">
@@ -164,104 +225,77 @@ export default function SkillsAndLanguages() {
             </p>
           </div>
 
-          {/* LANGUES */}
+          {/* ================= LANGUES ================= */}
           <section className="mt-10">
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-lg font-semibold text-emerald-300 mb-1">
               🌍 Langues parlées
             </h3>
             <p className="text-sm text-gray-400 mb-6">
-              Choisis une langue puis son niveau. Elle sera ajoutée
-              automatiquement.
+              Choisis une langue puis son niveau (5 maximum).
             </p>
 
             {/* Sélecteurs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Langue */}
               <select
                 value={selectedLang}
                 onChange={(e) => {
                   const lang = e.target.value;
                   setSelectedLang(lang);
-
+                  if (languages.length >= 5) return;
                   if (!lang || !selectedLevel) return;
-
-                  setLanguages((prev) => {
-                    const exists = prev.find((l) => l.label === lang);
-                    if (exists) {
-                      return prev.map((l) =>
-                        l.label === lang ? { ...l, level: selectedLevel } : l
-                      );
-                    }
-                    return [...prev, { label: lang, level: selectedLevel }];
-                  });
-
+                  setLanguages((prev) =>
+                    prev.some((l) => l.label === lang)
+                      ? prev.map((l) =>
+                          l.label === lang ? { ...l, level: selectedLevel } : l
+                        )
+                      : [...prev, { label: lang, level: selectedLevel }]
+                  );
                   setSelectedLang("");
                   setSelectedLevel("");
                 }}
-                className="
-        w-full
-        bg-dark_bg_1/80
-        border border-white/10
-        text-white
-        rounded-xl
-        px-5 py-4
-        text-base
-        focus:outline-none
-        focus:ring-2 focus:ring-emerald-500/40
-      "
+                className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               >
-                <option value="" className="bg-dark_bg_2 text-gray-400">
+                <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
                   Choisir une langue
                 </option>
                 {LANGUAGES.map((l) => (
-                  <option key={l} value={l} className="bg-dark_bg_2 text-white">
+                  <option
+                    key={l}
+                    value={l}
+                    className="bg-dark_bg_2 text-white text-lg"
+                  >
                     {l}
                   </option>
                 ))}
               </select>
 
-              {/* Niveau */}
               <select
                 value={selectedLevel}
                 onChange={(e) => {
                   const level = e.target.value;
                   setSelectedLevel(level);
-
+                  if (languages.length >= 5) return;
                   if (!selectedLang || !level) return;
-
-                  setLanguages((prev) => {
-                    const exists = prev.find((l) => l.label === selectedLang);
-                    if (exists) {
-                      return prev.map((l) =>
-                        l.label === selectedLang ? { ...l, level } : l
-                      );
-                    }
-                    return [...prev, { label: selectedLang, level }];
-                  });
-
+                  setLanguages((prev) =>
+                    prev.some((l) => l.label === selectedLang)
+                      ? prev.map((l) =>
+                          l.label === selectedLang ? { ...l, level } : l
+                        )
+                      : [...prev, { label: selectedLang, level }]
+                  );
                   setSelectedLang("");
                   setSelectedLevel("");
                 }}
-                className="
-        w-full
-        bg-dark_bg_1/80
-        border border-white/10
-        text-white
-        rounded-xl
-        px-5 py-4
-        text-base
-        focus:outline-none
-        focus:ring-2 focus:ring-emerald-500/40
-      "
+                className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               >
-                <option value="" className="bg-dark_bg_2 text-gray-400">
+                <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
                   Niveau
                 </option>
                 {LEVELS.map((lvl) => (
                   <option
                     key={lvl}
                     value={lvl}
-                    className="bg-dark_bg_2 text-white"
+                    className="bg-dark_bg_2 text-white text-lg"
                   >
                     {lvl}
                   </option>
@@ -269,142 +303,119 @@ export default function SkillsAndLanguages() {
               </select>
             </div>
 
-            {/* Langues ajoutées */}
-            {languages.length > 0 && (
-              <div className="mt-6">
-                <p className="text-sm text-gray-400 mb-3">
-                  Langues sélectionnées
-                </p>
-
+            {/* Zone langues (toujours visible) */}
+            <div className="mt-6 min-h-[72px] rounded-xl bg-white/5 border border-white/10 flex items-center px-4">
+              {languages.length === 0 ? (
+                <div className="flex items-center gap-3 text-gray-500 text-sm">
+                  <span className="text-emerald-400 text-lg">🌐</span>
+                  Aucune langue sélectionnée pour le moment
+                </div>
+              ) : (
                 <div className="flex flex-wrap gap-3">
                   {languages.map((l) => (
                     <span
                       key={l.label}
                       onClick={() => removeLanguage(l.label)}
-                      className="
-              px-4 py-2
-              rounded-full
-              bg-emerald-600/20
-              border border-emerald-500
-              text-white
-              text-sm
-              cursor-pointer
-              hover:bg-emerald-700/30
-              transition
-            "
+                      className="px-4 py-2 rounded-full bg-emerald-600/20 border border-emerald-500 text-white text-sm cursor-pointer hover:bg-emerald-700/30 transition"
                     >
                       {l.label} · {l.level} ✕
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </section>
 
-          {/* COMPÉTENCES */}
-          <section className="mt-14">
-            <h3 className="text-xl font-semibold text-white mb-1">
-              🧩 Domaine d’activité
+          {/* Séparateur CANON */}
+          <div className="relative flex items-center justify-center my-10">
+            <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+            <div className="relative z-10 w-4 h-4 rounded-full bg-emerald-500/30 ring-1 ring-emerald-400/40 shadow-[0_0_12px_rgba(16,185,129,0.35)]" />
+          </div>
+
+          {/* ================= COMPÉTENCES ================= */}
+          <section>
+            <h3 className="text-lg font-semibold text-emerald-300 mb-1">
+              🧩 Compétences
             </h3>
             <p className="text-sm text-gray-400 mb-6">
-              Choisis ton domaine, puis sélectionne jusqu’à 5 compétences
-              associées.
+              Domaine + jusqu’à 5 compétences clés.
             </p>
 
-            {/* SELECT DOMAINE */}
-            <div className="relative mb-8">
-              <select
-                value={categoryId}
-                onChange={(e) => {
-                  setCategoryId(e.target.value);
-                  setSelectedSkills([]); // reset compétences quand on change de domaine
-                }}
-                className="
-        w-full
-        appearance-none
-        bg-dark_bg_1/80
-        border border-white/10
-        text-white
-        rounded-2xl
-        px-6 py-5
-        text-base
-        focus:outline-none
-        focus:ring-2 focus:ring-emerald-500/40
-        transition
-      "
-              >
-                <option value="" className="bg-dark_bg_2 text-gray-400">
-                  Choisir un domaine d’activité
-                </option>
-                {categories.map((c) => (
+            {/* Domaine + ajout */}
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="relative md:col-span-3">
+                <select
+                  value={categoryId}
+                  onChange={(e) => {
+                    setCategoryId(e.target.value);
+                    setSelectedSkills([]);
+                  }}
+                  className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-2xl px-6 py-5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                >
                   <option
-                    key={c.id}
-                    value={c.id}
-                    className="bg-dark_bg_2 text-white"
+                    value=""
+                    className="bg-dark_bg_2 text-gray-400 text-lg"
                   >
-                    {c.name}
+                    Choisir un domaine d’activité
                   </option>
-                ))}
-              </select>
+                  {categories.map((c) => (
+                    <option
+                      key={c.id}
+                      value={c.id}
+                      className="bg-dark_bg_2 text-white text-lg"
+                    >
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-emerald-400 text-lg">
+                  ▾
+                </div>
+              </div>
 
-              <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-emerald-400 text-lg">
-                ▾
+              <div className="flex gap-2 md:col-span-2">
+                <input
+                  value={customSkill}
+                  onChange={(e) => setCustomSkill(e.target.value)}
+                  placeholder="Compétence personnalisée"
+                  className="flex-1 bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                  onKeyDown={(e) => e.key === "Enter" && addCustomSkill()}
+                />
+                <button
+                  onClick={addCustomSkill}
+                  className="px-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold hover:bg-emerald-600/30 transition"
+                >
+                  +
+                </button>
               </div>
             </div>
 
-            {/* MULTI SELECT COMPÉTENCES */}
-            {availableSkills.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-400 mb-3">
-                  Compétences disponibles
-                  <span className="ml-2 text-emerald-400">
-                    ({selectedSkills.length}/5)
-                  </span>
-                </p>
-
-                <div
-                  className="
-          max-h-72
-          overflow-y-auto
-          rounded-2xl
-          border border-white/10
-          bg-dark_bg_1/60
-          p-4
-          space-y-2
-        "
-                >
+            {/* Zone compétences */}
+            <div className="min-h-[260px] rounded-2xl bg-white/5 border border-white/10 p-4">
+              {availableSkills.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-gray-500 text-sm gap-3">
+                  <span className="text-emerald-400 text-xl">🧠</span>
+                  Sélectionne un domaine pour voir les compétences
+                </div>
+              ) : (
+                <div className="max-h-56 overflow-y-auto space-y-2">
                   {availableSkills.map((skill) => {
                     const checked = selectedSkills.includes(skill.name);
-
                     return (
                       <label
                         key={skill.id}
-                        className={`
-                flex items-center gap-3
-                px-4 py-3
-                rounded-xl
-                cursor-pointer
-                transition
-                ${
-                  checked
-                    ? "bg-emerald-600/20 text-white"
-                    : "hover:bg-white/5 text-gray-300"
-                }
-              `}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
+                          checked
+                            ? "bg-emerald-600/20 text-white"
+                            : "hover:bg-white/5 text-gray-300"
+                        }`}
                       >
                         <input
                           type="checkbox"
                           checked={checked}
                           disabled={!checked && selectedSkills.length >= 5}
                           onChange={() => toggleSkill(skill.name)}
-                          className="
-                  h-5 w-5
-                  rounded
-                  border-white/20
-                  bg-transparent
-                  text-emerald-500
-                  focus:ring-emerald-500
-                "
+                          className="h-5 w-5 text-emerald-500"
                         />
                         <span className="text-sm font-medium">
                           {skill.name}
@@ -413,16 +424,23 @@ export default function SkillsAndLanguages() {
                     );
                   })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </section>
 
           {/* FOOTER */}
           <div className="pt-10 flex justify-end">
             <button
               onClick={handleNext}
-              disabled={loading}
-              className="px-10 py-4 rounded-full text-lg font-semibold bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-xl"
+              disabled={
+                loading || languages.length === 0 || selectedSkills.length === 0
+              }
+              className={`px-10 py-4 rounded-full text-lg font-semibold transition
+    ${
+      loading || languages.length === 0 || selectedSkills.length === 0
+        ? "bg-white/10 text-gray-500 cursor-not-allowed pointer-events-none"
+        : "bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-xl hover:from-emerald-700 hover:to-emerald-800"
+    }`}
             >
               {loading ? <PulseLoader color="#fff" size={12} /> : "Suivant"}
             </button>

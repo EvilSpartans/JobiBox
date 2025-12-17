@@ -39,7 +39,7 @@ export default function Resume() {
   ];
 
   return (
-    <div className="relative h-screen flex items-center justify-center dark:bg-dark_bg_1 overflow-hidden">
+    <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
       <Logout />
       <GoBack />
       {/* Background glow */}
@@ -49,12 +49,12 @@ export default function Resume() {
       <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
         {/* Carte principale */}
         <div
-          className="flex flex-col justify-between w-full max-w-3xl
+          className="flex flex-col w-full max-w-3xl
                      p-6 sm:p-10 md:p-12
                      rounded-3xl
                      bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
                      backdrop-blur-xl shadow-2xl ring-1 ring-white/10
-                     max-h-[90vh] overflow-y-auto scrollbar-none"
+                     min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none"
         >
           {/* Header */}
           <div className="text-center space-y-6">
@@ -99,7 +99,7 @@ export default function Resume() {
           </div>
 
           {/* Footer */}
-          <div className="mt-14 flex flex-col items-center space-y-6">
+          <div className="mt-auto pt-14 flex flex-col items-center space-y-6">
             <p className="text-sm text-gray-400 text-center max-w-md">
               Ton CV sera sauvegardé et accessible à tout moment dans ton espace
               privé Jobissim.

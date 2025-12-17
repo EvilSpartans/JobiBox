@@ -55,6 +55,24 @@ export default function PersonalInfo() {
     );
   }, [dispatch, user]);
 
+  useEffect(() => {
+  if (!resume) return;
+
+  setForm((prev) => ({
+    ...prev,
+    firstName: resume.personalInfo?.firstName || prev.firstName,
+    lastName: resume.personalInfo?.lastName || prev.lastName,
+    email: resume.personalInfo?.email || prev.email,
+    phone: resume.personalInfo?.phone || prev.phone,
+    address: resume.personalInfo?.address || prev.address,
+    website: resume.personalInfo?.website || prev.website,
+    contractType: resume.contractType || prev.contractType,
+    alternanceDuration: resume.alternanceDuration || prev.alternanceDuration,
+    alternanceStartDate:
+      resume.alternanceStartDate || prev.alternanceStartDate,
+  }));
+}, [resume]);
+
   const contracts = [
     "CDI",
     "CDD",
@@ -87,48 +105,54 @@ export default function PersonalInfo() {
     form.email.trim() !== "" &&
     form.contractType.length > 0;
 
-  const handleNext = async () => {
-    if (!isFormValid || loading) return;
+const handleNext = async () => {
+  if (!isFormValid || loading) return;
 
-    const resumeId = localStorage.getItem("resumeId");
-    if (!resumeId) {
-      console.error("resumeId introuvable");
-      return;
-    }
+  const resumeId = localStorage.getItem("resumeId");
+  if (!resumeId) {
+    console.error("resumeId introuvable");
+    return;
+  }
 
-    const payload = {
-      title: resume?.title,
-      alternanceDuration: isAlternance ? form.alternanceDuration : "",
-      alternanceStartDate: isAlternance ? form.alternanceStartDate : "",
-      personalInfo: {
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        website: form.website,
-      },
-      contractType: form.contractType,
-    };
+  const payload = {
+    // 🔒 on garde TOUT ce qui existe déjà
+    title: resume?.title,
+    template: resume?.template,
+    mainColor: resume?.mainColor,
+    languages: resume?.languages || [],
+    skills: resume?.skills || [],
+    trainings: resume?.trainings || [],
+    experiences: resume?.experiences || [],
+    presentation: resume?.presentation || "",
 
-    console.log("Payload envoyé au updateResume :", payload);
-
-    try {
-      await dispatch(
-        updateResume({
-          token: user.token,
-          id: resumeId,
-          payload,
-        })
-      );
-
-      console.log("Resume mis à jour (infos personnelles)");
-
-      navigate("/skillsAndLanguages");
-    } catch (error) {
-      console.error("Erreur update resume :", error);
-    }
+    // ✅ on met à jour UNIQUEMENT cette étape
+    alternanceDuration: isAlternance ? form.alternanceDuration : "",
+    alternanceStartDate: isAlternance ? form.alternanceStartDate : "",
+    personalInfo: {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      website: form.website,
+    },
+    contractType: form.contractType,
   };
+
+  try {
+    await dispatch(
+      updateResume({
+        token: user.token,
+        id: resumeId,
+        payload,
+      })
+    ).unwrap();
+
+    navigate("/skillsAndLanguages");
+  } catch (error) {
+    console.error("Erreur update resume :", error);
+  }
+};
 
   return (
     <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
@@ -142,7 +166,7 @@ export default function PersonalInfo() {
       <div className="relative z-10 h-full flex items-center justify-center px-4">
         <div
           className="flex flex-col w-full max-w-5xl
-                     min-h-[82vh] max-h-[90vh]
+                     min-h-[85vh] max-h-[90vh]
                      overflow-y-auto scrollbar-none
                      p-6 sm:p-8 md:p-10
                      rounded-3xl

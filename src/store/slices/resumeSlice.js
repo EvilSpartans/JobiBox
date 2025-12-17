@@ -34,11 +34,15 @@ export const getResume = createAsyncThunk(
 
 export const createResume = createAsyncThunk(
   "resume/create",
-  async ({ token, title, template }, { rejectWithValue }) => {
+  async ({ token, title, template, mainColor }, { rejectWithValue }) => {
     try {
       const { data } = await axios.post(
         `${BASE_URL}/resume/create`,
-        { title, template },
+        {
+          title,
+          template,
+          mainColor, 
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -128,8 +132,13 @@ export const updateResume = createAsyncThunk(
       }
 
       if (Array.isArray(payload.languages)) {
-        payload.languages.forEach((lang) => {
-          formData.append("languages[]", lang);
+        payload.languages.forEach((lang, i) => {
+          if (lang?.label !== undefined) {
+            formData.append(`languages[${i}][label]`, lang.label);
+          }
+          if (lang?.level !== undefined) {
+            formData.append(`languages[${i}][level]`, lang.level);
+          }
         });
       }
 
@@ -155,11 +164,7 @@ export const updateResume = createAsyncThunk(
 
       if (Array.isArray(payload.skills)) {
         payload.skills.forEach((skill, i) => {
-          Object.entries(skill).forEach(([key, value]) => {
-            if (value !== undefined) {
-              formData.append(`skills[${i}][${key}]`, value);
-            }
-          });
+          formData.append(`skills[${i}]`, skill);
         });
       }
 
