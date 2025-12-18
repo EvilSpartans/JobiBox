@@ -202,6 +202,11 @@ export const uploadResumeAudio = createAsyncThunk(
   }
 );
 
+export const getResumeDownloadUrl = (id) => {
+  if (!id) return "";
+  return `${BASE_URL}/resume/${id}/download`;
+};
+
 export const ResumeSlice = createSlice({
   name: "resume",
   initialState,

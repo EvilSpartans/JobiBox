@@ -72,8 +72,37 @@ export default function SmartGeneration() {
   const audioChunksRef = useRef([]);
 
   const current = stepsConfig.find((s) => s.id === step);
+  const recordButtonRef = useRef(null);
+  const isKeyPressed = useRef(false);
 
   /* ----------- LOAD RESUME ----------- */
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (isKeyPressed.current) return;
+
+      // accepte TOUTES les touches du pad / clavier
+      if (/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
+        isKeyPressed.current = true;
+
+        if (recordButtonRef.current && !recordButtonRef.current.disabled) {
+          recordButtonRef.current.click();
+        }
+      }
+    };
+
+    const handleKeyUp = () => {
+      isKeyPressed.current = false;
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
 
   useEffect(() => {
     const resumeId = localStorage.getItem("resumeId");
@@ -244,8 +273,8 @@ export default function SmartGeneration() {
       <GoBack />
 
       {/* Glow background */}
-<div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 blur-3xl pointer-events-none" />
-<div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 h-full flex items-center justify-center px-4">
         <div className="flex flex-col w-full max-w-5xl min-h-[85vh] p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
@@ -329,6 +358,7 @@ export default function SmartGeneration() {
                   </div>
                 ) : (
                   <button
+                    ref={recordButtonRef}
                     disabled={countdown}
                     onClick={() => {
                       if (!recording && validatedSteps.includes(step)) {

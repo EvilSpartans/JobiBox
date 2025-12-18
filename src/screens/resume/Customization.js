@@ -18,7 +18,7 @@ import {
   updateResume,
 } from "../../store/slices/resumeSlice";
 
-export default function Personnalization() {
+export default function Customization() {
   const user = useSelector((state) => state.user.user);
   const { token } = user;
   const navigate = useNavigate();

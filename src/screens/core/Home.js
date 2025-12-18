@@ -15,8 +15,7 @@ export default function Home() {
   const user = useSelector((state) => state.user.user);
   const training = localStorage.getItem("trainingActivated");
   const exam = localStorage.getItem("examActivated");
-  // const resume = localStorage.getItem("resumeActivated");
-  const resume = "true"
+  const resume = localStorage.getItem("resumeActivated");
   const offers = localStorage.getItem("offersActivated");
   const examenInProgress = localStorage.getItem("examenInProgress");
   const beginnerInProgress = localStorage.getItem("beginnerInProgress");
@@ -36,7 +35,7 @@ export default function Home() {
 
         localStorage.setItem("trainingActivated", portalsData.training);
         localStorage.setItem("examActivated", portalsData.exam);
-        // localStorage.setItem("resumeActivated", portalsData.resume);
+        localStorage.setItem("resumeActivated", portalsData.resume);
         localStorage.setItem("offersActivated", portalsData.offers);
 
         // ---- Version + AnyDesk Sync ----

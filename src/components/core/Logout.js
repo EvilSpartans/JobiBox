@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { logout } from "../../store/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteVideoProcess } from "../../store/slices/videoProcessSlice";
+import { resetResumeState } from "../../store/slices/resumeSlice";
 
 export default function Logout({ position = "fixed" }) {
   const dispatch = useDispatch();
@@ -16,6 +17,7 @@ export default function Logout({ position = "fixed" }) {
 
   const confirmLogout = async () => {
     dispatch(logout());
+    dispatch(resetResumeState());
     clearLocalStorage();
     await clearCache();
     setShowModal(false);
