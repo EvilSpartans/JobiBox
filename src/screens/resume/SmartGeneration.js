@@ -72,6 +72,58 @@ export default function SmartGeneration() {
   const audioChunksRef = useRef([]);
 
   const current = stepsConfig.find((s) => s.id === step);
+  const currentKey = STEP_KEYS[step];
+
+  const clean = (value) =>
+  typeof value === "string" && value.trim() ? value.trim() : null;
+
+const joinDefined = (parts, separator = " — ") =>
+  parts.filter(Boolean).join(separator);
+
+const existingText =
+  currentKey === "presentation"
+    ? resume?.presentation
+    : currentKey === "trainings"
+    ? resume?.trainings
+        ?.map((t) => {
+          const main = joinDefined([
+            clean(t.degree),
+            clean(t.school),
+          ]);
+
+          const dates = joinDefined(
+            [clean(t.startDate), clean(t.endDate)],
+            " → "
+          );
+
+          return joinDefined(
+            [main, dates ? `(${dates})` : null],
+            " "
+          );
+        })
+        .join("\n")
+    : currentKey === "experiences"
+    ? resume?.experiences
+        ?.map((e) => {
+          const main = joinDefined([
+            clean(e.job),
+            clean(e.company),
+          ]);
+
+          const dates = joinDefined(
+            [clean(e.startDate), clean(e.endDate)],
+            " → "
+          );
+
+          return joinDefined(
+            [main, dates ? `(${dates})` : null],
+            " "
+          );
+        })
+        .join("\n")
+    : "";
+
+  const hasExistingAnswer = Boolean(existingText && existingText.length > 0);
   const recordButtonRef = useRef(null);
   const isKeyPressed = useRef(false);
 
@@ -374,10 +426,28 @@ export default function SmartGeneration() {
                         : "bg-emerald-600 text-white"
                     }`}
                   >
-                    {recording ? "Arrêter" : "Démarrer l’enregistrement"}
+                    {recording
+                      ? "Arrêter"
+                      : hasExistingAnswer
+                      ? "Recommencer l’enregistrement"
+                      : "Démarrer l’enregistrement"}
                   </button>
                 )}
               </div>
+
+{/* Réponse */}
+              {hasExistingAnswer && (
+  <div className="mt-6 rounded-xl bg-emerald-600/10 border border-emerald-500/30 p-5 max-h-[160px] overflow-y-auto">
+    <p className="text-sm text-emerald-300 mb-2 font-semibold">
+      Ta réponse :
+    </p>
+
+    <p className="text-sm text-gray-200 whitespace-pre-line">
+      {existingText}
+    </p>
+  </div>
+)}
+
             </div>
 
             {/* FOOTER */}

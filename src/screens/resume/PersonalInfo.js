@@ -214,7 +214,7 @@ const handleNext = async () => {
               type="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="exemple@email.com"
+              placeholder="Ex. : prenom.nom@email.com"
               required
             />
 
@@ -223,7 +223,7 @@ const handleNext = async () => {
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              placeholder="06 12 34 56 78"
+              placeholder="Ex. : 06 XX XX XX XX"
             />
 
             <Input

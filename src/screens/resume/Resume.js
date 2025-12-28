@@ -111,7 +111,7 @@ export default function Resume() {
                          bg-gradient-to-r from-emerald-600 to-emerald-700
                          text-lg font-semibold text-white shadow-xl
                          hover:from-emerald-700 hover:to-emerald-800
-                         transition-all duration-300"
+                         transition-all duration-300 animate-pulse"
             >
               <span className="relative z-10">Commencer l’expérience</span>
 

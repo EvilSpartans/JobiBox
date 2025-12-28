@@ -22,6 +22,7 @@ const Photo = forwardRef(function Photo(
   const [showModal, setShowModal] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [countdown, setCountdown] = useState(null);
+  const [cameraLoading, setCameraLoading] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -54,6 +55,11 @@ const Photo = forwardRef(function Photo(
   /* ================= CAMERA ================= */
   const initializeCamera = async () => {
     try {
+      setCameraLoading(true);
+
+      // stop ancienne caméra si existante
+      stopCamera();
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
@@ -62,9 +68,26 @@ const Photo = forwardRef(function Photo(
         },
         audio: false,
       });
+
+      if (!videoRef.current) {
+        setCameraLoading(false);
+        return;
+      }
+
       videoRef.current.srcObject = stream;
+
+      // ✅ méthode fiable
+      videoRef.current.onloadeddata = () => {
+        setCameraLoading(false);
+      };
+
+      // 🔐 fallback de sécurité (au cas où)
+      setTimeout(() => {
+        setCameraLoading(false);
+      }, 2000);
     } catch (err) {
       console.error("Erreur caméra :", err);
+      setCameraLoading(false);
     }
   };
 
@@ -146,6 +169,7 @@ const Photo = forwardRef(function Photo(
 
   const closeModal = () => {
     setShowModal(false);
+    setCameraLoading(false);
     stopCamera();
   };
 
@@ -171,19 +195,14 @@ const Photo = forwardRef(function Photo(
           px-6 py-4 rounded-2xl
           font-semibold
           ${
-            isResume
-              ? "bg-emerald-600 text-white"
-              : "bg-gray-300 text-gray-700"
+            isResume ? "bg-emerald-600 text-white" : "bg-gray-300 text-gray-700"
           }
         `}
       >
         <FontAwesomeIcon icon={faCamera} />
         {isResume ? "Créer ma photo de CV" : "Créer ma photo CV vidéo"}
         {photoConfirmed && (
-          <FontAwesomeIcon
-            icon={faCheckCircle}
-            className="text-white ml-2"
-          />
+          <FontAwesomeIcon icon={faCheckCircle} className="text-white ml-2" />
         )}
       </button>
 
@@ -197,15 +216,9 @@ const Photo = forwardRef(function Photo(
       {/* ===== MODAL ===== */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/80"
-            onClick={closeModal}
-          />
+          <div className="absolute inset-0 bg-black/80" onClick={closeModal} />
           <div className="relative bg-white rounded-2xl p-6 w-full max-w-md z-10">
-            <button
-              className="absolute top-3 right-3"
-              onClick={closeModal}
-            >
+            <button className="absolute top-3 right-3" onClick={closeModal}>
               <FontAwesomeIcon icon={faTimes} />
             </button>
 
@@ -221,11 +234,24 @@ const Photo = forwardRef(function Photo(
               <img src={photo} alt="capture" className="mx-auto rounded-xl" />
             ) : (
               <div className="relative">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  className="w-full rounded-xl transform -scale-x-100"
-                />
+                <div className="relative">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full rounded-xl transform -scale-x-100"
+                  />
+
+                  {cameraLoading && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 rounded-xl">
+                      <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-600 border-t-transparent" />
+                      <p className="mt-4 text-white text-sm">
+                        Initialisation de la caméra…
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={startCountdown}
                   className="mt-4 w-full py-2 rounded-xl bg-emerald-600 text-white"

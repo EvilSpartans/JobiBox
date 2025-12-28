@@ -24,21 +24,8 @@ import template6 from "../../../assets/images/resume/template6.png";
 import template7 from "../../../assets/images/resume/template7.png";
 import { useNavigate } from "react-router-dom";
 
-/* ================= HELPERS DATES ================= */
-const toInputDate = (date) => {
-  if (!date) return "";
-  if (date.includes("-") && date.length === 10) {
-    const [d, m, y] = date.split("-");
-    return `${y}-${m}-${d}`;
-  }
-  return date;
-};
-
-const fromInputDate = (date) => {
-  if (!date) return "";
-  const [y, m, d] = date.split("-");
-  return `${d}-${m}-${y}`;
-};
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 /* ================= CONSTANTES ================= */
 const TEMPLATES = [
@@ -54,8 +41,11 @@ const TEMPLATES = [
 const COLORS = [
   "#10b981",
   "#1e3a8a",
+  "#2563eb",
   "#6d28d9",
+  "#7c3aed",
   "#dc2626",
+  "#7f1d1d",
   "#ea580c",
   "#facc15",
   "#111827",
@@ -95,6 +85,7 @@ export default function Finalization() {
   const [activeStep, setActiveStep] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showConfetti, setShowConfetti] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowConfetti(false), 4000);
@@ -137,6 +128,7 @@ export default function Finalization() {
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const photoRef = useRef(null);
   const [videoSelectOpen, setVideoSelectOpen] = useState(false);
+  const [deleteSkillTarget, setDeleteSkillTarget] = useState(null);
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -208,14 +200,27 @@ export default function Finalization() {
       website: resume.personalInfo?.website || "",
       contractType: resume.contractType || [],
       alternanceDuration: resume.alternanceDuration || "",
-      alternanceStartDate: toInputDate(resume.alternanceStartDate),
+      alternanceStartDate: resume.alternanceStartDate || "",
     });
 
     setLanguages(resume.languages || []);
     setSkills(resume.skills || []);
     setPresentation(resume.presentation || "");
-    setExperiences(resume.experiences || []);
-    setTrainings(resume.trainings || []);
+    setExperiences(
+      (resume.experiences || []).map((e) => ({
+        ...e,
+        startDate: parseDate(e.startDate),
+        endDate: parseDate(e.endDate),
+      }))
+    );
+
+    setTrainings(
+      (resume.trainings || []).map((t) => ({
+        ...t,
+        startDate: parseDate(t.startDate),
+        endDate: parseDate(t.endDate),
+      }))
+    );
   }, [resume]);
 
   /* ================= LANGUES AUTO ================= */
@@ -232,6 +237,51 @@ export default function Finalization() {
   }, [selectedLang, selectedLevel]);
 
   /* ================= SAVE ================= */
+
+  // DATES
+  const parseDate = (value) => {
+    if (!value) return {};
+    if (typeof value !== "string") return value;
+
+    if (value === "En cours") {
+      return "En cours";
+    }
+
+    const parts = value.split("/");
+
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return { day, month, year };
+    }
+
+    if (parts.length === 2) {
+      const [month, year] = parts;
+      return { month, year };
+    }
+
+    if (/^\d{4}$/.test(value)) {
+      return { year: value };
+    }
+
+    return {};
+  };
+
+  const formatDate = (d) => {
+    if (!d) return "";
+    if (d === "En cours") return "En cours";
+    if (d.year && d.month && d.day) return `${d.day}/${d.month}/${d.year}`;
+    if (d.year && d.month) return `${d.month}/${d.year}`;
+    if (d.year) return `${d.year}`;
+    return "";
+  };
+
+  const formatDDMMYYYY = (date) => {
+    if (!date) return "";
+    // date attendu : YYYY-MM-DD
+    const [y, m, d] = date.split("-");
+    return `${d}-${m}-${y}`;
+  };
+
   const saveStep = async () => {
     let payload = { ...resume };
 
@@ -255,7 +305,7 @@ export default function Finalization() {
           ? form.alternanceDuration
           : "",
         alternanceStartDate: form.contractType.includes("Alternance")
-          ? fromInputDate(form.alternanceStartDate)
+          ? formatDDMMYYYY(form.alternanceStartDate)
           : "",
       };
     }
@@ -270,13 +320,13 @@ export default function Finalization() {
         presentation,
         experiences: experiences.map((e) => ({
           ...e,
-          startDate: fromInputDate(e.startDate),
-          endDate: fromInputDate(e.endDate),
+          startDate: formatDate(e.startDate),
+          endDate: formatDate(e.endDate),
         })),
         trainings: trainings.map((t) => ({
           ...t,
-          startDate: fromInputDate(t.startDate),
-          endDate: fromInputDate(t.endDate),
+          startDate: formatDate(t.startDate),
+          endDate: formatDate(t.endDate),
         })),
       };
     }
@@ -291,6 +341,45 @@ export default function Finalization() {
     await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
     dispatch(previewResume({ token: user.token, id: resume.id }));
     setActiveStep(null);
+  };
+
+  const PERSONAL_INFO_PLACEHOLDERS = {
+    firstName: "Ajouter un prénom",
+    lastName: "Ajouter un nom",
+    email: "Ajouter une adresse email",
+    phone: "Ajouter un numéro de téléphone",
+    address: "Ajouter une adresse",
+    website: "Ajouter un site web",
+  };
+
+  const handleSafeBackHome = () => {
+    const confirmed = window.confirm(
+      "Êtes-vous sûr de vouloir revenir à l’accueil ?\n\nTu pourras toujours éditer ton CV depuis le."
+    );
+
+    if (!confirmed) return;
+
+    dispatch(resetResumeState());
+    localStorage.removeItem("resumeId");
+    navigate("/");
+  };
+
+  // GO HOME
+  const [showExitModal, setShowExitModal] = useState(false);
+
+  const handleBackHome = () => {
+    setShowExitModal(true);
+  };
+
+  const confirmBackHome = () => {
+    dispatch(resetResumeState());
+    localStorage.removeItem("resumeId");
+    setShowExitModal(false);
+    navigate("/");
+  };
+
+  const cancelBackHome = () => {
+    setShowExitModal(false);
   };
 
   /* ================= RENDER ================= */
@@ -441,11 +530,7 @@ export default function Finalization() {
               </button>
 
               <button
-                onClick={() => {
-                  dispatch(resetResumeState());
-                  localStorage.removeItem("resumeId");
-                  navigate("/");
-                }}
+                onClick={handleBackHome}
                 className="
     px-8 py-2
     rounded-full
@@ -471,7 +556,7 @@ export default function Finalization() {
           }
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4"
         >
-          <div className="relative w-full max-w-3xl h-[85vh] bg-dark_bg_2 rounded-2xl shadow-2xl ring-1 ring-white/10 flex flex-col">
+          <div className="relative w-full max-w-3xl h-[75vh] bg-dark_bg_2 rounded-2xl shadow-2xl ring-1 ring-white/10 flex flex-col">
             {/* ===== HEADER FIXE ===== */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
               <h3 className="text-lg font-bold text-white">
@@ -495,7 +580,7 @@ export default function Finalization() {
               {activeStep === "customization" && (
                 <>
                   <div>
-                    <label className="block text-emerald-300 mb-2">
+                    <label className="block text-emerald-300 font-semibold mb-2">
                       Titre du CV
                     </label>
                     <input
@@ -506,7 +591,7 @@ export default function Finalization() {
                   </div>
 
                   <div>
-                    <label className="block text-emerald-300 mb-2">
+                    <label className="block text-emerald-300 font-semibold mb-2">
                       Template
                     </label>
                     <div className="relative">
@@ -575,7 +660,7 @@ export default function Finalization() {
                   </div>
 
                   <div>
-                    <label className="block text-emerald-300 mb-2">
+                    <label className="block text-emerald-300 font-semibold mb-2">
                       Couleur principale
                     </label>
                     <div className="flex gap-3">
@@ -597,74 +682,96 @@ export default function Finalization() {
               {/* === STEP 2 === */}
               {activeStep === "personalInfo" && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      "firstName",
-                      "lastName",
-                      "email",
-                      "phone",
-                      "address",
-                      "website",
-                    ].map((f) => (
-                      <input
-                        key={f}
-                        value={form[f]}
-                        onChange={(e) =>
-                          setForm({ ...form, [f]: e.target.value })
-                        }
-                        placeholder={f}
-                        className="px-4 py-3 bg-white/5 rounded-xl text-white"
-                      />
-                    ))}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-emerald-300">
+                      Identité & coordonnées
+                    </h4>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {[
+                        "firstName",
+                        "lastName",
+                        "email",
+                        "phone",
+                        "address",
+                        "website",
+                      ].map((f) => (
+                        <input
+                          key={f}
+                          value={form[f]}
+                          onChange={(e) =>
+                            setForm({ ...form, [f]: e.target.value })
+                          }
+                          placeholder={PERSONAL_INFO_PLACEHOLDERS[f]}
+                          className="px-4 py-3 bg-white/5 rounded-xl text-white"
+                        />
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    {CONTRACTS.map((c) => (
-                      <button
-                        key={c}
-                        onClick={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            contractType: prev.contractType.includes(c)
-                              ? prev.contractType.filter((x) => x !== c)
-                              : [...prev.contractType, c],
-                          }))
-                        }
-                        className={`px-4 py-2 rounded-full ${
-                          form.contractType.includes(c)
-                            ? "bg-emerald-600 text-white"
-                            : "bg-white/10 text-gray-300"
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    ))}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-emerald-300">
+                      Contrats recherchés
+                    </h4>
+
+                    <div className="flex flex-wrap gap-3">
+                      {CONTRACTS.map((c) => (
+                        <button
+                          key={c}
+                          onClick={() =>
+                            setForm((prev) => ({
+                              ...prev,
+                              contractType: prev.contractType.includes(c)
+                                ? prev.contractType.filter((x) => x !== c)
+                                : [...prev.contractType, c],
+                            }))
+                          }
+                          className={`
+          px-4 py-2 rounded-full text-sm font-medium transition
+          ${
+            form.contractType.includes(c)
+              ? "bg-emerald-600 text-white"
+              : "bg-white/10 text-gray-300 hover:bg-white/20"
+          }
+        `}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {form.contractType.includes("Alternance") && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <input
-                        value={form.alternanceDuration}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            alternanceDuration: e.target.value,
-                          })
-                        }
-                        placeholder="Durée alternance"
-                        className="px-4 py-3 bg-white/5 rounded-xl text-white"
-                      />
-                      <input
-                        type="date"
-                        value={form.alternanceStartDate}
-                        onChange={(e) =>
-                          setForm({
-                            ...form,
-                            alternanceStartDate: e.target.value,
-                          })
-                        }
-                        className="px-4 py-3 bg-white/5 rounded-xl text-white"
-                      />
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-emerald-300">
+                        Détails de l’alternance
+                      </h4>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <input
+                          value={form.alternanceDuration}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              alternanceDuration: e.target.value,
+                            })
+                          }
+                          placeholder="Durée (ex : 12 mois)"
+                          className="px-4 py-3 bg-white/5 rounded-xl text-white"
+                        />
+
+                        <input
+                          type="date"
+                          value={form.alternanceStartDate}
+                          onChange={(e) =>
+                            setForm({
+                              ...form,
+                              alternanceStartDate: e.target.value,
+                            })
+                          }
+                          className="px-4 py-3 bg-white/5 rounded-xl text-white"
+                        />
+                      </div>
                     </div>
                   )}
                 </>
@@ -673,79 +780,113 @@ export default function Finalization() {
               {/* === STEP 3 === */}
               {activeStep === "skillsAndLanguages" && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <select
-                      value={selectedLang}
-                      onChange={(e) => setSelectedLang(e.target.value)}
-                      className="bg-white/5 text-white rounded-xl px-4 py-3"
-                    >
-                      <option value="">Langue</option>
-                      {LANGUAGES.map((l) => (
-                        <option key={l}>{l}</option>
-                      ))}
-                    </select>
+                  {/* ===== LANGUES ===== */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-emerald-300">Langues</h4>
 
-                    <select
-                      value={selectedLevel}
-                      onChange={(e) => setSelectedLevel(e.target.value)}
-                      className="bg-white/5 text-white rounded-xl px-4 py-3"
-                    >
-                      <option value="">Niveau</option>
-                      {LEVELS.map((l) => (
-                        <option key={l}>{l}</option>
+                    <div className="grid grid-cols-2 gap-4">
+                      <select
+                        value={selectedLang}
+                        onChange={(e) => setSelectedLang(e.target.value)}
+                        className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      >
+                        <option
+                          value=""
+                          className="bg-dark_bg_2 text-gray-400 text-lg"
+                        >
+                          Choisir une langue
+                        </option>
+                        {LANGUAGES.map((l) => (
+                          <option
+                            key={l}
+                            value={l}
+                            className="bg-dark_bg_2 text-white text-lg"
+                          >
+                            {l}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        value={selectedLevel}
+                        onChange={(e) => setSelectedLevel(e.target.value)}
+                        className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      >
+                        <option
+                          value=""
+                          className="bg-dark_bg_2 text-gray-400 text-lg"
+                        >
+                          Niveau
+                        </option>
+                        {LEVELS.map((lvl) => (
+                          <option
+                            key={lvl}
+                            value={lvl}
+                            className="bg-dark_bg_2 text-white text-lg"
+                          >
+                            {lvl}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
+                      {languages.map((l) => (
+                        <span
+                          key={l.label}
+                          onClick={() =>
+                            setLanguages((prev) =>
+                              prev.filter((x) => x.label !== l.label)
+                            )
+                          }
+                          className="px-4 py-2 bg-emerald-600/20 text-white rounded-full cursor-pointer"
+                        >
+                          {l.label} · {l.level} ✕
+                        </span>
                       ))}
-                    </select>
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    {languages.map((l) => (
-                      <span
-                        key={l.label}
-                        onClick={() =>
-                          setLanguages((prev) =>
-                            prev.filter((x) => x.label !== l.label)
+                  {/* ===== COMPÉTENCES ===== */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-emerald-300">
+                      Compétences
+                    </h4>
+
+                    <div className="flex gap-3">
+                      <input
+                        value={customSkill}
+                        onChange={(e) => setCustomSkill(e.target.value)}
+                        placeholder="Ajouter une compétence"
+                        className="flex-1 px-4 py-3 bg-white/5 rounded-xl text-white"
+                      />
+                      <button
+                        onClick={() => {
+                          if (
+                            !customSkill.trim() ||
+                            skills.includes(customSkill)
                           )
-                        }
-                        className="px-4 py-2 bg-emerald-600/20 text-white rounded-full cursor-pointer"
+                            return;
+                          setSkills((prev) => [...prev, customSkill]);
+                          setCustomSkill("");
+                        }}
+                        className="px-4 py-3 bg-emerald-600 rounded-xl text-white font-semibold"
                       >
-                        {l.label} · {l.level} ✕
-                      </span>
-                    ))}
-                  </div>
+                        +
+                      </button>
+                    </div>
 
-                  <div className="flex gap-3">
-                    <input
-                      value={customSkill}
-                      onChange={(e) => setCustomSkill(e.target.value)}
-                      placeholder="Compétence"
-                      className="flex-1 px-4 py-3 bg-white/5 rounded-xl text-white"
-                    />
-                    <button
-                      onClick={() => {
-                        if (!customSkill.trim() || skills.includes(customSkill))
-                          return;
-                        setSkills((prev) => [...prev, customSkill]);
-                        setCustomSkill("");
-                      }}
-                      className="px-4 py-3 bg-emerald-600 rounded-xl text-white"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    {skills.map((s) => (
-                      <span
-                        key={s}
-                        onClick={() =>
-                          window.confirm(`Supprimer la compétence "${s}" ?`) &&
-                          setSkills((prev) => prev.filter((x) => x !== s))
-                        }
-                        className="px-4 py-2 bg-emerald-600/20 text-white rounded-full cursor-pointer"
-                      >
-                        {s} ✕
-                      </span>
-                    ))}
+                    <div className="flex flex-wrap gap-3">
+                      {skills.map((s) => (
+                        <span
+                          key={s}
+                          onClick={() => setDeleteSkillTarget(s)}
+                          className="px-4 py-2 bg-emerald-600/20 text-white rounded-full cursor-pointer"
+                        >
+                          {s} ✕
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
@@ -754,7 +895,7 @@ export default function Finalization() {
               {activeStep === "smartGeneration" && (
                 <>
                   <div>
-                    <label className="block text-emerald-300 mb-2">
+                    <label className="block text-emerald-300 font-semibold mb-2">
                       Présentation
                     </label>
                     <textarea
@@ -768,29 +909,123 @@ export default function Finalization() {
                     {experiences.map((exp, i) => (
                       <ExperienceForm
                         key={i}
-                        data={exp}
+                        data={{ ...exp, __index: i }}
                         onChange={(d) =>
                           setExperiences((prev) =>
                             prev.map((e, idx) => (idx === i ? d : e))
                           )
                         }
+                        onDelete={(index) =>
+                          setDeleteTarget({ type: "experience", index })
+                        }
                       />
                     ))}
                   </Section>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setExperiences((prev) => [
+                        ...prev,
+                        {
+                          company: "",
+                          title: "",
+                          startDate: {},
+                          endDate: {},
+                          description: "",
+                        },
+                      ])
+                    }
+                    className="
+    group
+    w-full
+    flex items-center justify-center gap-3
+    px-6 py-4
+    rounded-2xl
+    border border-emerald-500/30
+    bg-emerald-500/10
+    text-emerald-300
+    font-semibold
+    transition
+    hover:bg-emerald-500/20
+    hover:border-emerald-400/60
+  "
+                  >
+                    <span
+                      className="
+      flex items-center justify-center
+      w-9 h-9
+      rounded-full
+      bg-emerald-500/20
+      group-hover:bg-emerald-500/30
+      transition
+    "
+                    >
+                      <FontAwesomeIcon icon={faPlus} />
+                    </span>
+                    Ajouter une expérience
+                  </button>
 
                   <Section title="Formations">
                     {trainings.map((t, i) => (
                       <TrainingForm
                         key={i}
-                        data={t}
+                        data={{ ...t, __index: i }}
                         onChange={(d) =>
                           setTrainings((prev) =>
                             prev.map((e, idx) => (idx === i ? d : e))
                           )
                         }
+                        onDelete={(index) =>
+                          setDeleteTarget({ type: "training", index })
+                        }
                       />
                     ))}
                   </Section>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTrainings((prev) => [
+                        ...prev,
+                        {
+                          school: "",
+                          degree: "",
+                          startDate: {},
+                          endDate: {},
+                          description: "",
+                        },
+                      ])
+                    }
+                    className="
+    group
+    w-full
+    flex items-center justify-center gap-3
+    px-6 py-4
+    rounded-2xl
+    border border-emerald-500/30
+    bg-emerald-500/10
+    text-emerald-300
+    font-semibold
+    transition
+    hover:bg-emerald-500/20
+    hover:border-emerald-400/60
+  "
+                  >
+                    <span
+                      className="
+      flex items-center justify-center
+      w-9 h-9
+      rounded-full
+      bg-emerald-500/20
+      group-hover:bg-emerald-500/30
+      transition
+    "
+                    >
+                      <FontAwesomeIcon icon={faPlus} />
+                    </span>
+                    Ajouter une formation
+                  </button>
                 </>
               )}
 
@@ -958,6 +1193,116 @@ export default function Finalization() {
           )}
         </div>
       )}
+
+      {/* ===================GO HOME============= */}
+      {showExitModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-75"></div>
+
+          <div className="bg-white w-full max-w-md p-6 rounded-lg text-center z-50 relative">
+            <p className="text-gray-800 text-lg font-semibold">
+              Veux-tu vraiment revenir à l’accueil ?
+            </p>
+            <p className="text-gray-600 mt-2">
+              Tu pourras toujours éditer ton CV depuis le site Jobissim.
+            </p>
+
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                className="bg-emerald-600 text-white px-6 py-2 rounded-md"
+                onClick={confirmBackHome}
+              >
+                Oui
+              </button>
+              <button
+                className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md"
+                onClick={cancelBackHome}
+              >
+                Non
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm delete */}
+      {deleteTarget && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-75"></div>
+
+          <div className="bg-white w-full max-w-md p-6 rounded-lg text-center z-50 relative">
+            <p className="text-gray-800 text-lg font-semibold">
+              Confirmer la suppression
+            </p>
+            <p className="text-gray-600 mt-2">Cette action est irréversible.</p>
+
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                className="bg-red-600 text-white px-6 py-2 rounded-md"
+                onClick={() => {
+                  if (deleteTarget.type === "experience") {
+                    setExperiences((prev) =>
+                      prev.filter((_, i) => i !== deleteTarget.index)
+                    );
+                  }
+                  if (deleteTarget.type === "training") {
+                    setTrainings((prev) =>
+                      prev.filter((_, i) => i !== deleteTarget.index)
+                    );
+                  }
+                  setDeleteTarget(null);
+                }}
+              >
+                Supprimer
+              </button>
+
+              <button
+                className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md"
+                onClick={() => setDeleteTarget(null)}
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm delete copétence */}
+      {deleteSkillTarget && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 bg-black bg-opacity-75"></div>
+
+          <div className="bg-white w-full max-w-md p-6 rounded-lg text-center z-50 relative">
+            <p className="text-gray-800 text-lg font-semibold">
+              Supprimer la compétence
+            </p>
+            <p className="text-gray-600 mt-2">
+              Êtes-vous sûr de vouloir supprimer « {deleteSkillTarget} » ?
+            </p>
+
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                className="bg-red-600 text-white px-6 py-2 rounded-md"
+                onClick={() => {
+                  setSkills((prev) =>
+                    prev.filter((s) => s !== deleteSkillTarget)
+                  );
+                  setDeleteSkillTarget(null);
+                }}
+              >
+                Supprimer
+              </button>
+
+              <button
+                className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md"
+                onClick={() => setDeleteSkillTarget(null)}
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -984,70 +1329,289 @@ function Section({ title, children }) {
   );
 }
 
-function ExperienceForm({ data, onChange }) {
+const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
+const MONTHS = [
+  { value: "01", label: "Janvier" },
+  { value: "02", label: "Février" },
+  { value: "03", label: "Mars" },
+  { value: "04", label: "Avril" },
+  { value: "05", label: "Mai" },
+  { value: "06", label: "Juin" },
+  { value: "07", label: "Juillet" },
+  { value: "08", label: "Août" },
+  { value: "09", label: "Septembre" },
+  { value: "10", label: "Octobre" },
+  { value: "11", label: "Novembre" },
+  { value: "12", label: "Décembre" },
+];
+const YEARS = Array.from(
+  { length: 60 },
+  (_, i) => new Date().getFullYear() - i
+);
+
+function DateSelect({ label, value = {}, onChange, allowOngoing = false }) {
+  const isOngoing = value === "En cours";
+
+  const selectClass =
+    "bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50";
+
+  const optionClass = "bg-dark_bg_2 text-white text-lg";
+  const optionPlaceholderClass = "bg-dark_bg_2 text-gray-400 text-lg";
+
   return (
-    <div className="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl">
-      <input
-        value={data.company}
-        onChange={(e) => onChange({ ...data, company: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <input
-        value={data.title}
-        onChange={(e) => onChange({ ...data, title: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <input
-        type="date"
-        value={toInputDate(data.startDate)}
-        onChange={(e) => onChange({ ...data, startDate: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <input
-        type="date"
-        value={toInputDate(data.endDate)}
-        onChange={(e) => onChange({ ...data, endDate: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <textarea
-        value={data.description}
-        onChange={(e) => onChange({ ...data, description: e.target.value })}
-        className="col-span-2 bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
+    <div className="space-y-2">
+      {label && (
+        <div className="text-xs uppercase tracking-wider text-gray-400">
+          {label}
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        {/* JOUR */}
+        <select
+          disabled={isOngoing}
+          value={!isOngoing && typeof value === "object" ? value.day || "" : ""}
+          onChange={(e) =>
+            onChange({
+              ...(typeof value === "object" && !isOngoing ? value : {}),
+              day: e.target.value,
+            })
+          }
+          className={`${selectClass} w-[72px]`}
+        >
+          <option value="" className={optionPlaceholderClass}>
+            Jour
+          </option>
+          {DAYS.map((d) => (
+            <option key={d} value={d} className={optionClass}>
+              {d}
+            </option>
+          ))}
+        </select>
+
+        {/* MOIS */}
+        <select
+          disabled={isOngoing}
+          value={
+            !isOngoing && typeof value === "object" ? value.month || "" : ""
+          }
+          onChange={(e) =>
+            onChange({
+              ...(typeof value === "object" && !isOngoing ? value : {}),
+              month: e.target.value,
+            })
+          }
+          className={`${selectClass} w-[130px]`}
+        >
+          <option value="" className={optionPlaceholderClass}>
+            Mois
+          </option>
+          {MONTHS.map((m) => (
+            <option key={m.value} value={m.value} className={optionClass}>
+              {m.label}
+            </option>
+          ))}
+        </select>
+
+        {/* ANNÉE */}
+        <select
+          disabled={isOngoing}
+          value={
+            !isOngoing && typeof value === "object" ? value.year || "" : ""
+          }
+          onChange={(e) =>
+            onChange({
+              ...(typeof value === "object" && !isOngoing ? value : {}),
+              year: e.target.value,
+            })
+          }
+          className={`${selectClass} w-[96px]`}
+        >
+          <option value="" className={optionPlaceholderClass}>
+            Année
+          </option>
+          {YEARS.map((y) => (
+            <option key={y} value={y} className={optionClass}>
+              {y}
+            </option>
+          ))}
+        </select>
+
+      </div>
     </div>
   );
 }
 
-function TrainingForm({ data, onChange }) {
+function ExperienceForm({ data, onChange, onDelete }) {
   return (
-    <div className="grid grid-cols-2 gap-4 bg-white/5 p-4 rounded-xl">
-      <input
-        value={data.school}
-        onChange={(e) => onChange({ ...data, school: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <input
-        value={data.degree}
-        onChange={(e) => onChange({ ...data, degree: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <input
-        type="date"
-        value={toInputDate(data.startDate)}
-        onChange={(e) => onChange({ ...data, startDate: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <input
-        type="date"
-        value={toInputDate(data.endDate)}
-        onChange={(e) => onChange({ ...data, endDate: e.target.value })}
-        className="bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
-      <textarea
-        value={data.description}
-        onChange={(e) => onChange({ ...data, description: e.target.value })}
-        className="col-span-2 bg-dark_bg_1/80 text-white rounded-xl px-3 py-2"
-      />
+    <div className="relative bg-white/5 p-6 pt-12 rounded-2xl space-y-6 border border-white/10">
+      {/* SUPPRIMER */}
+      <button
+        type="button"
+        onClick={() => onDelete(data.__index)}
+        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/10 text-red-400 hover:bg-red-500/20 transition"
+      >
+        <FontAwesomeIcon icon={faTrash} />
+      </button>
+
+      {/* POSTE / ENTREPRISE */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+            Poste
+          </label>
+          <input
+            value={data.title || ""}
+            onChange={(e) => onChange({ ...data, title: e.target.value })}
+            className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-2"
+          />
+        </div>
+
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+              Entreprise
+            </label>
+            <input
+              value={data.company || ""}
+              onChange={(e) => onChange({ ...data, company: e.target.value })}
+              className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-2"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                ...data,
+                endDate: data.endDate === "En cours" ? {} : "En cours",
+              })
+            }
+            className={`h-[42px] px-4 rounded-xl text-sm whitespace-nowrap transition ${
+              data.endDate === "En cours"
+                ? "bg-emerald-600 text-white"
+                : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}
+          >
+            En cours
+          </button>
+        </div>
+      </div>
+
+      {/* DATES */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <DateSelect
+          label="Date de début"
+          value={data.startDate}
+          onChange={(v) => onChange({ ...data, startDate: v })}
+        />
+
+        <DateSelect
+          label="Date de fin"
+          value={data.endDate}
+          allowOngoing
+          onChange={(v) => onChange({ ...data, endDate: v })}
+        />
+      </div>
+
+      {/* DESCRIPTION */}
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+          Description
+        </label>
+        <textarea
+          value={data.description || ""}
+          onChange={(e) => onChange({ ...data, description: e.target.value })}
+          className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-3 min-h-[100px]"
+        />
+      </div>
+    </div>
+  );
+}
+
+function TrainingForm({ data, onChange, onDelete }) {
+  return (
+    <div className="relative bg-white/5 p-6 pt-12 rounded-2xl space-y-6 border border-white/10">
+      {/* SUPPRIMER */}
+      <button
+        type="button"
+        onClick={() => onDelete(data.__index)}
+        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/10 text-red-400 hover:bg-red-500/20 transition"
+      >
+        <FontAwesomeIcon icon={faTrash} />
+      </button>
+
+      {/* DIPLÔME / ÉTABLISSEMENT */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+            Diplôme
+          </label>
+          <input
+            value={data.degree || ""}
+            onChange={(e) => onChange({ ...data, degree: e.target.value })}
+            className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-2"
+          />
+        </div>
+
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+              Établissement
+            </label>
+            <input
+              value={data.school || ""}
+              onChange={(e) => onChange({ ...data, school: e.target.value })}
+              className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-2"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                ...data,
+                endDate: data.endDate === "En cours" ? {} : "En cours",
+              })
+            }
+            className={`h-[42px] px-4 rounded-xl text-sm whitespace-nowrap transition ${
+              data.endDate === "En cours"
+                ? "bg-emerald-600 text-white"
+                : "bg-white/10 text-gray-300 hover:bg-white/20"
+            }`}
+          >
+            En cours
+          </button>
+        </div>
+      </div>
+
+      {/* DATES */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <DateSelect
+          label="Date de début"
+          value={data.startDate}
+          onChange={(v) => onChange({ ...data, startDate: v })}
+        />
+
+        <DateSelect
+          label="Date de fin"
+          value={data.endDate}
+          allowOngoing
+          onChange={(v) => onChange({ ...data, endDate: v })}
+        />
+      </div>
+
+      {/* DESCRIPTION */}
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
+          Description
+        </label>
+        <textarea
+          value={data.description || ""}
+          onChange={(e) => onChange({ ...data, description: e.target.value })}
+          className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-3 min-h-[100px]"
+        />
+      </div>
     </div>
   );
 }

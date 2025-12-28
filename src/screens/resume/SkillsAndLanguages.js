@@ -100,6 +100,20 @@ export default function SkillsAndLanguages() {
       .catch(() => setAvailableSkills([]));
   }, [categoryId, user]);
 
+  useEffect(() => {
+    if (!selectedLang || !selectedLevel) return;
+    if (languages.length >= 5) return;
+    if (languages.some((l) => l.label === selectedLang)) return;
+
+    setLanguages((prev) => [
+      ...prev,
+      { label: selectedLang, level: selectedLevel },
+    ]);
+
+    setSelectedLang("");
+    setSelectedLevel("");
+  }, [selectedLang, selectedLevel]);
+
   /* ---------- HANDLERS ---------- */
 
   const addLanguage = () => {
@@ -125,7 +139,7 @@ export default function SkillsAndLanguages() {
       if (prev.includes(label)) {
         return prev.filter((s) => s !== label);
       }
-      if (prev.length >= 5) return prev; // limite conseillée
+      if (prev.length >= 6) return prev; // limite conseillée
       return [...prev, label];
     });
   };
@@ -147,7 +161,7 @@ export default function SkillsAndLanguages() {
     }
 
     // limite 5 compétences
-    if (selectedSkills.length >= 5) return;
+    if (selectedSkills.length >= 6) return;
 
     // ajout en tête de la liste visible
     setAvailableSkills((prev) => [
@@ -238,21 +252,7 @@ export default function SkillsAndLanguages() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <select
                 value={selectedLang}
-                onChange={(e) => {
-                  const lang = e.target.value;
-                  setSelectedLang(lang);
-                  if (languages.length >= 5) return;
-                  if (!lang || !selectedLevel) return;
-                  setLanguages((prev) =>
-                    prev.some((l) => l.label === lang)
-                      ? prev.map((l) =>
-                          l.label === lang ? { ...l, level: selectedLevel } : l
-                        )
-                      : [...prev, { label: lang, level: selectedLevel }]
-                  );
-                  setSelectedLang("");
-                  setSelectedLevel("");
-                }}
+                onChange={(e) => setSelectedLang(e.target.value)}
                 className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               >
                 <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
@@ -271,21 +271,7 @@ export default function SkillsAndLanguages() {
 
               <select
                 value={selectedLevel}
-                onChange={(e) => {
-                  const level = e.target.value;
-                  setSelectedLevel(level);
-                  if (languages.length >= 5) return;
-                  if (!selectedLang || !level) return;
-                  setLanguages((prev) =>
-                    prev.some((l) => l.label === selectedLang)
-                      ? prev.map((l) =>
-                          l.label === selectedLang ? { ...l, level } : l
-                        )
-                      : [...prev, { label: selectedLang, level }]
-                  );
-                  setSelectedLang("");
-                  setSelectedLevel("");
-                }}
+                onChange={(e) => setSelectedLevel(e.target.value)}
                 className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               >
                 <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
@@ -338,7 +324,7 @@ export default function SkillsAndLanguages() {
               🧩 Compétences
             </h3>
             <p className="text-sm text-gray-400 mb-6">
-              Domaine + jusqu’à 5 compétences clés.
+              Domaine + jusqu’à 6 compétences clés.
             </p>
 
             {/* Domaine + ajout */}
@@ -413,7 +399,7 @@ export default function SkillsAndLanguages() {
                         <input
                           type="checkbox"
                           checked={checked}
-                          disabled={!checked && selectedSkills.length >= 5}
+                          disabled={!checked && selectedSkills.length >= 6}
                           onChange={() => toggleSkill(skill.name)}
                           className="h-5 w-5 text-emerald-500"
                         />

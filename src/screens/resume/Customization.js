@@ -56,15 +56,18 @@ export default function Customization() {
     { key: "template7", image: template7 },
   ];
 
-  const colors = [
-    { name: "Émeraude", value: "#10b981" },
-    { name: "Bleu", value: "#1e3a8a" },
-    { name: "Violet", value: "#6d28d9" },
-    { name: "Rouge", value: "#dc2626" },
-    { name: "Orange", value: "#ea580c" },
-    { name: "Jaune", value: "#facc15" },
-    { name: "Noir", value: "#111827" },
-  ];
+const colors = [
+  { name: "Émeraude", value: "#10b981" },
+  { name: "Bleu nuit", value: "#1e3a8a" },
+  { name: "Bleu clair", value: "#2563eb" },
+  { name: "Violet", value: "#6d28d9" },
+  { name: "Prune", value: "#7c3aed" },
+  { name: "Rouge", value: "#dc2626" },
+  { name: "Bordeaux", value: "#7f1d1d" },
+  { name: "Orange", value: "#ea580c" },
+  { name: "Jaune doré", value: "#facc15" },
+  { name: "Noir", value: "#111827" },
+];
 
   const handleNext = async () => {
     if (!title || !selectedDesign || loading) return;
