@@ -90,6 +90,7 @@ payload: {
   contractType: resume?.contractType || [],
   languages: resume?.languages || [],
   skills: resume?.skills || [],
+  softSkills: resume?.softSkills || [],
   trainings: resume?.trainings || [],
   experiences: resume?.experiences || [],
   presentation: resume?.presentation || "",

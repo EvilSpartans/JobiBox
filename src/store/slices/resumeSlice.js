@@ -41,7 +41,7 @@ export const createResume = createAsyncThunk(
         {
           title,
           template,
-          mainColor, 
+          mainColor,
         },
         {
           headers: {
@@ -165,6 +165,12 @@ export const updateResume = createAsyncThunk(
       if (Array.isArray(payload.skills)) {
         payload.skills.forEach((skill, i) => {
           formData.append(`skills[${i}]`, skill);
+        });
+      }
+
+      if (Array.isArray(payload.softSkills)) {
+        payload.softSkills.forEach((softSkill, i) => {
+          formData.append(`softSkills[${i}]`, softSkill);
         });
       }
 

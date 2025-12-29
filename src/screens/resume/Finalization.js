@@ -117,6 +117,8 @@ export default function Finalization() {
   const [selectedLevel, setSelectedLevel] = useState("");
   const [skills, setSkills] = useState([]);
   const [customSkill, setCustomSkill] = useState("");
+  const [softSkills, setSoftSkills] = useState([]);
+  const [softSkillInput, setSoftSkillInput] = useState("");
 
   /* ================= STEP 4 ================= */
   const [presentation, setPresentation] = useState("");
@@ -205,6 +207,7 @@ export default function Finalization() {
 
     setLanguages(resume.languages || []);
     setSkills(resume.skills || []);
+    setSoftSkills(resume.softSkills || []);
     setPresentation(resume.presentation || "");
     setExperiences(
       (resume.experiences || []).map((e) => ({
@@ -311,7 +314,7 @@ export default function Finalization() {
     }
 
     if (activeStep === "skillsAndLanguages") {
-      payload = { ...payload, languages, skills };
+      payload = { ...payload, languages, skills, softSkills };
     }
 
     if (activeStep === "smartGeneration") {
@@ -590,6 +593,8 @@ export default function Finalization() {
                     />
                   </div>
 
+                  <FormSeparator />
+
                   <div>
                     <label className="block text-emerald-300 font-semibold mb-2">
                       Template
@@ -659,6 +664,8 @@ export default function Finalization() {
                     </div>
                   </div>
 
+                  <FormSeparator />
+
                   <div>
                     <label className="block text-emerald-300 font-semibold mb-2">
                       Couleur principale
@@ -709,6 +716,8 @@ export default function Finalization() {
                     </div>
                   </div>
 
+                  <FormSeparator />
+
                   <div className="space-y-3">
                     <h4 className="font-semibold text-emerald-300">
                       Contrats recherchés
@@ -742,37 +751,41 @@ export default function Finalization() {
                   </div>
 
                   {form.contractType.includes("Alternance") && (
-                    <div className="space-y-3">
-                      <h4 className="font-semibold text-emerald-300">
-                        Détails de l’alternance
-                      </h4>
+                    <>
+                      <FormSeparator />
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <input
-                          value={form.alternanceDuration}
-                          onChange={(e) =>
-                            setForm({
-                              ...form,
-                              alternanceDuration: e.target.value,
-                            })
-                          }
-                          placeholder="Durée (ex : 12 mois)"
-                          className="px-4 py-3 bg-white/5 rounded-xl text-white"
-                        />
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-emerald-300">
+                          Détails de l’alternance
+                        </h4>
 
-                        <input
-                          type="date"
-                          value={form.alternanceStartDate}
-                          onChange={(e) =>
-                            setForm({
-                              ...form,
-                              alternanceStartDate: e.target.value,
-                            })
-                          }
-                          className="px-4 py-3 bg-white/5 rounded-xl text-white"
-                        />
+                        <div className="grid grid-cols-2 gap-4">
+                          <input
+                            value={form.alternanceDuration}
+                            onChange={(e) =>
+                              setForm({
+                                ...form,
+                                alternanceDuration: e.target.value,
+                              })
+                            }
+                            placeholder="Durée (ex : 12 mois)"
+                            className="px-4 py-3 bg-white/5 rounded-xl text-white"
+                          />
+
+                          <input
+                            type="date"
+                            value={form.alternanceStartDate}
+                            onChange={(e) =>
+                              setForm({
+                                ...form,
+                                alternanceStartDate: e.target.value,
+                              })
+                            }
+                            className="px-4 py-3 bg-white/5 rounded-xl text-white"
+                          />
+                        </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </>
               )}
@@ -847,10 +860,12 @@ export default function Finalization() {
                     </div>
                   </div>
 
+                  <FormSeparator />
+
                   {/* ===== COMPÉTENCES ===== */}
                   <div className="space-y-3">
                     <h4 className="font-semibold text-emerald-300">
-                      Compétences
+                      Savoir-faire
                     </h4>
 
                     <div className="flex gap-3">
@@ -888,6 +903,74 @@ export default function Finalization() {
                       ))}
                     </div>
                   </div>
+
+                  <FormSeparator />
+
+                  {/* ===== SAVOIR-ÊTRE ===== */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-emerald-300">
+                      Savoir-être
+                    </h4>
+
+                    {/* INPUT AJOUT */}
+                    <div className="flex items-stretch gap-3">
+                      <input
+                        value={softSkillInput}
+                        onChange={(e) => setSoftSkillInput(e.target.value)}
+                        placeholder="Ajouter un savoir-être"
+                        className="flex-1 px-6 py-5 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            const value = softSkillInput.trim();
+                            if (!value) return;
+                            if (softSkills.includes(value)) return;
+                            if (softSkills.length >= 6) return;
+
+                            setSoftSkills((prev) => [...prev, value]);
+                            setSoftSkillInput("");
+                          }
+                        }}
+                      />
+
+                      <button
+                        onClick={() => {
+                          const value = softSkillInput.trim();
+                          if (!value) return;
+                          if (softSkills.includes(value)) return;
+                          if (softSkills.length >= 6) return;
+
+                          setSoftSkills((prev) => [...prev, value]);
+                          setSoftSkillInput("");
+                        }}
+                        className="px-6 py-5 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* LISTE DES SAVOIR-ÊTRE */}
+                    <div className="flex flex-wrap gap-3">
+                      {softSkills.length === 0 ? (
+                        <span className="text-sm text-gray-400">
+                          Aucun savoir-être ajouté
+                        </span>
+                      ) : (
+                        softSkills.map((s) => (
+                          <span
+                            key={s}
+                            onClick={() =>
+                              setSoftSkills((prev) =>
+                                prev.filter((x) => x !== s)
+                              )
+                            }
+                            className="px-4 py-2 bg-emerald-600/20 border border-emerald-500 text-white rounded-full cursor-pointer hover:bg-emerald-700/30 transition"
+                          >
+                            {s} ✕
+                          </span>
+                        ))
+                      )}
+                    </div>
+                  </div>
                 </>
               )}
 
@@ -904,6 +987,8 @@ export default function Finalization() {
                       className="w-full min-h-[120px] bg-white/5 text-white rounded-xl p-4"
                     />
                   </div>
+
+                  <FormSeparator />
 
                   <Section title="Expériences">
                     {experiences.map((exp, i) => (
@@ -965,6 +1050,8 @@ export default function Finalization() {
                     </span>
                     Ajouter une expérience
                   </button>
+
+                  <FormSeparator />
 
                   <Section title="Formations">
                     {trainings.map((t, i) => (
@@ -1036,6 +1123,8 @@ export default function Finalization() {
                   <Section title="Photo de profil">
                     <Photo ref={photoRef} user={user} mode="resume" />
                   </Section>
+
+                  <FormSeparator />
 
                   {/* CV VIDÉO */}
                   <Section title="CV vidéo">
@@ -1436,7 +1525,6 @@ function DateSelect({ label, value = {}, onChange, allowOngoing = false }) {
             </option>
           ))}
         </select>
-
       </div>
     </div>
   );
@@ -1612,6 +1700,15 @@ function TrainingForm({ data, onChange, onDelete }) {
           className="w-full bg-dark_bg_1/80 text-white rounded-xl px-4 py-3 min-h-[100px]"
         />
       </div>
+    </div>
+  );
+}
+
+function FormSeparator() {
+  return (
+    <div className="relative flex items-center justify-center my-10">
+      <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+      <div className="relative z-10 w-4 h-4 rounded-full bg-emerald-500/30 ring-1 ring-emerald-400/40 shadow-[0_0_12px_rgba(16,185,129,0.35)]" />
     </div>
   );
 }

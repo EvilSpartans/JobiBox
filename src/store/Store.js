@@ -16,6 +16,7 @@ import musicSlice from "./slices/musicSlice";
 import themeSlice from "./slices/themeSlice";
 import subCategorySlice from "./slices/subCategorySlice";
 import citySlice from "./slices/citySlice";
+import softSkillSlice from "./slices/softSkillSlice";
 import ResumeSlice from "./slices/resumeSlice";
 
 // saveUserOnlyFilter
@@ -43,6 +44,7 @@ const rootReducer = combineReducers({
   theme: themeSlice,
   subCategory: subCategorySlice,
   city: citySlice,
+  softSkill: softSkillSlice,
   resume: ResumeSlice,
 });
 

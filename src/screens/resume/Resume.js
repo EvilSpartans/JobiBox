@@ -113,7 +113,12 @@ export default function Resume() {
                          hover:from-emerald-700 hover:to-emerald-800
                          transition-all duration-300 animate-pulse"
             >
-              <span className="relative z-10">Commencer l’expérience</span>
+              <span className="relative z-10 inline-flex items-center gap-2">
+                Commencer l’expérience
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </span>
 
               <span
                 className="absolute inset-0 bg-white/10 opacity-0 

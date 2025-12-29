@@ -276,6 +276,7 @@ const existingText =
         alternanceStartDate: resume.alternanceStartDate || "",
         languages: resume.languages || [],
         skills: resume.skills || [],
+        softSkills: resume.softSkills || [],
 
         // valeurs existantes
         presentation: resume.presentation ?? "",

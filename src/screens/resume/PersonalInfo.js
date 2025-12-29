@@ -121,6 +121,7 @@ const handleNext = async () => {
     mainColor: resume?.mainColor,
     languages: resume?.languages || [],
     skills: resume?.skills || [],
+    softSkills: resume?.softSkills || [],
     trainings: resume?.trainings || [],
     experiences: resume?.experiences || [],
     presentation: resume?.presentation || "",

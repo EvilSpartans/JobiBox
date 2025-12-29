@@ -7,6 +7,7 @@ import axios from "axios";
 
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
 import { getCategories } from "../../store/slices/categorySlice";
+import { getSoftSkills } from "../../store/slices/softSkillSlice";
 import GoBack from "../../components/core/GoBack";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -46,8 +47,19 @@ export default function SkillsAndLanguages() {
 
   const [categoryId, setCategoryId] = useState("");
   const [availableSkills, setAvailableSkills] = useState([]);
+  const [availableSoftSkills, setAvailableSoftSkills] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [customSkill, setCustomSkill] = useState("");
+
+  // onglets
+  const [activeTab, setActiveTab] = useState("hard");
+
+  // soft skills
+  const softSkillState = useSelector((state) => state.softSkill);
+  const softSkillResults = softSkillState.softSkills || [];
+
+  const [softSkills, setSoftSkills] = useState([]);
+  const [softSkillInput, setSoftSkillInput] = useState("");
 
   /* ---------- FETCH RESUME + CATEGORIES ---------- */
 
@@ -68,6 +80,10 @@ export default function SkillsAndLanguages() {
 
     if (Array.isArray(resume.skills)) {
       setSelectedSkills(resume.skills);
+    }
+
+    if (Array.isArray(resume.softSkills)) {
+      setSoftSkills(resume.softSkills);
     }
   }, [resume]);
 
@@ -113,6 +129,24 @@ export default function SkillsAndLanguages() {
     setSelectedLang("");
     setSelectedLevel("");
   }, [selectedLang, selectedLevel]);
+
+  // Fetch softSkills
+  // Fetch soft skills (initial + filtre)
+  useEffect(() => {
+    dispatch(getSoftSkills(softSkillInput || ""));
+  }, [dispatch, softSkillInput]);
+
+  // Remplacement direct des propositions (pas de merge)
+  useEffect(() => {
+    setAvailableSoftSkills(softSkillResults || []);
+  }, [softSkillResults]);
+
+  // Pré-sélection par défaut (une seule fois)
+  useEffect(() => {
+    if (availableSoftSkills.length > 0 && softSkills.length === 0) {
+      setSoftSkills(availableSoftSkills.slice(0, 3).map((s) => s.name));
+    }
+  }, [availableSoftSkills]);
 
   /* ---------- HANDLERS ---------- */
 
@@ -175,6 +209,51 @@ export default function SkillsAndLanguages() {
     setCustomSkill("");
   };
 
+  const addSoftSkill = (label) => {
+    if (softSkills.includes(label)) return;
+    if (softSkills.length >= 6) return;
+
+    setSoftSkills((prev) => [...prev, label]);
+    setSoftSkillInput("");
+  };
+
+  const removeSoftSkill = (label) => {
+    setSoftSkills((prev) => prev.filter((s) => s !== label));
+  };
+
+  const toggleSoftSkill = (label) => {
+    setSoftSkills((prev) => {
+      if (prev.includes(label)) {
+        return prev.filter((s) => s !== label);
+      }
+      if (prev.length >= 6) return prev;
+      return [...prev, label];
+    });
+  };
+
+  const addCustomSoftSkill = () => {
+    const value = softSkillInput.trim();
+    if (!value) return;
+
+    if (softSkills.includes(value)) {
+      setSoftSkillInput("");
+      return;
+    }
+
+    if (softSkills.length >= 6) return;
+
+    // push dans la liste affichée (COMME SAVOIR-FAIRE)
+    setAvailableSoftSkills((prev) => [
+      { id: `custom-${value}`, name: value },
+      ...prev,
+    ]);
+
+    // sélection immédiate
+    setSoftSkills((prev) => [value, ...prev]);
+
+    setSoftSkillInput("");
+  };
+
   const handleNext = async () => {
     if (languages.length === 0 || selectedSkills.length === 0 || loading)
       return;
@@ -199,6 +278,7 @@ export default function SkillsAndLanguages() {
       // ✅ CE QUE CET ÉCRAN MODIFIE
       languages,
       skills: selectedSkills,
+      softSkills: softSkills,
     };
 
     await dispatch(
@@ -320,98 +400,231 @@ export default function SkillsAndLanguages() {
 
           {/* ================= COMPÉTENCES ================= */}
           <section>
-            <h3 className="text-lg font-semibold text-emerald-300 mb-1">
-              🧩 Compétences
-            </h3>
-            <p className="text-sm text-gray-400 mb-6">
-              Domaine + jusqu’à 6 compétences clés.
-            </p>
-
-            {/* Domaine + ajout */}
-            <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div className="relative md:col-span-3">
-                <select
-                  value={categoryId}
-                  onChange={(e) => {
-                    setCategoryId(e.target.value);
-                    setSelectedSkills([]);
-                  }}
-                  className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-2xl px-6 py-5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                >
-                  <option
-                    value=""
-                    className="bg-dark_bg_2 text-gray-400 text-lg"
-                  >
-                    Choisir un domaine d’activité
-                  </option>
-                  {categories.map((c) => (
-                    <option
-                      key={c.id}
-                      value={c.id}
-                      className="bg-dark_bg_2 text-white text-lg"
-                    >
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-emerald-400 text-lg">
-                  ▾
-                </div>
-              </div>
-
-              <div className="flex gap-2 md:col-span-2">
-                <input
-                  value={customSkill}
-                  onChange={(e) => setCustomSkill(e.target.value)}
-                  placeholder="Compétence personnalisée"
-                  className="flex-1 bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-                  onKeyDown={(e) => e.key === "Enter" && addCustomSkill()}
-                />
+            {/* ONGLET SWITCH */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex rounded-full bg-white/5 border border-white/10 p-1">
                 <button
-                  onClick={addCustomSkill}
-                  className="px-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold hover:bg-emerald-600/30 transition"
+                  onClick={() => setActiveTab("hard")}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
+                    activeTab === "hard"
+                      ? "bg-emerald-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
                 >
-                  +
+                  🧩 Savoir-faire
+                </button>
+                <button
+                  onClick={() => setActiveTab("soft")}
+                  className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
+                    activeTab === "soft"
+                      ? "bg-emerald-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  💬 Savoir-être
                 </button>
               </div>
             </div>
 
-            {/* Zone compétences */}
-            <div className="min-h-[260px] rounded-2xl bg-white/5 border border-white/10 p-4">
-              {availableSkills.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-gray-500 text-sm gap-3">
-                  <span className="text-emerald-400 text-xl">🧠</span>
-                  Sélectionne un domaine pour voir les compétences
-                </div>
-              ) : (
-                <div className="max-h-56 overflow-y-auto space-y-2">
-                  {availableSkills.map((skill) => {
-                    const checked = selectedSkills.includes(skill.name);
-                    return (
-                      <label
-                        key={skill.id}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
-                          checked
-                            ? "bg-emerald-600/20 text-white"
-                            : "hover:bg-white/5 text-gray-300"
-                        }`}
+            {/* ================= SAVOIR-FAIRE ================= */}
+            {activeTab === "hard" && (
+              <>
+                <h3 className="text-lg font-semibold text-emerald-300 mb-1">
+                  🧩 Savoir-faire
+                </h3>
+                <p className="text-sm text-gray-400 mb-6">
+                  Domaine + jusqu’à 6 compétences techniques.
+                </p>
+
+                {/* Domaine + ajout */}
+                <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div className="relative md:col-span-3">
+                    <select
+                      value={categoryId}
+                      onChange={(e) => {
+                        setCategoryId(e.target.value);
+                        setSelectedSkills([]);
+                      }}
+                      className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-2xl px-6 py-5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                    >
+                      <option
+                        value=""
+                        className="bg-dark_bg_2 text-gray-400 text-lg"
                       >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          disabled={!checked && selectedSkills.length >= 6}
-                          onChange={() => toggleSkill(skill.name)}
-                          className="h-5 w-5 text-emerald-500"
-                        />
-                        <span className="text-sm font-medium">
-                          {skill.name}
-                        </span>
-                      </label>
-                    );
-                  })}
+                        Choisir un domaine d’activité
+                      </option>
+                      {categories.map((c) => (
+                        <option
+                          key={c.id}
+                          value={c.id}
+                          className="bg-dark_bg_2 text-white text-lg"
+                        >
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-6 flex items-center text-emerald-400 text-lg">
+                      ▾
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 md:col-span-2">
+                    <input
+                      value={customSkill}
+                      onChange={(e) => setCustomSkill(e.target.value)}
+                      placeholder="Compétence personnalisée"
+                      className="flex-1 bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                      onKeyDown={(e) => e.key === "Enter" && addCustomSkill()}
+                    />
+                    <button
+                      onClick={addCustomSkill}
+                      className="px-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold hover:bg-emerald-600/30 transition"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {/* Zone savoir-faire */}
+                <div className="h-[240px] rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col">
+                  {availableSkills.length === 0 ? (
+                    <div className="flex-1 flex items-center justify-center text-gray-500 text-sm gap-3">
+                      <span className="text-emerald-400 text-xl">🧠</span>
+                      Sélectionne un domaine pour voir les compétences
+                    </div>
+                  ) : (
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                      {availableSkills.map((skill) => {
+                        const checked = selectedSkills.includes(skill.name);
+                        return (
+                          <label
+                            key={skill.id}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
+                              checked
+                                ? "bg-emerald-600/20 text-white"
+                                : "hover:bg-white/5 text-gray-300"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              disabled={!checked && selectedSkills.length >= 6}
+                              onChange={() => toggleSkill(skill.name)}
+                              className="h-5 w-5 text-emerald-500"
+                            />
+                            <span className="text-sm font-medium">
+                              {skill.name}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* ================= SAVOIR-ÊTRE ================= */}
+            {activeTab === "soft" && (
+              <>
+                <h3 className="text-lg font-semibold text-emerald-300 mb-1">
+                  💬 Savoir-être
+                </h3>
+                <p className="text-sm text-gray-400 mb-6">
+                  Sélectionne jusqu’à 6 qualités humaines.
+                </p>
+
+                {/* INPUT */}
+                <div className="mb-6 flex items-stretch gap-3">
+                  <input
+                    value={softSkillInput}
+                    onChange={(e) => setSoftSkillInput(e.target.value)}
+                    placeholder="Rechercher ou ajouter un savoir-être"
+                    className="flex-1 bg-dark_bg_1/80 border border-white/10 text-white rounded-2xl px-6 py-5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                    onKeyDown={(e) => e.key === "Enter" && addCustomSoftSkill()}
+                  />
+
+                  <button
+                    onClick={addCustomSoftSkill}
+                    disabled={softSkills.length >= 6}
+                    className="px-6 py-5 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold hover:bg-emerald-600/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* GRID 2 COLONNES — HAUTEUR FIXE */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* ===== PROPOSITIONS ===== */}
+                  <div className="h-[240px] rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col">
+                    <h4 className="text-sm font-semibold text-gray-300 mb-3">
+                      Propositions
+                    </h4>
+
+                    {availableSoftSkills.length === 0 ? (
+                      <div className="flex-1 flex items-center justify-center text-gray-500 text-sm gap-3">
+                        <span className="text-emerald-400 text-xl">💡</span>
+                        Aucune proposition trouvée
+                      </div>
+                    ) : (
+                      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+                        {availableSoftSkills.map((skill) => {
+                          const checked = softSkills.includes(skill.name);
+
+                          return (
+                            <label
+                              key={skill.id}
+                              className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
+                                checked
+                                  ? "bg-emerald-600/20 text-white opacity-60 cursor-not-allowed"
+                                  : "hover:bg-white/5 text-gray-300"
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                disabled={checked || softSkills.length >= 6}
+                                onChange={() => toggleSoftSkill(skill.name)}
+                                className="h-5 w-5 text-emerald-500"
+                              />
+                              <span className="text-sm font-medium">
+                                {skill.name}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ===== SÉLECTION ===== */}
+                  <div className="h-[240px] rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col">
+                    <h4 className="text-sm font-semibold text-gray-300 mb-3">
+                      Sélection ({softSkills.length}/6)
+                    </h4>
+
+                    {softSkills.length === 0 ? (
+                      <div className="flex-1 flex items-center justify-center text-gray-500 text-sm gap-3">
+                        <span className="text-emerald-400 text-xl">💬</span>
+                        Aucun savoir-être sélectionné
+                      </div>
+                    ) : (
+                      <div className="flex-1 overflow-y-auto flex flex-wrap gap-3 content-start">
+                        {softSkills.map((label) => (
+                          <span
+                            key={label}
+                            onClick={() => toggleSoftSkill(label)}
+                            className="px-4 py-2 rounded-full bg-emerald-600/20 border border-emerald-500 text-white text-sm cursor-pointer hover:bg-emerald-700/30 transition"
+                          >
+                            {label} ✕
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </section>
 
           {/* FOOTER */}
