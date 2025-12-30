@@ -318,6 +318,10 @@ const existingText =
     return null; // tout est fait
   };
 
+  const allStepsCompleted = [1, 2, 3].every((s) =>
+  validatedSteps.includes(s)
+);
+
   /* ---------------- RENDER ---------------- */
 
   return (
@@ -349,18 +353,15 @@ const existingText =
             {stepsConfig.map((s) => (
               <div
                 key={s.id}
-                onClick={() => {
-                  if (validatedSteps.includes(s.id)) {
-                    setStep(s.id);
-                  }
-                }}
+onClick={() => setStep(s.id)}
                 className={`relative rounded-2xl p-4 border transition cursor-pointer ${
-                  step === s.id
-                    ? "bg-emerald-600/20 border-emerald-500 text-white"
-                    : validatedSteps.includes(s.id)
-                    ? "bg-white/5 border-emerald-500/40 text-emerald-300 hover:bg-white/10"
-                    : "border-white/10 text-gray-400 cursor-default"
-                }`}
+  step === s.id
+    ? "bg-emerald-600/20 border-emerald-500 text-white"
+    : validatedSteps.includes(s.id)
+    ? "bg-white/5 border-emerald-500/40 text-emerald-300 hover:bg-white/10"
+    : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+}`}
+
               >
                 {validatedSteps.includes(s.id) && (
                   <span className="absolute top-3 right-3 text-emerald-400 text-lg">
@@ -452,7 +453,7 @@ const existingText =
             </div>
 
             {/* FOOTER */}
-            {validatedSteps.includes(3) && (
+            {allStepsCompleted && (
               <div className="pt-10 flex justify-end">
                 <button
                   onClick={() => navigate("/finalization")}

@@ -237,7 +237,7 @@ const handleNext = async () => {
             />
 
             <Input
-              label="Site web"
+              label="Site web (facultatif)"
               name="website"
               value={form.website}
               onChange={handleChange}

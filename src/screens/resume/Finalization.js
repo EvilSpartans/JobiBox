@@ -466,7 +466,7 @@ export default function Finalization() {
                 onClick={() => setActiveStep(s.key)}
                 className="
         w-full flex items-center gap-5
-        px-6 py-5
+        px-6 py-3
         rounded-2xl
         bg-white/5 border border-white/10
         active:scale-[0.99]
@@ -510,13 +510,19 @@ export default function Finalization() {
 
           {/* ===== QR CODE + ACTION ===== */}
           <div className="mt-16 flex flex-col items-center">
+            <p className="mb-6 text-sm text-gray-400 text-center max-w-md">
+              Scanne le QR code pour récupérer ton CV. Il reste disponible à
+              tout moment dans ton espace privé sur{" "}
+              <span className="text-emerald-400 font-medium">jobissim.com</span>
+              .
+            </p>
             {/* QR Code */}
             <div className="bg-white p-5 rounded-2xl shadow-lg">
               <QRCodeSVG value={getResumeDownloadUrl(resume?.id)} />
             </div>
 
             {/* Actions */}
-            <div className="mt-10 flex flex-col items-center gap-4">
+            <div className="mt-6 flex flex-col items-center gap-3">
               <button
                 onClick={() => setShowPreview(true)}
                 className="
@@ -918,7 +924,7 @@ export default function Finalization() {
                         value={softSkillInput}
                         onChange={(e) => setSoftSkillInput(e.target.value)}
                         placeholder="Ajouter un savoir-être"
-                        className="flex-1 px-6 py-5 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                        className="flex-1 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             const value = softSkillInput.trim();
@@ -942,7 +948,7 @@ export default function Finalization() {
                           setSoftSkills((prev) => [...prev, value]);
                           setSoftSkillInput("");
                         }}
-                        className="px-6 py-5 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold"
+                        className="px-6 py-3 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold"
                       >
                         +
                       </button>
