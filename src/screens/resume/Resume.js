@@ -69,10 +69,12 @@ export default function Resume() {
               CV papier
             </h2>
 
-            <p className="text-lg sm:text-xl text-gray-300 max-w-xl mx-auto">
-              Crée un CV professionnel, structuré et prêt à l’emploi, conçu
-              automatiquement par l’IA.
-            </p>
+<p className="text-lg sm:text-xl text-gray-300 max-w-xl mx-auto">
+  Crée un CV professionnel, structuré et prêt à l’emploi, généré
+  automatiquement par l’IA en{" "}
+  <span className="text-emerald-400 font-semibold">5 minutes environ</span>.
+</p>
+
           </div>
 
           {/* Parcours vertical */}
