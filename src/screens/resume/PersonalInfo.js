@@ -11,6 +11,7 @@ import Input from "../../components/resume/Input";
 import Footer from "../../components/resume/Footer";
 import Header from "../../components/resume/Header";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
+import GlowBackground from "../../components/resume/GlowBackground";
 
 export default function PersonalInfo() {
  const user = useSelector((state) => state.user.user);
@@ -155,9 +156,7 @@ export default function PersonalInfo() {
    <Logout />
    <GoBack />
 
-   {/* Glow */}
-   <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 blur-3xl pointer-events-none" />
-   <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 blur-3xl pointer-events-none" />
+   <GlowBackground />
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
     <div
@@ -170,7 +169,7 @@ export default function PersonalInfo() {
                      backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
     >
      <Header
-      step=" Étape 2 · Informations personnelles"
+      step="Étape 2 · Informations personnelles"
       title="Parle-nous de toi"
       description="Ces informations apparaîtront sur ton CV papier."
      />

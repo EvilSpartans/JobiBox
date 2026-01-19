@@ -3,16 +3,20 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Logout from "../../components/core/Logout";
-import PulseLoader from "react-spinners/PulseLoader";
 import { useDispatch, useSelector } from "react-redux";
 
 import GoBack from "../../components/core/GoBack";
-import { getCategories } from "../../store/slices/categorySlice";
-import { getSoftSkills } from "../../store/slices/softSkillSlice";
-import { LANGUAGE_LEVELS, LANGUAGES_RESUME } from "../../utils/IAResume";
-import { getResume, updateResume } from "../../store/slices/resumeSlice";
 import Footer from "../../components/resume/Footer";
 import Header from "../../components/resume/Header";
+import RemovableTag from "../../components/resume/RemovableTag";
+import { getCategories } from "../../store/slices/categorySlice";
+import { getSoftSkills } from "../../store/slices/softSkillSlice";
+import FormSeparator from "../../components/resume/FormSeparator";
+import GlowBackground from "../../components/resume/GlowBackground";
+import { LANGUAGE_LEVELS, LANGUAGES_RESUME } from "../../utils/IAResume";
+import { getResume, updateResume } from "../../store/slices/resumeSlice";
+import AddItemInput from "../../components/resume/AddItemInput";
+import ConfirmModal from "../../components/modals/ConfirmModal";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -48,9 +52,10 @@ export default function SkillsAndLanguages() {
  // soft skills
  const softSkillState = useSelector((state) => state.softSkill);
  const softSkillResults = softSkillState.softSkills || [];
-
  const [softSkills, setSoftSkills] = useState([]);
  const [softSkillInput, setSoftSkillInput] = useState("");
+ const [deleteLanguageTarget, setDeleteLanguageTarget] = useState(null);
+ const [deleteSoftSkillTarget, setDeleteSoftSkillTarget] = useState(null);
 
  /* ---------- FETCH RESUME + CATEGORIES ---------- */
 
@@ -140,7 +145,6 @@ export default function SkillsAndLanguages() {
  }, [availableSoftSkills]);
 
  /* ---------- HANDLERS ---------- */
-
  const removeLanguage = (label) => {
   setLanguages((prev) => prev.filter((l) => l.label !== label));
  };
@@ -256,15 +260,12 @@ export default function SkillsAndLanguages() {
   navigate("/smartGeneration");
  };
 
-
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
    <Logout />
    <GoBack />
 
-   {/* Glow background */}
-   <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 blur-3xl pointer-events-none" />
-   <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 blur-3xl pointer-events-none" />
+   <GlowBackground />
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
     <div className="flex flex-col w-full max-w-5xl min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
@@ -329,25 +330,19 @@ export default function SkillsAndLanguages() {
         </div>
        ) : (
         <div className="flex flex-wrap gap-3">
-         {languages.map((l) => (
-          <span
-           key={l.label}
-           onClick={() => removeLanguage(l.label)}
-           className="px-4 py-2 rounded-full bg-emerald-600/20 border border-emerald-500 text-white text-sm cursor-pointer hover:bg-emerald-700/30 transition"
-          >
-           {l.label} · {l.level} ✕
-          </span>
+         {languages.map((l, index) => (
+          <RemovableTag
+           key={index}
+           label={`${l.label} · ${l.level}`}
+           onRemove={() => setDeleteLanguageTarget(l)}
+          />
          ))}
         </div>
        )}
       </div>
      </section>
 
-     {/* Séparateur CANON */}
-     <div className="relative flex items-center justify-center my-10">
-      <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
-      <div className="relative z-10 w-4 h-4 rounded-full bg-emerald-500/30 ring-1 ring-emerald-400/40 shadow-[0_0_12px_rgba(16,185,129,0.35)]" />
-     </div>
+     <FormSeparator />
 
      {/* ================= COMPÉTENCES ================= */}
      <section>
@@ -417,19 +412,14 @@ export default function SkillsAndLanguages() {
          </div>
 
          <div className="flex gap-2 md:col-span-2">
-          <input
+          <AddItemInput
            value={customSkill}
-           onChange={(e) => setCustomSkill(e.target.value)}
+           onChange={setCustomSkill}
            placeholder="Compétence personnalisée"
-           className="flex-1 bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-           onKeyDown={(e) => e.key === "Enter" && addCustomSkill()}
+           onAdd={addCustomSkill}
+           maxItems={6}
+           currentCount={selectedSkills.length}
           />
-          <button
-           onClick={addCustomSkill}
-           className="px-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold hover:bg-emerald-600/30 transition"
-          >
-           +
-          </button>
          </div>
         </div>
 
@@ -481,22 +471,15 @@ export default function SkillsAndLanguages() {
         </p>
 
         {/* INPUT */}
-        <div className="mb-6 flex items-stretch gap-3">
-         <input
+        <div className="mb-6">
+         <AddItemInput
           value={softSkillInput}
-          onChange={(e) => setSoftSkillInput(e.target.value)}
+          onChange={setSoftSkillInput}
           placeholder="Rechercher ou ajouter un savoir-être"
-          className="flex-1 bg-dark_bg_1/80 border border-white/10 text-white rounded-2xl px-6 py-5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-          onKeyDown={(e) => e.key === "Enter" && addCustomSoftSkill()}
+          onAdd={addCustomSoftSkill}
+          maxItems={6}
+          currentCount={softSkills.length}
          />
-
-         <button
-          onClick={addCustomSoftSkill}
-          disabled={softSkills.length >= 6}
-          className="px-6 py-5 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold hover:bg-emerald-600/30 transition disabled:opacity-40 disabled:cursor-not-allowed"
-         >
-          +
-         </button>
         </div>
 
         {/* GRID 2 COLONNES — HAUTEUR FIXE */}
@@ -522,14 +505,14 @@ export default function SkillsAndLanguages() {
                key={skill.id}
                className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition ${
                 checked
-                 ? "bg-emerald-600/20 text-white opacity-60 cursor-not-allowed"
+                 ? "bg-emerald-600/20 text-white"
                  : "hover:bg-white/5 text-gray-300"
                }`}
               >
                <input
                 type="checkbox"
                 checked={checked}
-                disabled={checked || softSkills.length >= 6}
+                disabled={!checked && softSkills.length >= 6}
                 onChange={() => toggleSoftSkill(skill.name)}
                 className="h-5 w-5 text-emerald-500"
                />
@@ -554,14 +537,12 @@ export default function SkillsAndLanguages() {
            </div>
           ) : (
            <div className="flex-1 overflow-y-auto flex flex-wrap gap-3 content-start">
-            {softSkills.map((label) => (
-             <span
-              key={label}
-              onClick={() => toggleSoftSkill(label)}
-              className="px-4 py-2 rounded-full bg-emerald-600/20 border border-emerald-500 text-white text-sm cursor-pointer hover:bg-emerald-700/30 transition"
-             >
-              {label} ✕
-             </span>
+            {softSkills.map((label, index) => (
+             <RemovableTag
+              key={index}
+              label={label}
+              onRemove={() => setDeleteSoftSkillTarget(label)}
+             />
             ))}
            </div>
           )}
@@ -570,6 +551,31 @@ export default function SkillsAndLanguages() {
        </>
       )}
      </section>
+
+     <ConfirmModal
+      isOpen={!!deleteLanguageTarget}
+      title="Supprimer la langue"
+      message={`Êtes-vous sûr de vouloir supprimer « ${deleteLanguageTarget?.label} » ?`}
+      onCancel={() => setDeleteLanguageTarget(null)}
+      onConfirm={() => {
+       removeLanguage(deleteLanguageTarget.label);
+       setDeleteLanguageTarget(null);
+      }}
+      confirmText="Supprimer"
+     />
+
+     {/* Confirm delete soft skill */}
+     <ConfirmModal
+      isOpen={!!deleteSoftSkillTarget}
+      title="Supprimer le savoir-être"
+      message={`Êtes-vous sûr de vouloir supprimer « ${deleteSoftSkillTarget} » ?`}
+      onCancel={() => setDeleteSoftSkillTarget(null)}
+      onConfirm={() => {
+       toggleSoftSkill(deleteSoftSkillTarget);
+       setDeleteSoftSkillTarget(null);
+      }}
+      confirmText="Supprimer"
+     />
 
      <div className="pt-10 flex justify-end">
       <Footer

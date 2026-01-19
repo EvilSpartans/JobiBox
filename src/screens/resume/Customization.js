@@ -14,6 +14,7 @@ import Footer from "../../components/resume/Footer";
 import { COLORS, TEMPLATES } from "../../utils/IAResume";
 import FormSeparator from "../../components/resume/FormSeparator";
 import Header from "../../components/resume/Header";
+import GlowBackground from "../../components/resume/GlowBackground";
 
 export default function Customization() {
  const user = useSelector((state) => state.user.user);
@@ -113,9 +114,8 @@ export default function Customization() {
    {/* Actions fixes */}
    <Logout />
    <GoBack itemsToRemove={["resumeId"]} />
-   {/* Background glow */}
-   <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 rounded-full blur-3xl pointer-events-none" />
-   <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 rounded-full blur-3xl pointer-events-none" />
+
+   <GlowBackground />
 
    <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
     {/* Carte */}

@@ -17,11 +17,11 @@ import {
 } from "../../utils/IAResume";
 import Footer from "../../components/resume/Footer";
 import Header from "../../components/resume/Header";
+import GlowBackground from "../../components/resume/GlowBackground";
 
 /* ---------------- CONFIG ---------------- */
 
 const STEP_KEYS = SMART_GENERATION_STEP_KEYS;
-
 const STEPS_CONFIG = SMART_GENERATION_STEPS_CONFIG;
 
 /* ---------------- COMPONENT ---------------- */
@@ -277,22 +277,19 @@ export default function SmartGeneration() {
  const allStepsCompleted = [1, 2, 3].every((s) => validatedSteps.includes(s));
 
  /* ---------------- RENDER ---------------- */
-
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
    <Logout />
    <GoBack />
 
-   {/* Glow background */}
-   <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 blur-3xl pointer-events-none" />
-   <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 blur-3xl pointer-events-none" />
+   <GlowBackground />
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
     <div className="flex flex-col w-full max-w-5xl min-h-[85vh] p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
      <Header
       step="Étape 4 · Génération intelligente"
       title="Parle naturellement"
-      description=" Réponds oralement. L’IA structure automatiquement ton CV."
+      description="Réponds oralement. L’IA structure automatiquement ton CV."
      />
 
      {/* STEPS */}

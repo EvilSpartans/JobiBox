@@ -1,8 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
 import { RESUME_IA_STEPS } from "../../utils/IAResume";
+import Header from "../../components/resume/Header";
+import GlowBackground from "../../components/resume/GlowBackground";
 
 export default function Resume() {
  const navigate = useNavigate();
@@ -17,10 +20,8 @@ export default function Resume() {
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
    <Logout />
    <GoBack />
-   {/* Background glow */}
-   <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 rounded-full blur-3xl pointer-events-none" />
-   <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 rounded-full blur-3xl pointer-events-none" />
 
+   <GlowBackground />
    <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
     {/* Carte principale */}
     <div
@@ -31,25 +32,14 @@ export default function Resume() {
                      backdrop-blur-xl shadow-2xl ring-1 ring-white/10
                      min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none"
     >
-     {/* Header */}
      <div className="text-center space-y-6">
-      <span
-       className="inline-block px-4 py-1 rounded-full text-sm font-semibold 
-                             bg-emerald-900/40 text-emerald-300 tracking-wide"
-      >
-       Génération intelligente de CV
-      </span>
-
-      <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-       CV papier
-      </h2>
-
-      <p className="text-lg sm:text-xl text-gray-300 max-w-xl mx-auto">
-       Crée un CV professionnel, structuré et prêt à l’emploi, généré
-       automatiquement par l’IA en{" "}
-       <span className="text-emerald-400 font-semibold">5 minutes environ</span>
-       .
-      </p>
+      <Header
+       step="Génération intelligente de CV"
+       title="CV papier"
+       description="Crée un CV professionnel, structuré et prêt à l’emploi, généré
+       automatiquement par l’IA en"
+       hint="5 minutes environ"
+      />
      </div>
 
      {/* Parcours vertical */}

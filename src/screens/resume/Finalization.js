@@ -6,8 +6,6 @@ import { QRCodeSVG } from "qrcode.react";
 import { useNavigate } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
 import { useDispatch, useSelector } from "react-redux";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
  getResume,
@@ -31,10 +29,16 @@ import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
 import Modal from "../../components/resume/Modal";
 import Header from "../../components/resume/Header";
+import AddButton from "../../components/resume/AddButton";
 import StepButton from "../../components/resume/StepButton";
 import TrainingForm from "../../components/resume/TrainingForm";
+import ConfirmModal from "../../components/modals/ConfirmModal";
+import RemovableTag from "../../components/resume/RemovableTag";
+import AddItemInput from "../../components/resume/AddItemInput";
 import FormSeparator from "../../components/resume/FormSeparator";
 import ExperienceForm from "../../components/resume/ExperienceForm";
+import GlowBackground from "../../components/resume/GlowBackground";
+import { formatDate, formatDDMMYYYY, parseDate } from "../../utils/DateUtils";
 
 /* ================= CONSTANTES ================= */
 const templates = TEMPLATES;
@@ -58,7 +62,6 @@ export default function Finalization() {
  const [showPreview, setShowPreview] = useState(false);
  const [showConfetti, setShowConfetti] = useState(true);
  const [deleteTarget, setDeleteTarget] = useState(null);
- // GO HOME
  const [showExitModal, setShowExitModal] = useState(false);
 
  useEffect(() => {
@@ -105,6 +108,8 @@ export default function Finalization() {
  const photoRef = useRef(null);
  const [videoSelectOpen, setVideoSelectOpen] = useState(false);
  const [deleteSkillTarget, setDeleteSkillTarget] = useState(null);
+ const [deleteLanguageTarget, setDeleteLanguageTarget] = useState(null);
+ const [deleteSoftSkillTarget, setDeleteSoftSkillTarget] = useState(null);
 
  const finalizationSteps = FINALIZATION_STEPS;
 
@@ -217,50 +222,6 @@ export default function Finalization() {
 
  /* ================= SAVE ================= */
 
- // DATES
- const parseDate = (value) => {
-  if (!value) return {};
-  if (typeof value !== "string") return value;
-
-  if (value === "En cours") {
-   return "En cours";
-  }
-
-  const parts = value.split("/");
-
-  if (parts.length === 3) {
-   const [day, month, year] = parts;
-   return { day, month, year };
-  }
-
-  if (parts.length === 2) {
-   const [month, year] = parts;
-   return { month, year };
-  }
-
-  if (/^\d{4}$/.test(value)) {
-   return { year: value };
-  }
-
-  return {};
- };
-
- const formatDate = (d) => {
-  if (!d) return "";
-  if (d === "En cours") return "En cours";
-  if (d.year && d.month && d.day) return `${d.day}/${d.month}/${d.year}`;
-  if (d.year && d.month) return `${d.month}/${d.year}`;
-  if (d.year) return `${d.year}`;
-  return "";
- };
-
- const formatDDMMYYYY = (date) => {
-  if (!date) return "";
-  // date attendu : YYYY-MM-DD
-  const [y, m, d] = date.split("-");
-  return `${d}-${m}-${y}`;
- };
-
  const saveStep = async () => {
   let payload = { ...resume };
 
@@ -337,6 +298,16 @@ export default function Finalization() {
   setShowExitModal(false);
  };
 
+ const confirmDeleteTarget = () => {
+  if (deleteTarget.type === "experience") {
+   setExperiences((prev) => prev.filter((_, i) => i !== deleteTarget.index));
+  }
+  if (deleteTarget.type === "training") {
+   setTrainings((prev) => prev.filter((_, i) => i !== deleteTarget.index));
+  }
+  setDeleteTarget(null);
+ };
+
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
    {showConfetti && (
@@ -351,8 +322,7 @@ export default function Finalization() {
    <Logout />
    <GoBack />
 
-   <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-emerald-600/20 rounded-full blur-3xl pointer-events-none" />
-   <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-emerald-800/20 rounded-full blur-3xl pointer-events-none" />
+   <GlowBackground />
 
    {/* ================= PAGE PRINCIPALE ================= */}
    <div className="relative z-10 h-full flex items-center justify-center px-4">
@@ -667,16 +637,12 @@ export default function Finalization() {
        </div>
 
        <div className="flex flex-wrap gap-3">
-        {languages.map((l) => (
-         <span
-          key={l.label}
-          onClick={() =>
-           setLanguages((prev) => prev.filter((x) => x.label !== l.label))
-          }
-          className="px-4 py-2 bg-emerald-600/20 text-white rounded-full cursor-pointer"
-         >
-          {l.label} · {l.level} ✕
-         </span>
+        {languages.map((language, index) => (
+         <RemovableTag
+          key={index}
+          label={`${language.label} · ${language.level}`}
+          onRemove={() => setDeleteLanguageTarget(language)}
+         />
         ))}
        </div>
       </div>
@@ -687,34 +653,27 @@ export default function Finalization() {
       <div className="space-y-3">
        <h4 className="font-semibold text-emerald-300">Savoir-faire</h4>
 
-       <div className="flex gap-3">
-        <input
-         value={customSkill}
-         onChange={(e) => setCustomSkill(e.target.value)}
-         placeholder="Ajouter une compétence"
-         className="flex-1 px-4 py-3 bg-white/5 rounded-xl text-white"
-        />
-        <button
-         onClick={() => {
-          if (!customSkill.trim() || skills.includes(customSkill)) return;
-          setSkills((prev) => [...prev, customSkill]);
+       <AddItemInput
+        value={customSkill}
+        onChange={setCustomSkill}
+        placeholder="Ajouter une compétence"
+        onAdd={(skill) => {
+         if (!skills.includes(skill)) {
+          setSkills((prev) => [...prev, skill]);
           setCustomSkill("");
-         }}
-         className="px-4 py-3 bg-emerald-600 rounded-xl text-white font-semibold"
-        >
-         +
-        </button>
-       </div>
+         }
+        }}
+        maxItems={6}
+        currentCount={skills.length}
+       />
 
        <div className="flex flex-wrap gap-3">
-        {skills.map((s) => (
-         <span
-          key={s}
-          onClick={() => setDeleteSkillTarget(s)}
-          className="px-4 py-2 bg-emerald-600/20 text-white rounded-full cursor-pointer"
-         >
-          {s} ✕
-         </span>
+        {skills.map((skill, index) => (
+         <RemovableTag
+          key={index}
+          label={skill}
+          onRemove={() => setDeleteSkillTarget(skill)}
+         />
         ))}
        </div>
       </div>
@@ -726,54 +685,31 @@ export default function Finalization() {
        <h4 className="font-semibold text-emerald-300">Savoir-être</h4>
 
        {/* INPUT AJOUT */}
-       <div className="flex items-stretch gap-3">
-        <input
-         value={softSkillInput}
-         onChange={(e) => setSoftSkillInput(e.target.value)}
-         placeholder="Ajouter un savoir-être"
-         className="flex-1 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-           const value = softSkillInput.trim();
-           if (!value) return;
-           if (softSkills.includes(value)) return;
-           if (softSkills.length >= 6) return;
-
-           setSoftSkills((prev) => [...prev, value]);
-           setSoftSkillInput("");
-          }
-         }}
-        />
-
-        <button
-         onClick={() => {
-          const value = softSkillInput.trim();
-          if (!value) return;
-          if (softSkills.includes(value)) return;
-          if (softSkills.length >= 6) return;
-
-          setSoftSkills((prev) => [...prev, value]);
+       <AddItemInput
+        value={softSkillInput}
+        onChange={setSoftSkillInput}
+        placeholder="Ajouter un savoir-être"
+        maxItems={6}
+        currentCount={softSkills.length}
+        onAdd={(skill) => {
+         if (!softSkills.includes(skill)) {
+          setSoftSkills((prev) => [...prev, skill]);
           setSoftSkillInput("");
-         }}
-         className="px-6 py-3 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-semibold"
-        >
-         +
-        </button>
-       </div>
+         }
+        }}
+       />
 
        {/* LISTE DES SAVOIR-ÊTRE */}
        <div className="flex flex-wrap gap-3">
         {softSkills.length === 0 ? (
          <span className="text-sm text-gray-400">Aucun savoir-être ajouté</span>
         ) : (
-         softSkills.map((s) => (
-          <span
-           key={s}
-           onClick={() => setSoftSkills((prev) => prev.filter((x) => x !== s))}
-           className="px-4 py-2 bg-emerald-600/20 border border-emerald-500 text-white rounded-full cursor-pointer hover:bg-emerald-700/30 transition"
-          >
-           {s} ✕
-          </span>
+         softSkills.map((skill, index) => (
+          <RemovableTag
+           key={index}
+           label={skill}
+           onRemove={() => setDeleteSoftSkillTarget(skill)}
+          />
          ))
         )}
        </div>
@@ -810,8 +746,7 @@ export default function Finalization() {
        ))}
       </Section>
 
-      <button
-       type="button"
+      <AddButton
        onClick={() =>
         setExperiences((prev) => [
          ...prev,
@@ -824,35 +759,9 @@ export default function Finalization() {
          },
         ])
        }
-       className="
-        group
-        w-full
-        flex items-center justify-center gap-3
-        px-6 py-4
-        rounded-2xl
-        border border-emerald-500/30
-        bg-emerald-500/10
-        text-emerald-300
-        font-semibold
-        transition
-        hover:bg-emerald-500/20
-        hover:border-emerald-400/60
-      "
       >
-       <span
-        className="
-          flex items-center justify-center
-          w-9 h-9
-          rounded-full
-          bg-emerald-500/20
-          group-hover:bg-emerald-500/30
-          transition
-        "
-       >
-        <FontAwesomeIcon icon={faPlus} />
-       </span>
        Ajouter une expérience
-      </button>
+      </AddButton>
 
       <FormSeparator />
 
@@ -869,8 +778,7 @@ export default function Finalization() {
        ))}
       </Section>
 
-      <button
-       type="button"
+      <AddButton
        onClick={() =>
         setTrainings((prev) => [
          ...prev,
@@ -883,35 +791,9 @@ export default function Finalization() {
          },
         ])
        }
-       className="
-          group
-          w-full
-          flex items-center justify-center gap-3
-          px-6 py-4
-          rounded-2xl
-          border border-emerald-500/30
-          bg-emerald-500/10
-          text-emerald-300
-          font-semibold
-          transition
-          hover:bg-emerald-500/20
-          hover:border-emerald-400/60
-          "
       >
-       <span
-        className="
-          flex items-center justify-center
-          w-9 h-9
-          rounded-full
-          bg-emerald-500/20
-          group-hover:bg-emerald-500/30
-          transition
-        "
-       >
-        <FontAwesomeIcon icon={faPlus} />
-       </span>
        Ajouter une formation
-      </button>
+      </AddButton>
      </>
     )}
 
@@ -1061,112 +943,65 @@ export default function Finalization() {
    )}
 
    {/* ===================GO HOME============= */}
-   {showExitModal && (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-     <div className="absolute inset-0 bg-black bg-opacity-75"></div>
+   <ConfirmModal
+    isOpen={showExitModal}
+    title="Veux-tu vraiment revenir à l’accueil ?"
+    message="Tu pourras toujours éditer ton CV depuis le site Jobissim."
+    onCancel={cancelBackHome}
+    onConfirm={confirmBackHome}
+    confirmClass="bg-emerald-600"
+   />
 
-     <div className="bg-white w-full max-w-md p-6 rounded-lg text-center z-50 relative">
-      <p className="text-gray-800 text-lg font-semibold">
-       Veux-tu vraiment revenir à l’accueil ?
-      </p>
-      <p className="text-gray-600 mt-2">
-       Tu pourras toujours éditer ton CV depuis le site Jobissim.
-      </p>
-
-      <div className="mt-6 flex justify-center gap-4">
-       <button
-        className="bg-emerald-600 text-white px-6 py-2 rounded-md"
-        onClick={confirmBackHome}
-       >
-        Oui
-       </button>
-       <button
-        className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md"
-        onClick={cancelBackHome}
-       >
-        Non
-       </button>
-      </div>
-     </div>
-    </div>
-   )}
-
-   {/* Confirm delete */}
-   {deleteTarget && (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-     <div className="absolute inset-0 bg-black bg-opacity-75"></div>
-
-     <div className="bg-white w-full max-w-md p-6 rounded-lg text-center z-50 relative">
-      <p className="text-gray-800 text-lg font-semibold">
-       Confirmer la suppression
-      </p>
-      <p className="text-gray-600 mt-2">Cette action est irréversible.</p>
-
-      <div className="mt-6 flex justify-center gap-4">
-       <button
-        className="bg-red-600 text-white px-6 py-2 rounded-md"
-        onClick={() => {
-         if (deleteTarget.type === "experience") {
-          setExperiences((prev) =>
-           prev.filter((_, i) => i !== deleteTarget.index)
-          );
-         }
-         if (deleteTarget.type === "training") {
-          setTrainings((prev) =>
-           prev.filter((_, i) => i !== deleteTarget.index)
-          );
-         }
-         setDeleteTarget(null);
-        }}
-       >
-        Supprimer
-       </button>
-
-       <button
-        className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md"
-        onClick={() => setDeleteTarget(null)}
-       >
-        Annuler
-       </button>
-      </div>
-     </div>
-    </div>
-   )}
+   {/* Confirm delete formation or experience */}
+   <ConfirmModal
+    isOpen={deleteTarget}
+    title="Confirmer la suppression"
+    message="Cette action est irréversible."
+    onCancel={() => setDeleteTarget(null)}
+    onConfirm={confirmDeleteTarget}
+    confirmText="Supprimer"
+   />
 
    {/* Confirm delete copétence */}
-   {deleteSkillTarget && (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-     <div className="absolute inset-0 bg-black bg-opacity-75"></div>
+   <ConfirmModal
+    isOpen={deleteSkillTarget}
+    title="Supprimer la compétence"
+    message={`Êtes-vous sûr de vouloir supprimer « ${deleteSkillTarget} » ?`}
+    onCancel={() => setDeleteSkillTarget(null)}
+    onConfirm={() => {
+     setSkills((prev) => prev.filter((s) => s !== deleteSkillTarget));
+     setDeleteSkillTarget(null);
+    }}
+    confirmText="Supprimer"
+   />
 
-     <div className="bg-white w-full max-w-md p-6 rounded-lg text-center z-50 relative">
-      <p className="text-gray-800 text-lg font-semibold">
-       Supprimer la compétence
-      </p>
-      <p className="text-gray-600 mt-2">
-       Êtes-vous sûr de vouloir supprimer « {deleteSkillTarget} » ?
-      </p>
+   {/* Confirm delete language */}
+   <ConfirmModal
+    isOpen={!!deleteLanguageTarget}
+    title="Supprimer la langue"
+    message={`Êtes-vous sûr de vouloir supprimer « ${deleteLanguageTarget?.label} » ?`}
+    onCancel={() => setDeleteLanguageTarget(null)}
+    onConfirm={() => {
+     setLanguages((prev) =>
+      prev.filter((l) => l.label !== deleteLanguageTarget.label)
+     );
+     setDeleteLanguageTarget(null);
+    }}
+    confirmText="Supprimer"
+   />
 
-      <div className="mt-6 flex justify-center gap-4">
-       <button
-        className="bg-red-600 text-white px-6 py-2 rounded-md"
-        onClick={() => {
-         setSkills((prev) => prev.filter((s) => s !== deleteSkillTarget));
-         setDeleteSkillTarget(null);
-        }}
-       >
-        Supprimer
-       </button>
-
-       <button
-        className="bg-gray-300 text-gray-800 px-6 py-2 rounded-md"
-        onClick={() => setDeleteSkillTarget(null)}
-       >
-        Annuler
-       </button>
-      </div>
-     </div>
-    </div>
-   )}
+   {/* Confirm delete soft skill */}
+   <ConfirmModal
+    isOpen={!!deleteSoftSkillTarget}
+    title="Supprimer le savoir-être"
+    message={`Êtes-vous sûr de vouloir supprimer « ${deleteSoftSkillTarget} » ?`}
+    onCancel={() => setDeleteSoftSkillTarget(null)}
+    onConfirm={() => {
+     setSoftSkills((prev) => prev.filter((s) => s !== deleteSoftSkillTarget));
+     setDeleteSoftSkillTarget(null);
+    }}
+    confirmText="Supprimer"
+   />
   </div>
  );
 }
