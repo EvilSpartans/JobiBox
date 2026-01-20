@@ -23,7 +23,7 @@ export default function Film({ onStartSequence }) {
   const selectedMusic = JSON.parse(localStorage.getItem("selectedMusic"));
   const textStyle = JSON.parse(localStorage.getItem("textStyle"));
   const selectedGreenFilter = JSON.parse(
-    localStorage.getItem("selectedGreenFilter")
+    localStorage.getItem("selectedGreenFilter"),
   );
 
   const [questions, setQuestions] = useState([]);
@@ -68,14 +68,14 @@ export default function Film({ onStartSequence }) {
   useEffect(() => {
     sessionStorage.removeItem("hasReloaded");
     const selectedQuestions = JSON.parse(
-      localStorage.getItem("selectedQuestions")
+      localStorage.getItem("selectedQuestions"),
     );
     const questionOrder = JSON.parse(localStorage.getItem("questionOrder"));
 
     if (selectedQuestions) {
       if (questionOrder) {
         const orderedQuestions = questionOrder.map((order) =>
-          selectedQuestions.find((q) => q.id === order.id)
+          selectedQuestions.find((q) => q.id === order.id),
         );
         setQuestions(orderedQuestions);
       } else {
@@ -210,12 +210,7 @@ export default function Film({ onStartSequence }) {
       }
     } else {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-        setTimeout(() => {
-          if (mediaRecorder.state !== "inactive") {
-            mediaRecorder.stop();
-          }
-        }, 1000);
-
+        mediaRecorder.stop();
         clearInterval(timerIntervalId);
       }
     }
@@ -225,7 +220,7 @@ export default function Film({ onStartSequence }) {
     videoFile,
     questionId,
     selectedQuestion,
-    token
+    token,
   ) => {
     setIsSavingVideo(true);
 
@@ -278,7 +273,7 @@ export default function Film({ onStartSequence }) {
               0,
               0,
               canvasRef.current.width,
-              canvasRef.current.height
+              canvasRef.current.height,
             );
           }
           break;
@@ -286,7 +281,7 @@ export default function Film({ onStartSequence }) {
       } catch (error) {
         console.error(
           "Erreur lors de la sauvegarde du clip, réessayer...",
-          error
+          error,
         );
       }
 
@@ -298,7 +293,7 @@ export default function Film({ onStartSequence }) {
 
     if (!success) {
       console.error(
-        "Échec de la sauvegarde du clip après plusieurs tentatives."
+        "Échec de la sauvegarde du clip après plusieurs tentatives.",
       );
       setLostConnexion(true);
       return false;
@@ -325,7 +320,7 @@ export default function Film({ onStartSequence }) {
         videoFile,
         questionId,
         selectedQuestion,
-        token
+        token,
       );
 
       if (!success) {
@@ -425,7 +420,7 @@ export default function Film({ onStartSequence }) {
       0,
       0,
       canvasRef.current.width,
-      canvasRef.current.height
+      canvasRef.current.height,
     );
 
     const wRatio = canvasRef.current.width / results.image.width;
@@ -440,7 +435,7 @@ export default function Film({ onStartSequence }) {
       offsetX,
       offsetY,
       results.image.width * ratio,
-      results.image.height * ratio
+      results.image.height * ratio,
     );
 
     contextRef.current.globalCompositeOperation = "source-out";
@@ -453,7 +448,7 @@ export default function Film({ onStartSequence }) {
       -canvasRef.current.width,
       0,
       canvasRef.current.width,
-      canvasRef.current.height
+      canvasRef.current.height,
     );
     contextRef.current.restore();
 
@@ -463,7 +458,7 @@ export default function Film({ onStartSequence }) {
       offsetX,
       offsetY,
       results.image.width * ratio,
-      results.image.height * ratio
+      results.image.height * ratio,
     );
 
     contextRef.current.restore();
@@ -598,6 +593,20 @@ export default function Film({ onStartSequence }) {
             </div>
           )}
         </div>
+
+        {videoBase64 && (
+          <div className="mt-4 flex items-center justify-center">
+            <button
+              onClick={handleRedoRecording}
+              className={`text-xl bg-green_2 text-white px-4 py-2 rounded-lg hover:bg-green_1 ${
+                status === "loading" ? "opacity-50 pointer-events-none" : ""
+              }`}
+              disabled={status === "loading"}
+            >
+              Recommencer
+            </button>
+          </div>
+        )}
 
         {/*
         <div className="mt-4 flex items-center justify-center">
