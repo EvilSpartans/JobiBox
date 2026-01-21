@@ -8,42 +8,42 @@ import Header from "../../components/resume/Header";
 import GlowBackground from "../../components/resume/GlowBackground";
 
 export default function Resume() {
- const navigate = useNavigate();
+  const navigate = useNavigate();
 
- const handleStart = () => {
-  navigate("/personnalization");
- };
+  const handleStart = () => {
+    navigate("/personnalization");
+  };
 
- const steps = RESUME_IA_STEPS;
+  const steps = RESUME_IA_STEPS;
 
- return (
-  <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
-   <Logout />
-   <GoBack />
+  return (
+    <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
+      <Logout />
+      <GoBack />
 
-   <GlowBackground />
-   <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
-    {/* Carte principale */}
-    <div
-     className="flex flex-col w-full max-w-3xl
+      <GlowBackground />
+      <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
+        {/* Carte principale */}
+        <div
+          className="flex flex-col w-full max-w-3xl
                      p-6 sm:p-10 md:p-12
                      rounded-3xl
                      bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
                      backdrop-blur-xl shadow-2xl ring-1 ring-white/10
                      min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none"
-    >
-     <div className="text-center space-y-6">
-      <Header
-       step="Génération intelligente de CV"
-       title="CV papier"
-       description="Crée un CV professionnel, structuré et prêt à l’emploi, généré
+        >
+          <div className="text-center space-y-6">
+            <Header
+              step="Génération intelligente de CV"
+              title="CV papier"
+              description="Crée un CV professionnel, structuré et prêt à l’emploi, généré
        automatiquement par l’IA en"
-       hint="5 minutes environ"
-      />
-     </div>
+              hint="5 minutes environ"
+            />
+          </div>
 
-     {/* Parcours vertical */}
-     {/* <div className="mt-12 space-y-6">
+          {/* Parcours vertical */}
+          {/* <div className="mt-12 space-y-6">
             {steps.map((item) => (
               <div
                 key={item.step}
@@ -64,69 +64,71 @@ export default function Resume() {
             ))}
           </div> */}
 
-     <div className="mt-14 relative rounded-3xl ring-1 ring-white/5 bg-white/[0.02] p-6">
-      {/* Label centré */}
-      <div className="mb-10 flex justify-center">
-       <div
-        className="px-4 py-1 rounded-full
+          <div className="mt-14 relative flex-1 flex flex-col rounded-3xl ring-1 ring-white/5 bg-white/[0.02] p-6">
+            {/* Label centré */}
+            <div className="mb-10 flex justify-center">
+              <div
+                className="px-4 py-1 rounded-full
                  text-[10px] tracking-[0.32em] font-semibold
                  bg-dark_bg_1/80 text-emerald-400
                  ring-1 ring-white/10
                  shadow-[0_0_16px_rgba(16,185,129,0.15)]"
-       >
-        LES ÉTAPES QUE TU VAS RETROUVER
-       </div>
-      </div>
+              >
+                LES ÉTAPES QUE TU VAS RETROUVER
+              </div>
+            </div>
 
-      <div className="relative grid grid-cols-[28px_1fr_auto] gap-x-6">
-       {/* Trait vertical */}
-       <div className="absolute left-3 top-0 bottom-0 w-px bg-emerald-500/25" />
+            <div className="relative flex-1 flex flex-col justify-center">
+              <div className="relative grid grid-cols-[28px_1fr_auto] gap-x-6">
+                {/* Trait vertical */}
+                <div className="absolute left-3 top-0 bottom-0 w-px bg-emerald-500/25" />
 
-       {steps.map((item) => (
-        <div
-         key={item.step}
-         className="col-span-3 grid grid-cols-[28px_1fr_auto] items-center py-4"
-        >
-         {/* Colonne trait + point */}
-         <div className="relative">
-          <span
-           className="absolute left-3 top-1/2 -translate-x-1/2 -translate-y-1/2
+                {steps.map((item) => (
+                  <div
+                    key={item.step}
+                    className="col-span-3 grid grid-cols-[28px_1fr_auto] items-center py-4"
+                  >
+                    {/* Colonne trait + point */}
+                    <div className="relative">
+                      <span
+                        className="absolute left-3 top-1/2 -translate-x-1/2 -translate-y-1/2
                        w-2.5 h-2.5 rounded-full bg-emerald-400
                        shadow-[0_0_14px_rgba(16,185,129,0.7)]"
-          />
-         </div>
+                      />
+                    </div>
 
-         {/* Contenu */}
-         <div>
-          <h3 className="text-sm sm:text-base font-semibold text-emerald-300">
-           {item.title}
-          </h3>
-          <p className="mt-1.5 text-xs sm:text-sm text-gray-300 leading-relaxed max-w-lg">
-           {item.desc}
-          </p>
-         </div>
+                    {/* Contenu */}
+                    <div>
+                      <h3 className="text-sm sm:text-base font-semibold text-emerald-300">
+                        {item.title}
+                      </h3>
+                      <p className="mt-1.5 text-xs sm:text-sm text-gray-300 leading-relaxed max-w-lg">
+                        {item.desc}
+                      </p>
+                    </div>
 
-         {/* Numéro */}
-         <div className="text-right pr-1">
-          <span className="text-5xl sm:text-6xl font-black text-emerald-500/10 select-none leading-none">
-           {item.step}
-          </span>
-         </div>
-        </div>
-       ))}
-      </div>
-     </div>
+                    {/* Numéro */}
+                    <div className="text-right pr-1">
+                      <span className="text-5xl sm:text-6xl font-black text-emerald-500/10 select-none leading-none">
+                        {item.step}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
-     {/* Footer */}
-     <div className="mt-auto pt-14 flex flex-col items-center space-y-6">
-      <p className="text-sm text-gray-400 text-center max-w-md">
-       Ton CV sera sauvegardé et accessible à tout moment dans ton espace privé
-       Jobissim.
-      </p>
+          {/* Footer */}
+          <div className="mt-auto pt-14 flex flex-col items-center space-y-6">
+            <p className="text-sm text-gray-400 text-center max-w-md">
+              Ton CV sera sauvegardé et accessible à tout moment dans ton espace
+              privé Jobissim.
+            </p>
 
-      <button
-       onClick={handleStart}
-       className="relative px-10 sm:px-14 py-4 rounded-full
+            <button
+              onClick={handleStart}
+              className="relative px-10 sm:px-14 py-4 rounded-full
              bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-700
              text-lg font-semibold text-white
              shadow-[0_18px_40px_-15px_rgba(16,185,129,0.6)]
@@ -134,24 +136,24 @@ export default function Resume() {
              active:shadow-[0_12px_25px_-12px_rgba(16,185,129,0.8)]
              transition-transform duration-150 ease-out
              overflow-hidden"
-      >
-       {/* halo pulsé permanent (mobile friendly) */}
-       <span
-        className="absolute inset-0
+            >
+              {/* halo pulsé permanent (mobile friendly) */}
+              <span
+                className="absolute inset-0
                bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.18),transparent_60%)]
                animate-pulse-soft"
-       />
+              />
 
-       {/* ripple au tap */}
-       <span className="tap-ripple absolute inset-0" />
+              {/* ripple au tap */}
+              <span className="tap-ripple absolute inset-0" />
 
-       {/* contenu */}
-       <span className="relative z-10 inline-flex items-center gap-3">
-        Commencer l’expérience
-        <span className="arrow-loop inline-block text-xl">→</span>
-       </span>
+              {/* contenu */}
+              <span className="relative z-10 inline-flex items-center gap-3">
+                Commencer l’expérience
+                <span className="arrow-loop inline-block text-xl">→</span>
+              </span>
 
-       <style>{`
+              <style>{`
     @keyframes arrowLoop {
       0% { transform: translateX(0); opacity: 0.6; }
       50% { transform: translateX(8px); opacity: 1; }
@@ -179,10 +181,10 @@ export default function Resume() {
       to { transform: scale(2.5); opacity: 0; }
     }
   `}</style>
-      </button>
-     </div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-   </div>
-  </div>
- );
+  );
 }
