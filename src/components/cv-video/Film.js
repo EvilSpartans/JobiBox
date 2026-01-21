@@ -658,6 +658,8 @@ export default function Film({ onStartSequence }) {
           </div>
         ) : status === "loading" ? (
           <PulseLoader color="#fff" size={16} />
+        ) : !videoBase64 ? (
+          "Cliquez sur le bouton de votre droite pour démarrer"
         ) : (
           "Continuer"
         )}
