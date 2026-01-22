@@ -22,7 +22,7 @@ export default function Home() {
   const intermediateInProgress = localStorage.getItem("intermediateInProgress");
   const expertInProgress = localStorage.getItem("expertInProgress");
   const existingSelectedGreenFilter = localStorage.getItem(
-    "selectedGreenFilter"
+    "selectedGreenFilter",
   );
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +40,20 @@ export default function Home() {
 
         // ---- Version + AnyDesk Sync ----
         const appVersion = await AppVersion();
-        const anydeskId = await window.electron.anydeskApi.getFreshId();
+        let anydeskId = null;
+
+        if (
+          typeof window !== "undefined" &&
+          window.electron &&
+          window.electron.anydeskApi &&
+          typeof window.electron.anydeskApi.getFreshId === "function"
+        ) {
+          try {
+            anydeskId = await window.electron.anydeskApi.getFreshId();
+          } catch (error) {
+            console.warn("RustDesk/AnyDesk indisponible :", error);
+          }
+        }
 
         const updatePayload = {
           id: jobiboxId,
@@ -143,12 +156,12 @@ export default function Home() {
               </button>
             )}
             {resume === "true" && (
-            <button
-              className="text-xl w-full flex justify-center bg-emerald-600 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-emerald-700 shadow-lg cursor-pointer transition ease-in duration-300"
-              onClick={() => navigate("/resume")}
-            >
-              CV papier
-            </button>
+              <button
+                className="text-xl w-full flex justify-center bg-emerald-600 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-emerald-700 shadow-lg cursor-pointer transition ease-in duration-300"
+                onClick={() => navigate("/resume")}
+              >
+                CV papier
+              </button>
             )}
             {offers === "true" && (
               <button
