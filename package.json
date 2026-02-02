@@ -117,6 +117,7 @@
   "@hookform/resolvers": "^3.3.1",
   "@mediapipe/camera_utils": "^0.3.1675466862",
   "@mediapipe/selfie_segmentation": "^0.1.1675465747",
+  "@mediapipe/tasks-vision": "^0.10.32",
   "@reduxjs/toolkit": "^1.9.6",
   "@tensorflow-models/body-pix": "^2.2.1",
   "@tensorflow/tfjs": "^4.20.0",
