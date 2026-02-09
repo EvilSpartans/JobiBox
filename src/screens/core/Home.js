@@ -17,6 +17,8 @@ export default function Home() {
   const exam = localStorage.getItem("examActivated");
   const resume = localStorage.getItem("resumeActivated");
   const offers = localStorage.getItem("offersActivated");
+  // Guide de carrière : affiché par défaut tant que le backend n'expose pas la clé
+  const careerGuide = localStorage.getItem("careerGuideActivated") ?? "true";
   const examenInProgress = localStorage.getItem("examenInProgress");
   const beginnerInProgress = localStorage.getItem("beginnerInProgress");
   const intermediateInProgress = localStorage.getItem("intermediateInProgress");
@@ -37,6 +39,9 @@ export default function Home() {
         localStorage.setItem("examActivated", portalsData.exam);
         localStorage.setItem("resumeActivated", portalsData.resume);
         localStorage.setItem("offersActivated", portalsData.offers);
+        if (portalsData.careerGuide !== undefined) {
+          localStorage.setItem("careerGuideActivated", portalsData.careerGuide);
+        }
 
         // ---- Version + AnyDesk Sync ----
         const appVersion = await AppVersion();
@@ -130,7 +135,7 @@ export default function Home() {
         {/*Login Form */}
         <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
           {/* Container */}
-          <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl">
+          <div className="flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-10 p-6 tall:p-10 dark:bg-dark_bg_2 rounded-xl overflow-y-auto max-h-[90vh]">
             {/*Heading*/}
             <div className="text-center dark:text-dark_text_1">
               <h2 className="mt-6 text-4xl font-bold">
@@ -142,14 +147,14 @@ export default function Home() {
             </div>
             {/*Buttons*/}
             <button
-              className="text-xl w-full flex justify-center bg-blue_4 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-500 shadow-lg cursor-pointer transition ease-in duration-300"
+              className="text-lg sm:text-xl w-full flex justify-center bg-blue_4 text-gray-100 p-4 sm:p-5 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue-500 shadow-lg cursor-pointer transition ease-in duration-300"
               onClick={() => navigate("/cvVideo")}
             >
               CV Vidéo
             </button>
             {training === "true" && (
               <button
-                className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
+                className="text-lg sm:text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 sm:p-5 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-pink-500 shadow-lg cursor-pointer transition ease-in duration-300"
                 onClick={() => navigate("/train")}
               >
                 Simulation d'entretien
@@ -157,15 +162,23 @@ export default function Home() {
             )}
             {resume === "true" && (
               <button
-                className="text-xl w-full flex justify-center bg-emerald-600 text-gray-100 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-emerald-700 shadow-lg cursor-pointer transition ease-in duration-300"
+                className="text-lg sm:text-xl w-full flex justify-center bg-emerald-600 text-gray-100 p-4 sm:p-5 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-emerald-700 shadow-lg cursor-pointer transition ease-in duration-300"
                 onClick={() => navigate("/resume")}
               >
                 CV papier
               </button>
             )}
+            {careerGuide === "true" && (
+              <button
+                className="text-lg sm:text-xl w-full flex justify-center bg-amber-600 text-white p-4 sm:p-5 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-amber-500 shadow-lg cursor-pointer transition ease-in duration-300 active:bg-amber-500 border border-amber-500/50"
+                onClick={() => navigate("/career")}
+              >
+                Guide de carrière
+              </button>
+            )}
             {offers === "true" && (
               <button
-                className="text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-6 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
+                className="text-lg sm:text-xl w-full flex justify-center bg-gray-300 text-gray-700 p-4 sm:p-5 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-gray-400 shadow-lg cursor-pointer transition ease-in duration-300"
                 onClick={() => navigate("/offers")}
               >
                 Offres d'emploi

@@ -377,6 +377,22 @@ textarea {
     color: #e296f2;
 }
 
+/* Étoile Guide Carrière - scintillement */
+@keyframes starTwinkle {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.75;
+        transform: scale(1.08);
+    }
+}
+
+.star-twinkle {
+    animation: starTwinkle 2.5s ease-in-out infinite;
+}
+
 label[for=terms],
 label[for=portal] {
     margin-right: 2%;
