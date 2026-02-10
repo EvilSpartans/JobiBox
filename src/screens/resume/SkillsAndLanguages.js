@@ -7,16 +7,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 import GoBack from "../../components/core/GoBack";
 import Footer from "../../components/resume/Footer";
-import Header from "../../components/resume/Header";
+import CVStepper from "../../components/resume/Stepper";
 import RemovableTag from "../../components/resume/RemovableTag";
+import AddItemInput from "../../components/resume/AddItemInput";
+import ConfirmModal from "../../components/modals/ConfirmModal";
 import { getCategories } from "../../store/slices/categorySlice";
 import { getSoftSkills } from "../../store/slices/softSkillSlice";
 import FormSeparator from "../../components/resume/FormSeparator";
 import GlowBackground from "../../components/resume/GlowBackground";
 import { LANGUAGE_LEVELS, LANGUAGES_RESUME } from "../../utils/IAResume";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
-import AddItemInput from "../../components/resume/AddItemInput";
-import ConfirmModal from "../../components/modals/ConfirmModal";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -31,7 +31,7 @@ export default function SkillsAndLanguages() {
  const { resume, status } = useSelector((state) => state.resume);
 
  const categories = useSelector(
-  (state) => state.category.categories?.items || []
+  (state) => state.category.categories?.items || [],
  );
 
  const loading = status === "loading";
@@ -48,6 +48,8 @@ export default function SkillsAndLanguages() {
 
  // onglets
  const [activeTab, setActiveTab] = useState("hard");
+ const currentStep = 3;
+ const completedSteps = [1, 2];
 
  // soft skills
  const softSkillState = useSelector((state) => state.softSkill);
@@ -91,7 +93,7 @@ export default function SkillsAndLanguages() {
   const skillNames = resume.skills;
 
   const matchedCategory = categories.find((cat) =>
-   cat.technicalSkills?.some((s) => skillNames.includes(s.name))
+   cat.technicalSkills?.some((s) => skillNames.includes(s.name)),
   );
 
   if (matchedCategory) {
@@ -223,7 +225,12 @@ export default function SkillsAndLanguages() {
   setSoftSkillInput("");
  };
 
- const handleNext = async () => {
+ const handleNext = async (step, direction) => {
+  if (direction === "backward") {
+   navigate(step.path);
+   return;
+  }
+
   if (languages.length === 0 || selectedSkills.length === 0 || loading) return;
 
   const resumeId = localStorage.getItem("resumeId");
@@ -254,10 +261,10 @@ export default function SkillsAndLanguages() {
     token: user.token,
     id: resumeId,
     payload,
-   })
+   }),
   );
 
-  navigate("/smartGeneration");
+  navigate(step.path);
  };
 
  return (
@@ -269,10 +276,14 @@ export default function SkillsAndLanguages() {
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
     <div className="flex flex-col w-full max-w-5xl min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
-     <Header
-      step="Étape 3 · Compétences & Langues"
-      title="Tes compétences clés"
-      description="Sélectionne ton domaine, tes compétences et les langues maîtrisées."
+     <CVStepper
+      currentStep={currentStep}
+      completedSteps={completedSteps}
+      disabled={
+       loading || languages.length === 0 || selectedSkills.length === 0
+      }
+      loading={loading}
+      onNavigate={handleNext}
      />
 
      {/* ================= LANGUES ================= */}

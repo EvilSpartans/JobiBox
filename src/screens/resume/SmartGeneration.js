@@ -16,8 +16,8 @@ import {
  SMART_GENERATION_STEPS_CONFIG,
 } from "../../utils/IAResume";
 import Footer from "../../components/resume/Footer";
-import Header from "../../components/resume/Header";
 import GlowBackground from "../../components/resume/GlowBackground";
+import CVStepper from "../../components/resume/Stepper";
 
 /* ---------------- CONFIG ---------------- */
 
@@ -47,6 +47,8 @@ export default function SmartGeneration() {
 
  const current = STEPS_CONFIG.find((s) => s.id === step);
  const currentKey = STEP_KEYS[step];
+ const currentStep = 4;
+ const completedSteps = [1, 2, 3];
 
  const clean = (value) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
@@ -58,26 +60,32 @@ export default function SmartGeneration() {
   currentKey === "presentation"
    ? resume?.presentation
    : currentKey === "trainings"
-   ? resume?.trainings
-      ?.map((t) => {
-       const main = joinDefined([clean(t.degree), clean(t.school)]);
+     ? resume?.trainings
+        ?.map((t) => {
+         const main = joinDefined([clean(t.degree), clean(t.school)]);
 
-       const dates = joinDefined([clean(t.startDate), clean(t.endDate)], " → ");
+         const dates = joinDefined(
+          [clean(t.startDate), clean(t.endDate)],
+          " → ",
+         );
 
-       return joinDefined([main, dates ? `(${dates})` : null], " ");
-      })
-      .join("\n")
-   : currentKey === "experiences"
-   ? resume?.experiences
-      ?.map((e) => {
-       const main = joinDefined([clean(e.job), clean(e.company)]);
+         return joinDefined([main, dates ? `(${dates})` : null], " ");
+        })
+        .join("\n")
+     : currentKey === "experiences"
+       ? resume?.experiences
+          ?.map((e) => {
+           const main = joinDefined([clean(e.job), clean(e.company)]);
 
-       const dates = joinDefined([clean(e.startDate), clean(e.endDate)], " → ");
+           const dates = joinDefined(
+            [clean(e.startDate), clean(e.endDate)],
+            " → ",
+           );
 
-       return joinDefined([main, dates ? `(${dates})` : null], " ");
-      })
-      .join("\n")
-   : "";
+           return joinDefined([main, dates ? `(${dates})` : null], " ");
+          })
+          .join("\n")
+       : "";
 
  const hasExistingAnswer = Boolean(existingText && existingText.length > 0);
  const recordButtonRef = useRef(null);
@@ -217,7 +225,7 @@ export default function SmartGeneration() {
      token: user.token,
      key,
      audio: audioFile,
-    })
+    }),
    ).unwrap();
 
    const payload = {
@@ -254,7 +262,7 @@ export default function SmartGeneration() {
      token: user.token,
      id: resume.id,
      payload,
-    })
+    }),
    ).unwrap();
 
    setValidatedSteps((prev) => [...new Set([...prev, step])]);
@@ -286,12 +294,13 @@ export default function SmartGeneration() {
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
     <div className="flex flex-col w-full max-w-5xl min-h-[85vh] p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
-     <Header
-      step="Étape 4 · Génération intelligente"
-      title="Parle naturellement"
-      description="Réponds oralement. L’IA structure automatiquement ton CV."
+     <CVStepper
+      currentStep={currentStep}
+      completedSteps={completedSteps}
+      disabled={!allStepsCompleted}
+      loading={loading}
+      onNavigate={() => navigate("/finalization")}
      />
-
      {/* STEPS */}
      <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
       {STEPS_CONFIG.map((s) => (
@@ -302,8 +311,8 @@ export default function SmartGeneration() {
          step === s.id
           ? "bg-emerald-600/20 border-emerald-500 text-white"
           : validatedSteps.includes(s.id)
-          ? "bg-white/5 border-emerald-500/40 text-emerald-300 hover:bg-white/10"
-          : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
+            ? "bg-white/5 border-emerald-500/40 text-emerald-300 hover:bg-white/10"
+            : "bg-white/5 border-white/10 text-gray-400 hover:bg-white/10"
         }`}
        >
         {validatedSteps.includes(s.id) && (
@@ -366,8 +375,8 @@ export default function SmartGeneration() {
           {recording
            ? "Arrêter"
            : hasExistingAnswer
-           ? "Recommencer l’enregistrement"
-           : "Démarrer l’enregistrement"}
+             ? "Recommencer l’enregistrement"
+             : "Démarrer l’enregistrement"}
          </button>
         )}
        </div>

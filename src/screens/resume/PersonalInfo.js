@@ -4,14 +4,14 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { CONTRACTS } from "../../utils/IAResume";
-import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
 import Input from "../../components/resume/Input";
+import Logout from "../../components/core/Logout";
 import Footer from "../../components/resume/Footer";
-import Header from "../../components/resume/Header";
-import { getResume, updateResume } from "../../store/slices/resumeSlice";
+import CVStepper from "../../components/resume/Stepper";
+import { CONTRACTS, CV_STEPS_STEPPER } from "../../utils/IAResume";
 import GlowBackground from "../../components/resume/GlowBackground";
+import { getResume, updateResume } from "../../store/slices/resumeSlice";
 
 export default function PersonalInfo() {
  const user = useSelector((state) => state.user.user);
@@ -21,6 +21,8 @@ export default function PersonalInfo() {
  const dispatch = useDispatch();
  const { resume } = useSelector((state) => state.resume);
  const contracts = CONTRACTS;
+ const currentStep = 2;
+ const completedSteps = [1]; 
 
  const [form, setForm] = useState({
   firstName: "",
@@ -52,13 +54,11 @@ export default function PersonalInfo() {
   const resumeId = localStorage.getItem("resumeId");
   if (!resumeId || !user?.token) return;
 
-  console.log("📡 Fetch resume avec id :", resumeId);
-
   dispatch(
    getResume({
     token: user.token,
     id: resumeId,
-   })
+   }),
   );
  }, [dispatch, user]);
 
@@ -101,7 +101,23 @@ export default function PersonalInfo() {
   form.email.trim() !== "" &&
   form.contractType.length > 0;
 
+ const handleNavigate = async (step, direction) => {
+  if (direction === "backward") {
+   navigate(step.path);
+   return;
+  }
+
+  await saveAndNavigate(step.path);
+ };
+
  const handleNext = async () => {
+  const nextStep = CV_STEPS_STEPPER.find((s) => s.id === currentStep + 1);
+  if (nextStep) {
+   await saveAndNavigate(nextStep.path);
+  }
+ };
+
+ const saveAndNavigate = async (path) => {
   if (!isFormValid || loading) return;
 
   const resumeId = localStorage.getItem("resumeId");
@@ -111,7 +127,6 @@ export default function PersonalInfo() {
   }
 
   const payload = {
-   // 🔒 on garde TOUT ce qui existe déjà
    title: resume?.title,
    template: resume?.template,
    mainColor: resume?.mainColor,
@@ -121,8 +136,6 @@ export default function PersonalInfo() {
    trainings: resume?.trainings || [],
    experiences: resume?.experiences || [],
    presentation: resume?.presentation || "",
-
-   // ✅ on met à jour UNIQUEMENT cette étape
    alternanceDuration: isAlternance ? form.alternanceDuration : "",
    alternanceStartDate: isAlternance ? form.alternanceStartDate : "",
    personalInfo: {
@@ -142,10 +155,10 @@ export default function PersonalInfo() {
      token: user.token,
      id: resumeId,
      payload,
-    })
+    }),
    ).unwrap();
 
-   navigate("/skillsAndLanguages");
+   navigate(path);
   } catch (error) {
    console.error("Erreur update resume :", error);
   }
@@ -168,13 +181,14 @@ export default function PersonalInfo() {
                      bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
                      backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
     >
-     <Header
-      step="Étape 2 · Informations personnelles"
-      title="Parle-nous de toi"
-      description="Ces informations apparaîtront sur ton CV papier."
+     <CVStepper
+      currentStep={currentStep}
+      completedSteps={completedSteps}
+      disabled={!isFormValid}
+      loading={loading}
+      onNavigate={handleNavigate}
      />
 
-     {/* FORM */}
      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
       <Input
        label="Nom *"
@@ -231,7 +245,6 @@ export default function PersonalInfo() {
       />
      </div>
 
-     {/* Contrats */}
      <div className="mt-12">
       <h3 className="text-lg font-semibold text-emerald-300 mb-4">
        Type de contrat recherché *
@@ -256,11 +269,10 @@ export default function PersonalInfo() {
       </div>
      </div>
 
-     {/* Alternance */}
      {isAlternance && (
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
        <Input
-        label="Durée de l’alternance"
+        label="Durée de l'alternance"
         name="alternanceDuration"
         value={form.alternanceDuration}
         onChange={handleChange}
@@ -277,7 +289,6 @@ export default function PersonalInfo() {
       </div>
      )}
 
-     {/* Footer */}
      <div className="pt-10 flex justify-end">
       <Footer
        onClick={handleNext}

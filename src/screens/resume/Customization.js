@@ -11,9 +11,9 @@ import {
 import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
 import Footer from "../../components/resume/Footer";
+import CVStepper from "../../components/resume/Stepper";
 import { COLORS, TEMPLATES } from "../../utils/IAResume";
 import FormSeparator from "../../components/resume/FormSeparator";
-import Header from "../../components/resume/Header";
 import GlowBackground from "../../components/resume/GlowBackground";
 
 export default function Customization() {
@@ -32,6 +32,9 @@ export default function Customization() {
  const designs = TEMPLATES;
  const colors = COLORS;
 
+ const currentStep = 1;
+ const completedSteps = [];
+
  useEffect(() => {
   const resumeId = localStorage.getItem("resumeId");
   if (!resumeId || !user?.token) return;
@@ -47,7 +50,13 @@ export default function Customization() {
   if (resume.mainColor) setSelectedColor(resume.mainColor);
  }, [resume]);
 
- const handleNext = async () => {
+
+ const handleNext = async (step, direction) => {
+  if (direction === "backward") {
+   navigate(step.path);
+   return;
+  }
+  
   if (!title || !selectedDesign || loading) return;
 
   try {
@@ -80,10 +89,10 @@ export default function Customization() {
        template: selectedDesign,
        mainColor: selectedColor,
       },
-     })
+     }),
     ).unwrap();
 
-    navigate("/personalInfo");
+    navigate(step.path);
     return;
    }
 
@@ -94,13 +103,13 @@ export default function Customization() {
      title,
      template: selectedDesign,
      mainColor: selectedColor,
-    })
+    }),
    );
 
    if (createResume.fulfilled.match(action)) {
     const resume = action.payload;
     localStorage.setItem("resumeId", resume.id);
-    navigate("/personalInfo");
+    navigate(step.path);
    } else {
     console.error("Création du CV échouée :", action);
    }
@@ -128,10 +137,12 @@ export default function Customization() {
                    bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
                    backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
     >
-     <Header
-      step="Étape 1 · Personnalisation"
-      title="Personnalise ton CV"
-      description="Donne un titre à ton CV puis choisis un design."
+     <CVStepper
+      currentStep={currentStep}
+      completedSteps={completedSteps}
+      disabled={!title || !selectedDesign}
+      loading={loading}
+      onNavigate={handleNext}
      />
 
      {/* Titre du CV */}

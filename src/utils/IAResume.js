@@ -6,6 +6,49 @@ import template5 from "../../assets/images/resume/template5.png";
 import template6 from "../../assets/images/resume/template6.png";
 import template7 from "../../assets/images/resume/template7.png";
 
+export const CV_STEPS_STEPPER = [
+ {
+  id: 1,
+  key: "personnalisation",
+  label: "PERSONNALISATION",
+  sublabel: "Template & Couleurs",
+  path: "/personnalization",
+  icon: "palette",
+ },
+ {
+  id: 2,
+  key: "informations",
+  label: "PROFIL CANDIDAT",
+  sublabel: "Données personnelles",
+  path: "/personalInfo",
+  icon: "user",
+ },
+ {
+  id: 3,
+  key: "competences",
+  label: "COMPÉTENCES & LANGUES",
+  sublabel: "Skills & Langues",
+  path: "/skillsAndLanguages",
+  icon: "skills",
+ },
+ {
+  id: 4,
+  key: "ia",
+  label: "GÉNÉRATION INTELLIGENTE",
+  sublabel: "Génération intelligente",
+  path: "/smartGeneration",
+  icon: "sparkles",
+ },
+ {
+  id: 5,
+  key: "finalisation",
+  label: "FINALISATION",
+  sublabel: "Aperçu & Export",
+  path: "/finalization",
+  icon: "check",
+ },
+];
+
 export const RESUME_IA_STEPS = [
  {
   step: "01",
@@ -135,7 +178,7 @@ export const RESUME_MONTHS = [
 
 export const RESUME_YEARS = Array.from(
  { length: 60 },
- (_, i) => new Date().getFullYear() - i
+ (_, i) => new Date().getFullYear() - i,
 );
 
 export const FINALIZATION_STEPS = [
