@@ -71,13 +71,6 @@ const StepIcon = ({ type, className }) => {
  return icons[type] || null;
 };
 
-/**
- * @param {number} currentStep - Etapa atual (1-5)
- * @param {number[]} completedSteps - Array com IDs das etapas completadas
- * @param {boolean} disabled - Desabilita navegação para frente (mesmas condições do Footer)
- * @param {boolean} loading - Estado de carregamento
- * @param {function} onNavigate - Callback ao navegar (recebe step e direction: 'forward' | 'backward')
- */
 export default function CVStepper({
  currentStep = 1,
  completedSteps = [],
@@ -92,17 +85,13 @@ export default function CVStepper({
 
   const direction = step.id > currentStep ? "forward" : "backward";
 
-  // Se está indo para frente e está desabilitado, não faz nada
   if (direction === "forward" && disabled) return;
 
-  // Se está na mesma etapa, não faz nada
   if (step.id === currentStep) return;
 
-  // Se tem callback onNavigate, usa ele (para salvar dados antes de navegar)
   if (onNavigate) {
    onNavigate(step, direction);
   } else {
-   // Navegação direta (fallback)
    navigate(step.path);
   }
  };
@@ -118,10 +107,8 @@ export default function CVStepper({
   if (loading) return false;
   if (step.id === currentStep) return false;
 
-  // Voltar sempre permitido
   if (step.id < currentStep) return true;
 
-  // Avançar só se não estiver desabilitado
   return !disabled;
  };
 
@@ -218,19 +205,6 @@ export default function CVStepper({
                   `}
         >
          {step.label}
-        </p>
-        <p
-         className={`
-                    text-[9px] sm:text-[10px] mt-0.5
-                    transition-colors duration-300
-                    ${
-                     status === "completed" || status === "current"
-                      ? "text-gray-400"
-                      : "text-gray-600"
-                    }
-                  `}
-        >
-         {step.sublabel}
         </p>
        </div>
 

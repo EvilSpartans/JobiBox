@@ -52,11 +52,6 @@ export default function Customization() {
 
 
  const handleNext = async (step, direction) => {
-  if (direction === "backward") {
-   navigate(step.path);
-   return;
-  }
-  
   if (!title || !selectedDesign || loading) return;
 
   try {
@@ -92,7 +87,7 @@ export default function Customization() {
      }),
     ).unwrap();
 
-    navigate(step.path);
+    navigate("/personalInfo");
     return;
    }
 
@@ -109,7 +104,7 @@ export default function Customization() {
    if (createResume.fulfilled.match(action)) {
     const resume = action.payload;
     localStorage.setItem("resumeId", resume.id);
-    navigate(step.path);
+    navigate("/personalInfo");
    } else {
     console.error("Création du CV échouée :", action);
    }
@@ -126,7 +121,7 @@ export default function Customization() {
 
    <GlowBackground />
 
-   <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
+   <div className="relative z-10 w-full h-full flex items-center justify-center px-2">
     {/* Carte */}
     <div
      className="flex flex-col w-full max-w-6xl

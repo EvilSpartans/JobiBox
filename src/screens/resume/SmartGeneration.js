@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import PulseLoader from "react-spinners/PulseLoader";
+import { useDispatch, useSelector } from "react-redux";
 
 import Logout from "../../components/core/Logout";
 import GoBack from "../../components/core/GoBack";
@@ -16,8 +17,11 @@ import {
  SMART_GENERATION_STEPS_CONFIG,
 } from "../../utils/IAResume";
 import Footer from "../../components/resume/Footer";
-import GlowBackground from "../../components/resume/GlowBackground";
 import CVStepper from "../../components/resume/Stepper";
+import TrainingForm from "../../components/resume/TrainingForm";
+import GlowBackground from "../../components/resume/GlowBackground";
+import ExperienceForm from "../../components/resume/ExperienceForm";
+import { formatDate, parseDate } from "../../utils/DateUtils";
 
 /* ---------------- CONFIG ---------------- */
 
@@ -41,14 +45,17 @@ export default function SmartGeneration() {
  const [countdown, setCountdown] = useState(null);
  const [isUploading, setIsUploading] = useState(false);
  const [confirmOverwrite, setConfirmOverwrite] = useState(false);
+ const [isSaving, setIsSaving] = useState(false);
 
  const mediaRecorderRef = useRef(null);
  const audioChunksRef = useRef([]);
 
- const current = STEPS_CONFIG.find((s) => s.id === step);
  const currentKey = STEP_KEYS[step];
+ const current = STEPS_CONFIG.find((s) => s.id === step);
  const currentStep = 4;
  const completedSteps = [1, 2, 3];
+
+ const [presentationDraft, setPresentationDraft] = useState("");
 
  const clean = (value) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
@@ -96,6 +103,14 @@ export default function SmartGeneration() {
  useEffect(() => {
   const handleKeyDown = (event) => {
    if (isKeyPressed.current) return;
+
+   const activeElement = document.activeElement;
+   const isTyping =
+    activeElement?.tagName === "INPUT" ||
+    activeElement?.tagName === "TEXTAREA" ||
+    activeElement?.isContentEditable;
+
+   if (isTyping) return;
 
    // accepte TOUTES les touches du pad / clavier
    if (/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/.test(event.key)) {
@@ -145,16 +160,6 @@ export default function SmartGeneration() {
   }
 
   setValidatedSteps(done);
-
-  if (!done.includes(1)) {
-   setStep(1);
-  } else if (!done.includes(2)) {
-   setStep(2);
-  } else if (!done.includes(3)) {
-   setStep(3);
-  } else {
-   setStep(3); // tout est validé
-  }
  }, [resume]);
 
  /* ----------- RECORDING ----------- */
@@ -250,11 +255,20 @@ export default function SmartGeneration() {
     // ✅ SEULEMENT la clé courante est modifiée
     ...(key === "presentation" && { presentation: aiResult.text || "" }),
     ...(key === "trainings" && {
-     trainings: aiResult.json?.trainings || [],
-    }),
-    ...(key === "experiences" && {
-     experiences: aiResult.json?.experiences || [],
-    }),
+  trainings: aiResult.json?.trainings?.map((t) => ({
+    ...t,
+    startDate: formatDate(parseDate(t.startDate)),
+    endDate: formatDate(parseDate(t.endDate)),
+  })),
+}),
+   ...(key === "experiences" && {
+  experiences: aiResult.json?.experiences?.map((e) => ({
+    ...e,
+    startDate: formatDate(parseDate(e.startDate)),
+    endDate: formatDate(parseDate(e.endDate)),
+  })),
+}),
+
    };
 
    await dispatch(
@@ -266,8 +280,6 @@ export default function SmartGeneration() {
    ).unwrap();
 
    setValidatedSteps((prev) => [...new Set([...prev, step])]);
-
-   if (step < 3) setStep(step + 1);
   } catch (e) {
    console.error("Erreur IA :", e);
   } finally {
@@ -284,6 +296,289 @@ export default function SmartGeneration() {
 
  const allStepsCompleted = [1, 2, 3].every((s) => validatedSteps.includes(s));
 
+ const buildPayload = (overrides = {}) => ({
+  title: resume.title,
+  template: resume.template,
+  mainColor: resume.mainColor,
+  qrcodePostId: resume.qrcodePostId,
+  personalInfo: resume.personalInfo,
+  contractType: resume.contractType || [],
+  alternanceDuration: resume.alternanceDuration || "",
+  alternanceStartDate: resume.alternanceStartDate || "",
+  languages: resume.languages || [],
+  skills: resume.skills || [],
+  softSkills: resume.softSkills || [],
+  presentation: resume.presentation ?? "",
+  trainings: resume.trainings ?? [],
+  experiences: resume.experiences ?? [],
+  ...overrides,
+ });
+
+ useEffect(() => {
+  if (resume?.presentation !== undefined) {
+   setPresentationDraft(resume.presentation || "");
+  }
+ }, [resume?.presentation]);
+
+ const savePresentation = useCallback(
+  async (text) => {
+   if (!resume?.id || !user?.token) return;
+   if (text === resume.presentation) return;
+
+   setIsSaving(true);
+   try {
+    await dispatch(
+     updateResume({
+      token: user.token,
+      id: resume.id,
+      payload: buildPayload({ presentation: text }),
+     }),
+    ).unwrap();
+
+    if (text.trim().length > 0) {
+     setValidatedSteps((prev) => [...new Set([...prev, 1])]);
+    } else {
+     setValidatedSteps((prev) => prev.filter((s) => s !== 1));
+    }
+   } catch (e) {
+    console.error("Erreur mise à jour présentation:", e);
+   } finally {
+    setIsSaving(false);
+   }
+  },
+  [resume, user, dispatch, buildPayload],
+ );
+
+ const debounceRef = useRef(null);
+
+ const handlePresentationChange = (e) => {
+  const text = e.target.value;
+  setPresentationDraft(text);
+
+  if (debounceRef.current) {
+   clearTimeout(debounceRef.current);
+  }
+
+  debounceRef.current = setTimeout(() => {
+   savePresentation(text);
+  }, 800);
+ };
+
+ useEffect(() => {
+  return () => {
+   if (debounceRef.current) {
+    clearTimeout(debounceRef.current);
+   }
+  };
+ }, []);
+
+ const handleTrainingChange = async (updatedTraining) => {
+  if (!resume?.id || !user?.token) return;
+
+  setIsSaving(true);
+  try {
+   const trainingToSave = {
+    ...updatedTraining,
+    startDate: formatDate(updatedTraining.startDate),
+    endDate: formatDate(updatedTraining.endDate),
+   };
+
+   const newTrainings = resume.trainings.map((t, i) =>
+    i === updatedTraining.__index ? trainingToSave : t,
+   );
+
+   await dispatch(
+    updateResume({
+     token: user.token,
+     id: resume.id,
+     payload: buildPayload({ trainings: newTrainings }),
+    }),
+   ).unwrap();
+  } catch (e) {
+   console.error("Erreur mise à jour formation:", e);
+  } finally {
+   setIsSaving(false);
+  }
+ };
+
+ const handleTrainingDelete = async (index) => {
+  if (!resume?.id || !user?.token) return;
+
+  setIsSaving(true);
+  try {
+   const newTrainings = resume.trainings.filter((_, i) => i !== index);
+
+   await dispatch(
+    updateResume({
+     token: user.token,
+     id: resume.id,
+     payload: buildPayload({ trainings: newTrainings }),
+    }),
+   ).unwrap();
+
+   if (newTrainings.length === 0) {
+    setValidatedSteps((prev) => prev.filter((s) => s !== 2));
+   }
+  } catch (e) {
+   console.error("Erreur suppression formation:", e);
+  } finally {
+   setIsSaving(false);
+  }
+ };
+
+ const handleExperienceChange = async (updatedExperience) => {
+  if (!resume?.id || !user?.token) return;
+
+  setIsSaving(true);
+  try {
+   const experienceToSave = {
+    ...updatedExperience,
+    startDate: formatDate(updatedExperience.startDate),
+    endDate: formatDate(updatedExperience.endDate),
+   };
+   const newExperiences = resume.experiences.map((e, i) =>
+    i === updatedExperience.__index ? experienceToSave : e,
+   );
+
+   await dispatch(
+    updateResume({
+     token: user.token,
+     id: resume.id,
+     payload: buildPayload({ experiences: newExperiences }),
+    }),
+   ).unwrap();
+  } catch (e) {
+   console.error("Erreur mise à jour expérience:", e);
+  } finally {
+   setIsSaving(false);
+  }
+ };
+
+ const handleExperienceDelete = async (index) => {
+  if (!resume?.id || !user?.token) return;
+
+  setIsSaving(true);
+  try {
+   const newExperiences = resume.experiences.filter((_, i) => i !== index);
+
+   await dispatch(
+    updateResume({
+     token: user.token,
+     id: resume.id,
+     payload: buildPayload({ experiences: newExperiences }),
+    }),
+   ).unwrap();
+
+   if (newExperiences.length === 0) {
+    setValidatedSteps((prev) => prev.filter((s) => s !== 3));
+   }
+  } catch (e) {
+   console.error("Erreur suppression expérience:", e);
+  } finally {
+   setIsSaving(false);
+  }
+ };
+
+ const renderEditableResponse = () => {
+  if (currentKey === "trainings" && resume?.trainings?.length > 0) {
+   return (
+    <div className="mt-6 space-y-4 text-left">
+     <div className="flex items-center justify-between">
+      <p className="text-sm text-emerald-300 font-semibold">
+       Tes formations ({resume.trainings.length}) :
+      </p>
+      {isSaving && (
+       <span className="text-xs text-gray-400 flex items-center gap-2">
+        <PulseLoader color="#10b981" size={6} /> Enregistrement...
+       </span>
+      )}
+     </div>
+     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+      {resume.trainings.map((training, index) => (
+       <TrainingForm
+        key={index}
+        data={{
+         ...training,
+         __index: index,
+         startDate: parseDate(training.startDate),
+         endDate: parseDate(training.endDate),
+        }}
+        onChange={handleTrainingChange}
+        onDelete={handleTrainingDelete}
+       />
+      ))}
+     </div>
+    </div>
+   );
+  }
+
+  if (currentKey === "experiences" && resume?.experiences?.length > 0) {
+   return (
+    <div className="mt-6 space-y-4 text-left">
+     <div className="flex items-center justify-between">
+      <p className="text-sm text-emerald-300 font-semibold">
+       Tes expériences ({resume.experiences.length}) :
+      </p>
+      {isSaving && (
+       <span className="text-xs text-gray-400 flex items-center gap-2">
+        <PulseLoader color="#10b981" size={6} /> Enregistrement...
+       </span>
+      )}
+     </div>
+     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+      {resume.experiences.map((experience, index) => (
+       <ExperienceForm
+        key={index}
+        data={{
+         ...experience,
+         __index: index,
+         startDate: parseDate(experience.startDate),
+         endDate: parseDate(experience.endDate),
+        }}
+        onChange={handleExperienceChange}
+        onDelete={handleExperienceDelete}
+       />
+      ))}
+     </div>
+    </div>
+   );
+  }
+
+  if (currentKey === "presentation" && presentationDraft) {
+   return (
+    <div className="mt-6 space-y-3 text-left">
+     <div className="flex items-center justify-between">
+      <p className="text-sm text-emerald-300 font-semibold">
+       Ta présentation :
+      </p>
+      {isSaving && (
+       <span className="text-xs text-gray-400 flex items-center gap-2">
+        <PulseLoader color="#10b981" size={6} /> Enregistrement...
+       </span>
+      )}
+     </div>
+     <textarea
+      disabled={!presentationDraft}
+      value={presentationDraft}
+      onChange={handlePresentationChange}
+      className="w-full bg-white/5 text-white rounded-xl px-4 py-3 min-h-[150px] border border-white/10 focus:border-emerald-500 focus:outline-none resize-none placeholder-gray-500"
+     />
+    </div>
+   );
+  }
+
+  return null;
+ };
+
+ const handleNavigate = async (step, direction) => {
+  if (direction === "backward") {
+   navigate("/skillsAndLanguages");
+   return;
+  }
+
+  navigate("/finalization");
+ };
+
  /* ---------------- RENDER ---------------- */
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
@@ -299,7 +594,7 @@ export default function SmartGeneration() {
       completedSteps={completedSteps}
       disabled={!allStepsCompleted}
       loading={loading}
-      onNavigate={() => navigate("/finalization")}
+      onNavigate={handleNavigate}
      />
      {/* STEPS */}
      <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -381,23 +676,24 @@ export default function SmartGeneration() {
         )}
        </div>
 
-       {/* Réponse */}
-       {hasExistingAnswer && (
-        <div className="mt-6 rounded-xl bg-emerald-600/10 border border-emerald-500/30 p-5 max-h-[160px] overflow-y-auto">
-         <p className="text-sm text-emerald-300 mb-2 font-semibold">
-          Ta réponse :
-         </p>
+       {renderEditableResponse()}
 
-         <p className="text-sm text-gray-200 whitespace-pre-line">
-          {existingText}
-         </p>
+       {validatedSteps.includes(step) && step < 3 && (
+        <div className="mt-8 flex justify-center">
+         <button
+          onClick={() => setStep(step + 1)}
+          className="px-8 py-3 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition flex items-center gap-2"
+         >
+          Étape suivante
+          <span className="text-lg">→</span>
+         </button>
         </div>
        )}
       </div>
 
       {/* FOOTER */}
-      {allStepsCompleted && (
-       <div className="pt-10 flex justify-end">
+      {allStepsCompleted && step === 3 && (
+       <div className="flex justify-end">
         <Footer
          onClick={() => navigate("/finalization")}
          disabled={!allStepsCompleted}

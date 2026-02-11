@@ -227,7 +227,7 @@ export default function SkillsAndLanguages() {
 
  const handleNext = async (step, direction) => {
   if (direction === "backward") {
-   navigate(step.path);
+   navigate("/personalInfo");
    return;
   }
 
@@ -264,7 +264,7 @@ export default function SkillsAndLanguages() {
    }),
   );
 
-  navigate(step.path);
+  navigate("/smartGeneration");
  };
 
  return (

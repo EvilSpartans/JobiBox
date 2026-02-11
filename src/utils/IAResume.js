@@ -10,8 +10,7 @@ export const CV_STEPS_STEPPER = [
  {
   id: 1,
   key: "personnalisation",
-  label: "PERSONNALISATION",
-  sublabel: "Template & Couleurs",
+  label: "PERSONNALISATION DU CV",
   path: "/personnalization",
   icon: "palette",
  },
@@ -19,7 +18,6 @@ export const CV_STEPS_STEPPER = [
   id: 2,
   key: "informations",
   label: "PROFIL CANDIDAT",
-  sublabel: "Données personnelles",
   path: "/personalInfo",
   icon: "user",
  },
@@ -27,7 +25,6 @@ export const CV_STEPS_STEPPER = [
   id: 3,
   key: "competences",
   label: "COMPÉTENCES & LANGUES",
-  sublabel: "Skills & Langues",
   path: "/skillsAndLanguages",
   icon: "skills",
  },
@@ -35,15 +32,13 @@ export const CV_STEPS_STEPPER = [
   id: 4,
   key: "ia",
   label: "GÉNÉRATION INTELLIGENTE",
-  sublabel: "Génération intelligente",
   path: "/smartGeneration",
   icon: "sparkles",
  },
  {
   id: 5,
   key: "finalisation",
-  label: "FINALISATION",
-  sublabel: "Aperçu & Export",
+  label: "FINALISATION DU CV",
   path: "/finalization",
   icon: "check",
  },
@@ -175,6 +170,24 @@ export const RESUME_MONTHS = [
  { value: "11", label: "Novembre" },
  { value: "12", label: "Décembre" },
 ];
+
+export const MONTHS_FR_TO_NUM = {
+ JANVIER: "01",
+ FÉVRIER: "02",
+ FEVRIER: "02",
+ MARS: "03",
+ AVRIL: "04",
+ MAI: "05",
+ JUIN: "06",
+ JUILLET: "07",
+ AOÛT: "08",
+ AOUT: "08",
+ SEPTEMBRE: "09",
+ OCTOBRE: "10",
+ NOVEMBRE: "11",
+ DÉCEMBRE: "12",
+ DECEMBRE: "12",
+};
 
 export const RESUME_YEARS = Array.from(
  { length: 60 },
