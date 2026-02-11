@@ -6,6 +6,7 @@
 export const CAREER_AGENTS = [
   {
     id: 'projet_professionnel',
+    firstName: 'Marie',
     title: 'Projet professionnel',
     description: 'Définir et clarifier vos objectifs de carrière',
     color: 'bg-sky-600',
@@ -18,6 +19,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'cv_profil',
+    firstName: 'Thomas',
     title: 'CV & Profil',
     description: 'Optimiser votre CV et profil LinkedIn',
     color: 'bg-emerald-600',
@@ -30,6 +32,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'entretien',
+    firstName: 'Sophie',
     title: 'Entretiens',
     description: 'Se préparer aux questions et situations',
     color: 'bg-purple-600',
@@ -42,6 +45,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'lettre_motivation',
+    firstName: 'Lucas',
     title: 'Lettre de motivation',
     description: 'Rédiger des lettres percutantes',
     color: 'bg-orange-500',
@@ -54,6 +58,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'recherche_emploi',
+    firstName: 'Emma',
     title: 'Recherche d\'emploi',
     description: 'Stratégies et méthodes efficaces',
     color: 'bg-rose-600',
@@ -66,6 +71,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'reconversion',
+    firstName: 'Paul',
     title: 'Reconversion',
     description: 'Changer de voie professionnelle',
     color: 'bg-cyan-600',

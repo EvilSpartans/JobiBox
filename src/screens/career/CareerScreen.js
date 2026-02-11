@@ -1,12 +1,13 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Logout from '../../components/core/Logout';
 import GoBack from '../../components/core/GoBack';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 import CareerHome from '../../components/career/CareerHome';
 import CareerChat from '../../components/career/CareerChat';
 import { sendCareerGuideRequest } from '../../utils/careerGuideApi';
 import { getRandomStarterQuestion } from '../../utils/careerGuideConstants';
 import { CAREER_AGENTS } from '../../utils/careerGuideConstants';
-import { getHistoryKey, saveHistory, loadHistory, getHistoryCounts } from '../../utils/careerGuideHistory';
+import { getHistoryKey, saveHistory, loadHistory, getHistoryCounts, clearHistory } from '../../utils/careerGuideHistory';
 import { useSelector } from 'react-redux';
 
 export default function CareerScreen() {
@@ -18,6 +19,7 @@ export default function CareerScreen() {
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [sendLoading, setSendLoading] = useState(false);
   const [historyVersion, setHistoryVersion] = useState(0);
+  const [showClearHistoryModal, setShowClearHistoryModal] = useState(false);
 
   const historyCounts = useMemo(() => getHistoryCounts(CAREER_AGENTS), [historyVersion]);
 
@@ -129,6 +131,21 @@ export default function CareerScreen() {
     setSelectedAgent(null);
   }, []);
 
+  const handleClearHistory = useCallback(() => {
+    setShowClearHistoryModal(true);
+  }, []);
+
+  const handleConfirmClearHistory = useCallback(() => {
+    clearHistory();
+    setMessages([]);
+    setHistoryVersion((v) => v + 1);
+    setShowClearHistoryModal(false);
+  }, []);
+
+  const handleCancelClearHistory = useCallback(() => {
+    setShowClearHistoryModal(false);
+  }, []);
+
   return (
     <div className="h-screen dark:bg-dark_bg_1 flex flex-col overflow-hidden">
       <GoBack itemsToRemove={[]} />
@@ -162,10 +179,21 @@ export default function CareerScreen() {
               onSendMessage={handleSendMessage}
               onSendAudio={handleSendAudio}
               sendLoading={sendLoading}
+              onClearHistory={handleClearHistory}
             />
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showClearHistoryModal}
+        title="Vider l'historique"
+        message="Voulez-vous vraiment vider tout l'historique du guide carrière ? Les discussions avec tous les coachs seront supprimées."
+        onConfirm={handleConfirmClearHistory}
+        onCancel={handleCancelClearHistory}
+        confirmText="Vider"
+        confirmClass="bg-red-600 hover:bg-red-700"
+      />
     </div>
   );
 }

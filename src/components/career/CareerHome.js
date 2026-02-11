@@ -28,8 +28,7 @@ export default function CareerHome({
           Bienvenue sur le Guide Carrière
         </h1>
         <p className="mt-3 text-sm sm:text-base text-dark_text_2 max-w-md leading-relaxed">
-          Je suis votre assistant IA dédié à votre réussite professionnelle. Choisissez un sujet ou
-          posez-moi directement votre question.
+        Nous sommes vos assistants IA dédiés à votre réussite professionnelle. Choisissez un expert ci-dessous ou posez directement votre question.
         </p>
       </div>
 
