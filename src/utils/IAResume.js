@@ -6,6 +6,44 @@ import template5 from "../../assets/images/resume/template5.png";
 import template6 from "../../assets/images/resume/template6.png";
 import template7 from "../../assets/images/resume/template7.png";
 
+export const CV_STEPS_STEPPER = [
+ {
+  id: 1,
+  key: "personnalisation",
+  label: "PERSONNALISATION DU CV",
+  path: "/personnalization",
+  icon: "palette",
+ },
+ {
+  id: 2,
+  key: "informations",
+  label: "PROFIL CANDIDAT",
+  path: "/personalInfo",
+  icon: "user",
+ },
+ {
+  id: 3,
+  key: "competences",
+  label: "COMPÉTENCES & LANGUES",
+  path: "/skillsAndLanguages",
+  icon: "skills",
+ },
+ {
+  id: 4,
+  key: "ia",
+  label: "GÉNÉRATION INTELLIGENTE",
+  path: "/smartGeneration",
+  icon: "sparkles",
+ },
+ {
+  id: 5,
+  key: "finalisation",
+  label: "FINALISATION DU CV",
+  path: "/finalization",
+  icon: "check",
+ },
+];
+
 export const RESUME_IA_STEPS = [
  {
   step: "01",
@@ -133,9 +171,27 @@ export const RESUME_MONTHS = [
  { value: "12", label: "Décembre" },
 ];
 
+export const MONTHS_FR_TO_NUM = {
+ JANVIER: "01",
+ FÉVRIER: "02",
+ FEVRIER: "02",
+ MARS: "03",
+ AVRIL: "04",
+ MAI: "05",
+ JUIN: "06",
+ JUILLET: "07",
+ AOÛT: "08",
+ AOUT: "08",
+ SEPTEMBRE: "09",
+ OCTOBRE: "10",
+ NOVEMBRE: "11",
+ DÉCEMBRE: "12",
+ DECEMBRE: "12",
+};
+
 export const RESUME_YEARS = Array.from(
  { length: 60 },
- (_, i) => new Date().getFullYear() - i
+ (_, i) => new Date().getFullYear() - i,
 );
 
 export const FINALIZATION_STEPS = [

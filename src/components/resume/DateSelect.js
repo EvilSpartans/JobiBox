@@ -12,87 +12,79 @@ export default function DateSelect({
  const YEARS = RESUME_YEARS;
  const isOngoing = value === "En cours";
 
- const selectClass =
-  "bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/30 disabled:opacity-50";
+ const day = isOngoing ? "" : value?.day || "";
+ const month = isOngoing ? "" : value?.month || "";
+ const year = isOngoing ? "" : value?.year || "";
 
- const optionClass = "bg-dark_bg_2 text-white text-lg";
- const optionPlaceholderClass = "bg-dark_bg_2 text-gray-400 text-lg";
+ const handleChange = (field, newValue) => {
+  if (isOngoing) {
+   onChange({ day: "", month: "", year: "", [field]: newValue });
+  } else {
+   onChange({ ...value, [field]: newValue });
+  }
+ };
 
  return (
-  <div className="space-y-2">
+  <div>
    {label && (
-    <div className="text-xs uppercase tracking-wider text-gray-400">
+    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1">
      {label}
-    </div>
+    </label>
    )}
 
-   <div className="flex flex-wrap gap-2">
-    {/* JOUR */}
+   <div className="flex gap-2">
+    {/* Jour */}
     <select
+     value={day}
+     onChange={(e) => handleChange("day", e.target.value)}
      disabled={isOngoing}
-     value={!isOngoing && typeof value === "object" ? value.day || "" : ""}
-     onChange={(e) =>
-      onChange({
-       ...(typeof value === "object" && !isOngoing ? value : {}),
-       day: e.target.value,
-      })
-     }
-     className={`${selectClass} w-[72px]`}
+     className={`flex-1 bg-dark_bg_1/80 text-white rounded-xl px-3 py-2 border border-white/10 focus:border-emerald-500 focus:outline-none ${
+      isOngoing ? "opacity-50 cursor-not-allowed" : ""
+     }`}
     >
-     <option value="" className={optionPlaceholderClass}>
-      Jour
-     </option>
-     {DAYS.map((d) => (
-      <option key={d} value={d} className={optionClass}>
+     <option value="">Jour</option>
+     {DAYS.filter((d) => d).map((d) => (
+      <option key={d} value={d}>
        {d}
       </option>
      ))}
     </select>
 
-    {/* MOIS */}
+    {/* Mois */}
     <select
+     value={month}
+     onChange={(e) => handleChange("month", e.target.value)}
      disabled={isOngoing}
-     value={!isOngoing && typeof value === "object" ? value.month || "" : ""}
-     onChange={(e) =>
-      onChange({
-       ...(typeof value === "object" && !isOngoing ? value : {}),
-       month: e.target.value,
-      })
-     }
-     className={`${selectClass} w-[130px]`}
+     className={`flex-1 bg-dark_bg_1/80 text-white rounded-xl px-3 py-2 border border-white/10 focus:border-emerald-500 focus:outline-none ${
+      isOngoing ? "opacity-50 cursor-not-allowed" : ""
+     }`}
     >
-     <option value="" className={optionPlaceholderClass}>
-      Mois
-     </option>
      {MONTHS.map((m) => (
-      <option key={m.value} value={m.value} className={optionClass}>
+      <option key={m.value} value={m.value}>
        {m.label}
       </option>
      ))}
     </select>
 
-    {/* ANNÉE */}
+    {/* Année */}
     <select
+     value={year}
+     onChange={(e) => handleChange("year", e.target.value)}
      disabled={isOngoing}
-     value={!isOngoing && typeof value === "object" ? value.year || "" : ""}
-     onChange={(e) =>
-      onChange({
-       ...(typeof value === "object" && !isOngoing ? value : {}),
-       year: e.target.value,
-      })
-     }
-     className={`${selectClass} w-[96px]`}
+     className={`flex-1 bg-dark_bg_1/80 text-white rounded-xl px-3 py-2 border border-white/10 focus:border-emerald-500 focus:outline-none ${
+      isOngoing ? "opacity-50 cursor-not-allowed" : ""
+     }`}
     >
-     <option value="" className={optionPlaceholderClass}>
-      Année
-     </option>
-     {YEARS.map((y) => (
-      <option key={y} value={y} className={optionClass}>
+     <option value="">Année</option>
+     {YEARS.filter((y) => y).map((y) => (
+      <option key={y} value={y}>
        {y}
       </option>
      ))}
     </select>
    </div>
+
+   {isOngoing && <p className="text-xs text-emerald-400 mt-1">En cours</p>}
   </div>
  );
 }
