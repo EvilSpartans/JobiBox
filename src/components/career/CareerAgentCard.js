@@ -31,7 +31,7 @@ export default function CareerAgentCard({ agent, onClick }) {
         <FontAwesomeIcon icon={icon} className="text-xl text-white" />
       </div>
       <span className="font-bold text-sm sm:text-base leading-tight block">
-        {agent.title}
+        {agent.firstName ? `${agent.firstName} · ${agent.title}` : agent.title}
       </span>
       <span className="text-xs sm:text-sm text-white/90 mt-1.5 leading-snug block">
         {agent.description}

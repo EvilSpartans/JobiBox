@@ -49,4 +49,15 @@ export function getHistoryCounts(agents) {
   return counts;
 }
 
+/**
+ * Vide tout l'historique du guide carrière.
+ */
+export function clearHistory() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.warn('careerGuideHistory clear', e);
+  }
+}
+
 export { saveHistory, loadHistory };

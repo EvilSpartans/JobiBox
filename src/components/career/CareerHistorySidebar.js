@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots } from '@fortawesome/free-solid-svg-icons';
+import { faCommentDots, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import {
   faBullseye,
@@ -20,7 +20,7 @@ const ICON_MAP = {
   refresh: faArrowsRotate,
 };
 
-export default function CareerHistorySidebar({ agents, selectedAgent, historyCounts, onSelectAgent, onClose }) {
+export default function CareerHistorySidebar({ agents, selectedAgent, historyCounts, onSelectAgent, onClose, onClearHistory }) {
   return (
     <div className="flex-shrink-0 w-full sm:w-44 md:w-52 h-full border-r border-dark_border_1 bg-dark_bg_3 flex flex-col overflow-hidden">
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-dark_border_1">
@@ -67,7 +67,7 @@ export default function CareerHistorySidebar({ agents, selectedAgent, historyCou
               }`}
             >
               {Icon && <FontAwesomeIcon icon={Icon} className="flex-shrink-0 text-dark_svg_2" />}
-              <span className="truncate flex-1">{agent.title}</span>
+              <span className="truncate flex-1">{agent.firstName ? `${agent.firstName} · ${agent.title}` : agent.title}</span>
               {count > 0 && (
                 <span className="text-xs text-dark_svg_2 tabular-nums flex-shrink-0">{count}</span>
               )}
@@ -75,6 +75,19 @@ export default function CareerHistorySidebar({ agents, selectedAgent, historyCou
           );
         })}
       </div>
+      {onClearHistory && (
+        <div className="flex-shrink-0 p-2 border-t border-dark_border_1">
+          <button
+            type="button"
+            onClick={onClearHistory}
+            className="w-full flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red_1 bg-red_1/10 border border-red_1/30 active:bg-red_1/20 transition-colors"
+            title="Supprimer tout l'historique des discussions"
+          >
+            <FontAwesomeIcon icon={faTrashCan} className="text-xs" />
+            <span>Vider l'historique</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

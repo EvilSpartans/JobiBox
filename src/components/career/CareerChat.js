@@ -18,6 +18,7 @@ export default function CareerChat({
   onSendMessage,
   onSendAudio,
   sendLoading,
+  onClearHistory,
 }) {
   const scrollRef = useRef(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
@@ -32,7 +33,9 @@ export default function CareerChat({
     requestAnimationFrame(scrollToBottom);
   }, [messages, sendLoading]);
 
-  const selectedAgentTitle = selectedAgent ? selectedAgent.title : null;
+  const selectedAgentLabel = selectedAgent
+    ? (selectedAgent.firstName ? `${selectedAgent.firstName} · ${selectedAgent.title}` : selectedAgent.title)
+    : null;
 
   return (
     <div className="flex flex-1 min-w-0 min-h-0 rounded-2xl border border-dark_border_1 overflow-hidden shadow-xl bg-dark_bg_2">
@@ -49,6 +52,7 @@ export default function CareerChat({
             historyCounts={historyCounts || {}}
             onSelectAgent={onSwitchAgent}
             onClose={() => setIsHistoryOpen(false)}
+            onClearHistory={onClearHistory}
           />
         </div>
       </div>
@@ -78,8 +82,8 @@ export default function CareerChat({
             <FontAwesomeIcon icon={faStar} className="text-amber-400 text-sm flex-shrink-0" />
             <span className="font-semibold dark:text-dark_text_1 truncate">
               Guide Carrière
-              {selectedAgentTitle && (
-                <span className="text-amber-400 font-medium ml-1">· {selectedAgentTitle}</span>
+              {selectedAgentLabel && (
+                <span className="text-amber-400 font-medium ml-1">· {selectedAgentLabel}</span>
               )}
             </span>
           </div>

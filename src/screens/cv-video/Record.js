@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Film from "../../components/cv-video/Film";
+import Film2 from "../../components/cv-video/Film2";
 import GoBack from "../../components/core/GoBack";
 import Logout from "../../components/core/Logout";
 
@@ -19,7 +19,7 @@ export default function Record() {
         {/*Login Form */}
         <div className="w-full flex items-center justify-center overflow-hidden">
           {/* Container */}
-          <Film onStartSequence={handleStartSequence} />
+          <Film2 onStartSequence={handleStartSequence} />
         </div>
       </div>
     </div>
