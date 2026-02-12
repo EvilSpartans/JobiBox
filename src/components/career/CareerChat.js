@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
+import { faVolumeXmark } from '@fortawesome/free-solid-svg-icons';
 import { CareerMessageUser, CareerMessageBot, CareerMessageBotLoading } from './CareerMessageBubble';
 import CareerInputBar from './CareerInputBar';
 import CareerHistorySidebar from './CareerHistorySidebar';
@@ -19,6 +20,8 @@ export default function CareerChat({
   onSendAudio,
   sendLoading,
   onClearHistory,
+  coachSpeaks = false,
+  onCoachSpeaksChange,
 }) {
   const scrollRef = useRef(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
@@ -32,10 +35,6 @@ export default function CareerChat({
     scrollToBottom();
     requestAnimationFrame(scrollToBottom);
   }, [messages, sendLoading]);
-
-  const selectedAgentLabel = selectedAgent
-    ? (selectedAgent.firstName ? `${selectedAgent.firstName} · ${selectedAgent.title}` : selectedAgent.title)
-    : null;
 
   return (
     <div className="flex flex-1 min-w-0 min-h-0 rounded-2xl border border-dark_border_1 overflow-hidden shadow-xl bg-dark_bg_2">
@@ -69,25 +68,52 @@ export default function CareerChat({
       </button>
       <div className="flex flex-col flex-1 min-w-0 min-h-0">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center gap-3 py-3 px-3 border-b border-dark_border_1 bg-dark_bg_2">
-          <button
-            type="button"
-            onClick={onBackToTopics}
-            className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold bg-amber-500/25 text-amber-300 border border-amber-400/40 active:bg-amber-500/40 transition-colors"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />
-            <span>Retour aux sujets</span>
-          </button>
-          <div className="flex-1 flex justify-center items-center gap-2 flex-wrap min-w-0">
-            <FontAwesomeIcon icon={faStar} className="text-amber-400 text-sm flex-shrink-0" />
-            <span className="font-semibold dark:text-dark_text_1 truncate">
-              Guide Carrière
-              {selectedAgentLabel && (
-                <span className="text-amber-400 font-medium ml-1">· {selectedAgentLabel}</span>
-              )}
-            </span>
+        <div className="flex-shrink-0 flex flex-col gap-2 py-3 px-3 border-b border-dark_border_1 bg-dark_bg_2">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={onBackToTopics}
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold bg-amber-500/25 text-amber-300 border border-amber-400/40 active:bg-amber-500/40 transition-colors"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+              <span>Retour aux sujets</span>
+            </button>
+            {onCoachSpeaksChange && (
+              <button
+                type="button"
+                onClick={() => onCoachSpeaksChange(!coachSpeaks)}
+                className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium border transition-colors ${
+                  coachSpeaks
+                    ? 'bg-amber-500/25 text-amber-300 border-amber-400/40'
+                    : 'bg-dark_bg_4 text-dark_text_2 border-dark_border_2'
+                }`}
+                title={coachSpeaks ? 'Désactiver la voix du coach' : 'Le coach lit ses réponses à voix haute'}
+              >
+                <FontAwesomeIcon icon={coachSpeaks ? faVolumeHigh : faVolumeXmark} />
+                <span className="hidden sm:inline">{coachSpeaks ? 'Voix activée' : 'Coach parle'}</span>
+              </button>
+            )}
+            {!onCoachSpeaksChange && <div className="w-28" aria-hidden />}
           </div>
-          <div className="w-28" aria-hidden />
+          {selectedAgent && (
+            <div className="flex items-center gap-2 min-w-0">
+              {selectedAgent.avatar ? (
+                <img
+                  src={selectedAgent.avatar}
+                  alt=""
+                  className="w-9 h-9 rounded-full object-cover object-top flex-shrink-0 ring-2 ring-amber-400/30"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-400 font-semibold text-sm">
+                  {(selectedAgent.firstName || selectedAgent.title || '?').charAt(0)}
+                </div>
+              )}
+              <div className="flex flex-col min-w-0">
+                <span className="font-semibold text-dark_text_1 truncate">{selectedAgent.firstName || selectedAgent.title}</span>
+                <span className="text-xs text-amber-400 truncate">{selectedAgent.title}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Messages */}
@@ -100,10 +126,17 @@ export default function CareerChat({
               msg.role === 'user' ? (
                 <CareerMessageUser key={`u-${i}`} text={msg.text} />
               ) : (
-                <CareerMessageBot key={`b-${i}`} text={msg.text} />
+                <CareerMessageBot
+                  key={`b-${i}`}
+                  text={msg.text}
+                  audioBase64={msg.audioBase64}
+                  autoPlay={coachSpeaks && msg.audioBase64 && i === messages.length - 1}
+                  avatar={selectedAgent?.avatar}
+                  initial={(selectedAgent?.firstName || selectedAgent?.title || '?').charAt(0)}
+                />
               )
             )}
-            {sendLoading && <CareerMessageBotLoading />}
+            {sendLoading && <CareerMessageBotLoading avatar={selectedAgent?.avatar} initial={(selectedAgent?.firstName || selectedAgent?.title || '?').charAt(0)} />}
           </div>
         </div>
 

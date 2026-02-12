@@ -1,12 +1,22 @@
+import marieAvatar from '../../assets/images/career/career-marie.png';
+import thomasAvatar from '../../assets/images/career/career-thomas.png';
+import sophieAvatar from '../../assets/images/career/career-sophie.png';
+import lucasAvatar from '../../assets/images/career/career-lucas.png';
+import emmaAvatar from '../../assets/images/career/career-emma.png';
+import paulAvatar from '../../assets/images/career/career-paul.png';
+
 /**
  * Agents du Guide Carrière (sujets thématiques).
  * id = valeur envoyée au backend (agent).
+ * firstName = prénom affiché.
+ * avatar = image du coach ; sinon affichage de l'initiale du prénom.
  * starterQuestions = variantes affichées aléatoirement au clic.
  */
 export const CAREER_AGENTS = [
   {
     id: 'projet_professionnel',
     firstName: 'Marie',
+    avatar: marieAvatar,
     title: 'Projet professionnel',
     description: 'Définir et clarifier vos objectifs de carrière',
     color: 'bg-sky-600',
@@ -20,6 +30,7 @@ export const CAREER_AGENTS = [
   {
     id: 'cv_profil',
     firstName: 'Thomas',
+    avatar: thomasAvatar,
     title: 'CV & Profil',
     description: 'Optimiser votre CV et profil LinkedIn',
     color: 'bg-emerald-600',
@@ -33,6 +44,7 @@ export const CAREER_AGENTS = [
   {
     id: 'entretien',
     firstName: 'Sophie',
+    avatar: sophieAvatar,
     title: 'Entretiens',
     description: 'Se préparer aux questions et situations',
     color: 'bg-purple-600',
@@ -46,6 +58,7 @@ export const CAREER_AGENTS = [
   {
     id: 'lettre_motivation',
     firstName: 'Lucas',
+    avatar: lucasAvatar,
     title: 'Lettre de motivation',
     description: 'Rédiger des lettres percutantes',
     color: 'bg-orange-500',
@@ -59,6 +72,7 @@ export const CAREER_AGENTS = [
   {
     id: 'recherche_emploi',
     firstName: 'Emma',
+    avatar: emmaAvatar,
     title: 'Recherche d\'emploi',
     description: 'Stratégies et méthodes efficaces',
     color: 'bg-rose-600',
@@ -72,6 +86,7 @@ export const CAREER_AGENTS = [
   {
     id: 'reconversion',
     firstName: 'Paul',
+    avatar: paulAvatar,
     title: 'Reconversion',
     description: 'Changer de voie professionnelle',
     color: 'bg-cyan-600',

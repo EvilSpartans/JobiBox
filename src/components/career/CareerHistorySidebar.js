@@ -1,24 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCommentDots, faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
-import {
-  faBullseye,
-  faFileLines,
-  faUserGroup,
-  faEnvelope,
-  faMagnifyingGlass,
-  faArrowsRotate,
-} from '@fortawesome/free-solid-svg-icons';
-
-const ICON_MAP = {
-  target: faBullseye,
-  file: faFileLines,
-  users: faUserGroup,
-  envelope: faEnvelope,
-  search: faMagnifyingGlass,
-  refresh: faArrowsRotate,
-};
+import { faCommentDots, faTrashCan, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 
 export default function CareerHistorySidebar({ agents, selectedAgent, historyCounts, onSelectAgent, onClose, onClearHistory }) {
   return (
@@ -47,16 +29,16 @@ export default function CareerHistorySidebar({ agents, selectedAgent, historyCou
               : 'text-dark_text_2 active:bg-dark_bg_4'
           }`}
         >
-          <FontAwesomeIcon icon={faCommentDots} className="flex-shrink-0 text-dark_svg_2" />
+          <FontAwesomeIcon icon={faCommentDots} className="flex-shrink-0 text-dark_svg_2 w-5 text-center" />
           <span className="truncate">Discussion générale</span>
           {historyCounts.general > 0 && (
             <span className="ml-auto text-xs text-dark_svg_2 tabular-nums">{historyCounts.general}</span>
           )}
         </button>
         {agents.map((agent) => {
-          const Icon = ICON_MAP[agent.icon];
           const isSelected = selectedAgent && selectedAgent.id === agent.id;
           const count = historyCounts[agent.id] || 0;
+          const initial = (agent.firstName || agent.title || '?').charAt(0);
           return (
             <button
               key={agent.id}
@@ -66,8 +48,17 @@ export default function CareerHistorySidebar({ agents, selectedAgent, historyCou
                 isSelected ? 'bg-dark_hover_1 text-dark_text_1 font-medium' : 'text-dark_text_2 active:bg-dark_bg_4'
               }`}
             >
-              {Icon && <FontAwesomeIcon icon={Icon} className="flex-shrink-0 text-dark_svg_2" />}
-              <span className="truncate flex-1">{agent.firstName ? `${agent.firstName} · ${agent.title}` : agent.title}</span>
+              <div className="w-8 h-8 flex-shrink-0 rounded-full bg-dark_bg_4 flex items-center justify-center overflow-hidden ring-1 ring-dark_border_2">
+                {agent.avatar ? (
+                  <img src={agent.avatar} alt="" className="w-full h-full object-cover object-top" />
+                ) : (
+                  <span className="text-dark_svg_2 font-semibold text-xs">{initial}</span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0 flex flex-col">
+                <span className="truncate font-medium">{agent.firstName || agent.title}</span>
+                {agent.firstName && <span className="truncate text-xs text-dark_svg_2">{agent.title}</span>}
+              </div>
               {count > 0 && (
                 <span className="text-xs text-dark_svg_2 tabular-nums flex-shrink-0">{count}</span>
               )}

@@ -1,13 +1,20 @@
 const STORAGE_KEY = 'careerGuideHistory';
 
 /**
- * @param {{ role: 'user'|'bot', text: string }[]} messages
+ * Sauvegarde l'historique sans les audios (base64) pour ne pas saturer le localStorage.
+ * @param {string} agentKey
+ * @param {{ role: 'user'|'bot', text: string, audioBase64?: string }[]} messages
  */
 function saveHistory(agentKey, messages) {
   try {
+    const toStore = (messages || []).map((msg) => ({
+      role: msg.role,
+      text: msg.text,
+      // on n'enregistre pas audioBase64 : usage unique en session, évite de saturer le localStorage
+    }));
     const raw = localStorage.getItem(STORAGE_KEY);
     const data = raw ? JSON.parse(raw) : {};
-    data[agentKey] = messages;
+    data[agentKey] = toStore;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.warn('careerGuideHistory save', e);

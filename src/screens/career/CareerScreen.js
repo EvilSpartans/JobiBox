@@ -5,7 +5,6 @@ import ConfirmModal from '../../components/modals/ConfirmModal';
 import CareerHome from '../../components/career/CareerHome';
 import CareerChat from '../../components/career/CareerChat';
 import { sendCareerGuideRequest } from '../../utils/careerGuideApi';
-import { getRandomStarterQuestion } from '../../utils/careerGuideConstants';
 import { CAREER_AGENTS } from '../../utils/careerGuideConstants';
 import { getHistoryKey, saveHistory, loadHistory, getHistoryCounts, clearHistory } from '../../utils/careerGuideHistory';
 import { useSelector } from 'react-redux';
@@ -20,21 +19,32 @@ export default function CareerScreen() {
   const [sendLoading, setSendLoading] = useState(false);
   const [historyVersion, setHistoryVersion] = useState(0);
   const [showClearHistoryModal, setShowClearHistoryModal] = useState(false);
+  const [coachSpeaks, setCoachSpeaks] = useState(false);
 
   const historyCounts = useMemo(() => getHistoryCounts(CAREER_AGENTS), [historyVersion]);
 
-  const addBotMessage = useCallback((text) => {
-    setMessages((prev) => [...prev, { role: 'bot', text }]);
+  const addBotMessage = useCallback((text, audioBase64) => {
+    setMessages((prev) => [...prev, { role: 'bot', text, audioBase64: audioBase64 || undefined }]);
   }, []);
 
   const sendRequest = useCallback(
-    async ({ question, audio, agent }) => {
+    async ({ question, audio, agent, historique, audioResponse }) => {
       setSendLoading(true);
       try {
-        const data = await sendCareerGuideRequest({ question, audio, agent }, token);
-        addBotMessage(data.response || '');
+        const data = await sendCareerGuideRequest(
+          {
+            question,
+            audio,
+            agent,
+            historique: historique ?? !!(question || audio),
+            audioResponse: audioResponse ?? coachSpeaks,
+          },
+          token
+        );
+        addBotMessage(data.response || '', data.audioBase64 || null);
       } catch (err) {
         const msg =
+          err.userMessage ||
           err.response?.data?.error ||
           err.response?.data?.details ||
           err.message ||
@@ -44,7 +54,7 @@ export default function CareerScreen() {
         setSendLoading(false);
       }
     },
-    [token, addBotMessage]
+    [token, addBotMessage, coachSpeaks]
   );
 
   useEffect(() => {
@@ -60,9 +70,8 @@ export default function CareerScreen() {
       setView('chat');
       const loaded = loadHistory(agent.id);
       if (loaded.length === 0) {
-        const question = getRandomStarterQuestion(agent);
-        setMessages([{ role: 'user', text: question }]);
-        sendRequest({ question, agent: agent.id });
+        setMessages([]);
+        sendRequest({ agent: agent.id, historique: false });
       } else {
         setMessages(loaded);
       }
@@ -76,7 +85,7 @@ export default function CareerScreen() {
       setView('chat');
       const loaded = loadHistory('general');
       setMessages([...loaded, { role: 'user', text: question }]);
-      sendRequest({ question });
+      sendRequest({ question, historique: loaded.length > 0 });
     },
     [sendRequest]
   );
@@ -95,13 +104,14 @@ export default function CareerScreen() {
         setSelectedAgent(null);
         const loaded = loadHistory('general');
         setMessages([...loaded, { role: 'user', text }]);
-        sendRequest({ question: text });
+        sendRequest({ question: text, historique: loaded.length > 0 });
         return;
       }
       setMessages((prev) => [...prev, { role: 'user', text }]);
       sendRequest({
         question: text,
         agent: selectedAgent ? selectedAgent.id : undefined,
+        historique: true,
       });
     },
     [view, selectedAgent, sendRequest]
@@ -114,13 +124,14 @@ export default function CareerScreen() {
         setSelectedAgent(null);
         const loaded = loadHistory('general');
         setMessages([...loaded, { role: 'user', text: '[Message vocal]' }]);
-        sendRequest({ audio: file });
+        sendRequest({ audio: file, historique: loaded.length > 0 });
         return;
       }
       setMessages((prev) => [...prev, { role: 'user', text: '[Message vocal]' }]);
       sendRequest({
         audio: file,
         agent: selectedAgent ? selectedAgent.id : undefined,
+        historique: true,
       });
     },
     [view, selectedAgent, sendRequest]
@@ -163,6 +174,8 @@ export default function CareerScreen() {
                   onSendMessage={handleSendMessage}
                   onSendAudio={handleSendAudio}
                   sendLoading={sendLoading}
+                  coachSpeaks={coachSpeaks}
+                  onCoachSpeaksChange={setCoachSpeaks}
                 />
               </div>
             </div>
@@ -180,6 +193,8 @@ export default function CareerScreen() {
               onSendAudio={handleSendAudio}
               sendLoading={sendLoading}
               onClearHistory={handleClearHistory}
+              coachSpeaks={coachSpeaks}
+              onCoachSpeaksChange={setCoachSpeaks}
             />
           </div>
         )}
