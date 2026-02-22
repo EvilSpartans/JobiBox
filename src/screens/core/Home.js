@@ -17,8 +17,7 @@ export default function Home() {
   const exam = localStorage.getItem("examActivated");
   const resume = localStorage.getItem("resumeActivated");
   const offers = localStorage.getItem("offersActivated");
-  // Guide de carrière : affiché par défaut tant que le backend n'expose pas la clé
-  const careerGuide = localStorage.getItem("careerGuideActivated") ?? "true";
+  const careerGuide = localStorage.getItem("careerGuideActivated");
   const examenInProgress = localStorage.getItem("examenInProgress");
   const beginnerInProgress = localStorage.getItem("beginnerInProgress");
   const intermediateInProgress = localStorage.getItem("intermediateInProgress");
@@ -39,8 +38,10 @@ export default function Home() {
         localStorage.setItem("examActivated", portalsData.exam);
         localStorage.setItem("resumeActivated", portalsData.resume);
         localStorage.setItem("offersActivated", portalsData.offers);
-        if (portalsData.careerGuide !== undefined) {
-          localStorage.setItem("careerGuideActivated", portalsData.careerGuide);
+        if (portalsData.career !== undefined) {
+          localStorage.setItem("careerGuideActivated", String(portalsData.career));
+        } else if (portalsData.careerGuide !== undefined) {
+          localStorage.setItem("careerGuideActivated", String(portalsData.careerGuide));
         }
 
         // ---- Version + AnyDesk Sync ----

@@ -57,7 +57,7 @@ export default function CareerHistorySidebar({ agents, selectedAgent, historyCou
               </div>
               <div className="flex-1 min-w-0 flex flex-col">
                 <span className="truncate font-medium">{agent.firstName || agent.title}</span>
-                {agent.firstName && <span className="truncate text-xs text-dark_svg_2">{agent.title}</span>}
+                {agent.firstName && <span className="truncate text-[0.9375rem] text-dark_svg_2">{agent.title}</span>}
               </div>
               {count > 0 && (
                 <span className="text-xs text-dark_svg_2 tabular-nums flex-shrink-0">{count}</span>

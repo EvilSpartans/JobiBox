@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
 import { signUpSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import { changeStatus, registerUser } from "../../store/slices/userSlice";
+import { changeStatus, registerUser, updateUser } from "../../store/slices/userSlice";
 import { sendWelcomeNotification } from "../core/Notification";
 
 export default function RegisterForm() {
@@ -26,16 +26,21 @@ export default function RegisterForm() {
 
  const onSubmit = async (data) => {
   dispatch(changeStatus("loading"));
-  let res = await dispatch(registerUser({ ...data }));
-
-  if (!res?.payload.token) return;
   const businessId = localStorage.getItem("businessId");
-  const newUser = res.payload;
+  const payload = { ...data };
+  if (businessId) {
+   payload.referenceBusinessId = businessId;
+  }
+  const res = await dispatch(registerUser(payload));
 
-  if (businessId && newUser?.id) {
+  if (!res?.payload?.token) return;
+  const newUser = res.payload;
+  const userId = newUser?.data?.id ?? newUser?.id;
+
+  if (businessId && userId) {
    await dispatch(
     updateUser({
-     id: newUser.id,
+     id: userId,
      referenceBusinessId: businessId,
      token: newUser.token,
     }),

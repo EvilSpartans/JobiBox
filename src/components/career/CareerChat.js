@@ -110,7 +110,7 @@ export default function CareerChat({
               )}
               <div className="flex flex-col min-w-0">
                 <span className="font-semibold text-dark_text_1 truncate">{selectedAgent.firstName || selectedAgent.title}</span>
-                <span className="text-xs text-amber-400 truncate">{selectedAgent.title}</span>
+                <span className="text-base font-medium text-amber-400 truncate">{selectedAgent.title}</span>
               </div>
             </div>
           )}

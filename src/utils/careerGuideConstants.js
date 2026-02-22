@@ -1,9 +1,9 @@
-import marieAvatar from '../../assets/images/career/career-marie.png';
-import thomasAvatar from '../../assets/images/career/career-thomas.png';
-import sophieAvatar from '../../assets/images/career/career-sophie.png';
-import lucasAvatar from '../../assets/images/career/career-lucas.png';
-import emmaAvatar from '../../assets/images/career/career-emma.png';
-import paulAvatar from '../../assets/images/career/career-paul.png';
+import marieAvatar from '../../assets/images/career/career-marie2.png';
+import thomasAvatar from '../../assets/images/career/career-thomas2.png';
+import sophieAvatar from '../../assets/images/career/career-sophie2.png';
+import lucasAvatar from '../../assets/images/career/career-lucas2.png';
+import emmaAvatar from '../../assets/images/career/career-emma2.png';
+import paulAvatar from '../../assets/images/career/career-paul2.png';
 
 /**
  * Agents du Guide Carrière (sujets thématiques).
