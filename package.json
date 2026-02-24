@@ -1,6 +1,6 @@
 {
  "name": "jobibox",
- "version": "1.8.8",
+ "version": "1.8.9",
  "description": "La cabine accoustique pour créer un cv vidéo",
  "repository": "https://github.com/EvilSpartans/JobiBox",
  "main": "electron/main.js",
