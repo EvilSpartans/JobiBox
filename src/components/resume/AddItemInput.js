@@ -7,6 +7,7 @@ export default function AddItemInput({
  placeholder,
  maxItems = null,
  currentCount = 0,
+ showMaxReachedMessage = true,
 }) {
  const isMaxReached = maxItems && currentCount >= maxItems;
 
@@ -52,7 +53,7 @@ export default function AddItemInput({
     </button>
    </div>
 
-   {isMaxReached && (
+   {isMaxReached && showMaxReachedMessage && (
     <span className="text-sm text-amber-400">
      Limite atteint ({maxItems}/{maxItems})
     </span>

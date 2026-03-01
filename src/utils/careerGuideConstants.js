@@ -1,3 +1,4 @@
+import marcusAvatar from '../../assets/images/career/career-marcus2.png';
 import marieAvatar from '../../assets/images/career/career-marie2.png';
 import thomasAvatar from '../../assets/images/career/career-thomas2.png';
 import sophieAvatar from '../../assets/images/career/career-sophie2.png';
@@ -15,8 +16,8 @@ import paulAvatar from '../../assets/images/career/career-paul2.png';
 export const CAREER_AGENTS = [
   {
     id: 'projet_professionnel',
-    firstName: 'Marie',
-    avatar: marieAvatar,
+    firstName: 'Marcus',
+    avatar: marcusAvatar,
     title: 'Projet professionnel',
     description: 'Définir et clarifier vos objectifs de carrière',
     color: 'bg-sky-600',
@@ -29,7 +30,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'cv_profil',
-    firstName: 'Thomas',
+    firstName: 'Andy',
     avatar: thomasAvatar,
     title: 'CV & Profil',
     description: 'Optimiser votre CV et profil LinkedIn',
@@ -43,7 +44,7 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'entretien',
-    firstName: 'Sophie',
+    firstName: 'Mathilde',
     avatar: sophieAvatar,
     title: 'Entretiens',
     description: 'Se préparer aux questions et situations',
@@ -57,8 +58,8 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'lettre_motivation',
-    firstName: 'Lucas',
-    avatar: lucasAvatar,
+    firstName: 'Charlotte',
+    avatar: emmaAvatar,
     title: 'Lettre de motivation',
     description: 'Rédiger des lettres percutantes',
     color: 'bg-orange-500',
@@ -71,8 +72,8 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'recherche_emploi',
-    firstName: 'Emma',
-    avatar: emmaAvatar,
+    firstName: 'Antia',
+    avatar: marieAvatar,
     title: 'Recherche d\'emploi',
     description: 'Stratégies et méthodes efficaces',
     color: 'bg-rose-600',
@@ -85,8 +86,8 @@ export const CAREER_AGENTS = [
   },
   {
     id: 'reconversion',
-    firstName: 'Paul',
-    avatar: paulAvatar,
+    firstName: 'Louis',
+    avatar: lucasAvatar,
     title: 'Reconversion',
     description: 'Changer de voie professionnelle',
     color: 'bg-cyan-600',

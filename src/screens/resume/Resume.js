@@ -1,44 +1,44 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import Logout from "../../components/core/Logout";
-import GoBack from "../../components/core/GoBack";
+import ResumeHeader from "../../components/resume/ResumeHeader";
 import { RESUME_IA_STEPS } from "../../utils/IAResume";
 import Header from "../../components/resume/Header";
 import GlowBackground from "../../components/resume/GlowBackground";
 
 export default function Resume() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleStart = () => {
     navigate("/personnalization");
   };
 
-  const steps = RESUME_IA_STEPS;
+  const STEP_KEYS = ["personnalisation", "profilCandidat", "interests", "competences", "generation", "finalisation"];
+const steps = RESUME_IA_STEPS;
 
   return (
     <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
-      <Logout />
-      <GoBack />
+      <ResumeHeader />
 
       <GlowBackground />
-      <div className="relative z-10 w-full h-full flex items-center justify-center px-4">
-        {/* Carte principale */}
+      <div className="relative z-10 h-full flex items-center justify-center px-4">
         <div
-          className="flex flex-col w-full max-w-3xl
-                     p-6 sm:p-10 md:p-12
+          className="flex flex-col w-full max-w-5xl
+                     h-[88vh]
+                     overflow-y-auto scrollbar-none
+                     p-6 sm:p-8 md:p-10
                      rounded-3xl
                      bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
-                     backdrop-blur-xl shadow-2xl ring-1 ring-white/10
-                     min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none"
+                     backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
         >
           <div className="text-center space-y-6">
             <Header
-              step="Génération intelligente de CV"
-              title="CV papier"
-              description="Crée un CV professionnel, structuré et prêt à l’emploi, généré
-       automatiquement par l’IA en"
-              hint="5 minutes environ"
+              step={t("resume.intro.step")}
+              title={t("resume.intro.title")}
+              description={t("resume.intro.description")}
+              hint={t("resume.intro.hint")}
             />
           </div>
 
@@ -64,52 +64,53 @@ export default function Resume() {
             ))}
           </div> */}
 
-          <div className="mt-14 relative flex-1 flex flex-col rounded-3xl ring-1 ring-white/5 bg-white/[0.02] p-6">
-            {/* Label centré */}
-            <div className="mb-10 flex justify-center">
+          <div className="mt-14 sm:mt-16 relative flex-1 flex flex-col">
+            <div className="mb-10 sm:mb-12 flex justify-center">
               <div
-                className="px-4 py-1 rounded-full
-                 text-[10px] tracking-[0.32em] font-semibold
-                 bg-dark_bg_1/80 text-emerald-400
-                 ring-1 ring-white/10
-                 shadow-[0_0_16px_rgba(16,185,129,0.15)]"
+                className="px-6 py-2.5 rounded-full
+                 text-xs sm:text-sm tracking-[0.2em] font-semibold
+                 text-emerald-300
+                 bg-emerald-500/10
+                 ring-1 ring-emerald-500/25"
               >
-                LES ÉTAPES QUE TU VAS RETROUVER
+                {t("resume.intro.stepsLabel")}
               </div>
             </div>
 
-            <div className="relative flex-1 flex flex-col justify-center">
-              <div className="relative grid grid-cols-[28px_1fr_auto] gap-x-6">
-                {/* Trait vertical */}
-                <div className="absolute left-3 top-0 bottom-0 w-px bg-emerald-500/25" />
+            <div className="relative flex-1 flex flex-col justify-center max-w-2xl mx-auto">
+              <div className="relative grid grid-cols-[36px_1fr_56px] gap-x-6 sm:gap-x-8">
+                <div className="absolute left-4 top-4 bottom-4 w-px bg-gradient-to-b from-transparent via-emerald-500/30 to-transparent" />
 
-                {steps.map((item) => (
+                {steps.map((item, idx) => (
                   <div
                     key={item.step}
-                    className="col-span-3 grid grid-cols-[28px_1fr_auto] items-center py-4"
+                    className="col-span-3 grid grid-cols-[36px_1fr_56px] items-center py-6 sm:py-7"
                   >
-                    {/* Colonne trait + point */}
                     <div className="relative">
                       <span
-                        className="absolute left-3 top-1/2 -translate-x-1/2 -translate-y-1/2
-                       w-2.5 h-2.5 rounded-full bg-emerald-400
-                       shadow-[0_0_14px_rgba(16,185,129,0.7)]"
+                        className="absolute left-4 top-1/2 -translate-x-1/2 -translate-y-1/2
+                         w-3.5 h-3.5 rounded-full bg-emerald-400
+                         shadow-[0_0_12px_rgba(16,185,129,0.5)]
+                         animate-pulse-dot"
+                      />
+                      <span
+                        className="absolute left-4 top-1/2 -translate-x-1/2 -translate-y-1/2
+                         w-3.5 h-3.5 rounded-full border-2 border-emerald-400/60
+                         animate-ping-dot"
                       />
                     </div>
 
-                    {/* Contenu */}
                     <div>
-                      <h3 className="text-sm sm:text-base font-semibold text-emerald-300">
-                        {item.title}
+                      <h3 className="text-base sm:text-lg font-semibold text-white">
+                        {t(`resume.steps.${STEP_KEYS[idx]}`)}
                       </h3>
-                      <p className="mt-1.5 text-xs sm:text-sm text-gray-300 leading-relaxed max-w-lg">
-                        {item.desc}
+                      <p className="mt-2 text-sm sm:text-base text-gray-300 leading-relaxed max-w-lg">
+                        {t(`resume.steps.${STEP_KEYS[idx]}Desc`)}
                       </p>
                     </div>
 
-                    {/* Numéro */}
-                    <div className="text-right pr-1">
-                      <span className="text-5xl sm:text-6xl font-black text-emerald-500/10 select-none leading-none">
+                    <div className="text-right">
+                      <span className="text-4xl sm:text-5xl font-bold text-emerald-500/[0.08] select-none tabular-nums">
                         {item.step}
                       </span>
                     </div>
@@ -122,8 +123,7 @@ export default function Resume() {
           {/* Footer */}
           <div className="mt-auto pt-14 flex flex-col items-center space-y-6">
             <p className="text-sm text-gray-400 text-center max-w-md">
-              Ton CV sera sauvegardé et accessible à tout moment dans ton espace
-              privé Jobissim.
+              {t("resume.intro.footer")}
             </p>
 
             <button
@@ -149,11 +149,25 @@ export default function Resume() {
 
               {/* contenu */}
               <span className="relative z-10 inline-flex items-center gap-3">
-                Commencer l’expérience
+                {t("resume.intro.startButton")}
                 <span className="arrow-loop inline-block text-xl">→</span>
               </span>
 
               <style>{`
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); }
+    }
+    .animate-pulse-dot {
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    @keyframes pingDot {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+    }
+    .animate-ping-dot {
+      animation: pingDot 2s ease-out infinite;
+    }
     @keyframes arrowLoop {
       0% { transform: translateX(0); opacity: 0.6; }
       50% { transform: translateX(8px); opacity: 1; }

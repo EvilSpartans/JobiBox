@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 import Confetti from "react-confetti";
 import { QRCodeSVG } from "qrcode.react";
 import { useNavigate } from "react-router-dom";
@@ -11,35 +12,44 @@ import {
  getResume,
  updateResume,
  previewResume,
+ translateResume,
  getResumeDownloadUrl,
  resetResumeState,
 } from "../../store/slices/resumeSlice";
 import Photo from "../../components/core/Photo";
-import Logout from "../../components/core/Logout";
-import GoBack from "../../components/core/GoBack";
+import ResumeHeader from "../../components/resume/ResumeHeader";
 import Modal from "../../components/resume/Modal";
 import CVStepper from "../../components/resume/Stepper";
 import ConfirmModal from "../../components/modals/ConfirmModal";
 import FormSeparator from "../../components/resume/FormSeparator";
 import GlowBackground from "../../components/resume/GlowBackground";
+import { supportedLangs } from "../../i18n";
+import { runPaginationWhenReady } from "../../utils/cvPreviewPagination";
+
+const TRANSLATE_LANGS = supportedLangs.filter((l) => l !== "fr");
 
 export default function Finalization() {
  const IMAGE_BASE_URL = process.env.REACT_APP_AWS_IMAGE_BASE_URL;
 
  const dispatch = useDispatch();
  const navigate = useNavigate();
+ const { t } = useTranslation();
  const user = useSelector((state) => state.user.user);
  const { resume, previewHtml, status } = useSelector((state) => state.resume);
  const loading = status === "loading";
 
  const [showMediasModal, setShowMediasModal] = useState(false);
+ const [ats, setAts] = useState(false);
+ const [translateLang, setTranslateLang] = useState("en");
+ const [translating, setTranslating] = useState(false);
+ const [toast, setToast] = useState(null);
  const [showPreview, setShowPreview] = useState(false);
  const [showConfetti, setShowConfetti] = useState(true);
  const [showExitModal, setShowExitModal] = useState(false);
 
  // Stepper config
- const currentStep = 5;
- const completedSteps = [1, 2, 3, 4];
+ const currentStep = 6;
+ const completedSteps = [1, 2, 3, 4, 5];
 
  useEffect(() => {
   const timer = setTimeout(() => setShowConfetti(false), 4000);
@@ -50,6 +60,7 @@ export default function Finalization() {
  const [videos, setVideos] = useState([]);
  const [selectedVideoId, setSelectedVideoId] = useState(null);
  const photoRef = useRef(null);
+ const previewIframeRef = useRef(null);
  const [videoSelectOpen, setVideoSelectOpen] = useState(false);
 
  /* ================= FETCH ================= */
@@ -101,13 +112,56 @@ export default function Finalization() {
  useEffect(() => {
   if (!resume) return;
   setSelectedVideoId(resume.qrcodePostId || null);
+  setAts(resume.ats ?? false);
  }, [resume]);
+
+ /* ================= TOAST ================= */
+ useEffect(() => {
+  if (!toast) return;
+  const timer = setTimeout(() => setToast(null), 4000);
+  return () => clearTimeout(timer);
+ }, [toast]);
+
+ /* ================= ATS TOGGLE ================= */
+ const handleAtsToggle = async () => {
+  const newAts = !ats;
+  setAts(newAts);
+  const payload = { ...resume, ats: newAts };
+  await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
+  dispatch(previewResume({ token: user.token, id: resume.id }));
+ };
+
+ /* ================= TRANSLATE ================= */
+ const handleTranslate = async () => {
+  if (!translateLang || translateLang === "fr" || translating) return;
+  if (resume?.locale === translateLang) return;
+
+  setTranslating(true);
+  try {
+   await dispatch(
+    translateResume({
+     token: user.token,
+     id: resume.id,
+     language: translateLang,
+     save: true,
+    })
+   ).unwrap();
+   setToast({ type: "success", msg: t("resume.finalization.translated") });
+   dispatch(getResume({ token: user.token, id: resume.id }));
+   dispatch(previewResume({ token: user.token, id: resume.id }));
+  } catch {
+   setToast({ type: "error", msg: t("resume.finalization.translateError") });
+  } finally {
+   setTranslating(false);
+  }
+ };
 
  /* ================= SAVE MEDIAS ================= */
  const saveMedias = async () => {
   const payload = {
    ...resume,
    qrcodePostId: selectedVideoId,
+   ats,
   };
 
   await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
@@ -142,14 +196,21 @@ export default function Finalization() {
     />
    )}
 
-   <Logout />
-   <GoBack />
+   <ResumeHeader />
 
    <GlowBackground />
 
    {/* ================= PAGE PRINCIPALE ================= */}
-   <div className="relative z-10 h-full flex items-center justify-center px-4 overflow-y-auto py-8">
-    <div className="w-full max-w-5xl min-h-[85vh] flex flex-col p-10 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
+   <div className="relative z-10 h-full flex items-center justify-center px-4">
+    <div
+     className="flex flex-col w-full max-w-5xl
+                   h-[88vh]
+                   overflow-y-auto scrollbar-none
+                   p-6 sm:p-8 md:p-10
+                   rounded-3xl
+                   bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
+                   backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
+    >
      {/* Stepper */}
      <CVStepper
       currentStep={currentStep}
@@ -157,10 +218,10 @@ export default function Finalization() {
       loading={loading}
      />
 
-     <h2 className="text-4xl py-10 font-extrabold text-center text-white">Félicitations ! 🎉</h2>
+     <h2 className="text-4xl py-10 font-extrabold text-center text-white">{t("resume.finalization.congrats")} 🎉</h2>
 
      <p className=" text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
-      Ton CV est prêt. Tu peux ajouter une photo et un CV vidéo.
+      {t("resume.finalization.ready")}
      </p>
 
      <div className="mt-10 flex justify-center">
@@ -170,38 +231,87 @@ export default function Finalization() {
       >
        <span className="text-3xl">📸</span>
        <div className="text-left">
-        <p className="font-semibold">Photo & CV vidéo</p>
+        <p className="font-semibold">{t("resume.finalization.photoVideo")}</p>
         <p className="text-sm text-gray-400">
-         Ajouter une photo de profil et lier un CV vidéo
+         {t("resume.finalization.photoVideoDesc")}
         </p>
        </div>
       </button>
      </div>
 
+     {/* Traduire et sauvegarder — directement sous le bouton Photo & CV vidéo */}
+     <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+      <select
+       value={translateLang}
+       onChange={(e) => setTranslateLang(e.target.value)}
+       className="bg-dark_bg_2 border border-white/20 text-white rounded-lg px-4 py-2 min-w-[180px]"
+      >
+       <option value="">{t("resume.finalization.selectLanguage")}</option>
+       <option value="fr" className="bg-dark_bg_2">{t("languages.fr")}</option>
+       {TRANSLATE_LANGS.map((l) => (
+        <option key={l} value={l} className="bg-dark_bg_2">
+         {t(`languages.${l}`)}
+        </option>
+       ))}
+      </select>
+      <button
+       onClick={handleTranslate}
+       disabled={!translateLang || translateLang === "fr" || resume?.locale === translateLang || translating}
+       className="px-6 py-2 rounded-lg bg-emerald-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+       {translating ? <PulseLoader color="#fff" size={8} /> : null}
+       {t("resume.finalization.translate")}
+      </button>
+     </div>
+     {toast && (
+      <div
+       className={`mt-3 px-4 py-2 rounded-lg text-sm text-center ${
+        toast.type === "success" ? "bg-emerald-600/30 text-emerald-200" : "bg-red-600/30 text-red-200"
+       }`}
+      >
+       {toast.msg}
+      </div>
+     )}
+
      <div className="mt-12 flex flex-col items-center">
       <p className="mb-6 text-sm text-gray-400 text-center max-w-md">
-       Scanne le QR code pour récupérer ton CV. Il reste disponible à tout
-       moment dans ton espace privé sur{" "}
+       {t("resume.finalization.qrHint")}{" "}
        <span className="text-emerald-400 font-medium">jobissim.com</span>.
       </p>
 
       <div className="bg-white p-5 rounded-2xl shadow-lg">
-       <QRCodeSVG value={getResumeDownloadUrl(resume?.id)} size={180} />
+       <QRCodeSVG
+        value={getResumeDownloadUrl(resume?.id, resume?.locale)}
+        size={180}
+       />
       </div>
 
+      {/* ATS + Traduction */}
       <div className="mt-8 flex flex-col items-center gap-4">
+       <label className="flex items-center gap-3 cursor-pointer">
+        <input
+         type="checkbox"
+         checked={ats}
+         onChange={handleAtsToggle}
+         className="w-5 h-5 rounded text-emerald-500"
+        />
+        <span className="text-gray-300">{t("resume.finalization.atsToggle")}</span>
+       </label>
+      </div>
+
+      <div className="mt-6 flex flex-col items-center gap-4">
        <button
         onClick={() => setShowPreview(true)}
         className="px-10 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold shadow-lg active:scale-[0.98] transition"
        >
-        Voir le CV
+        {t("resume.finalization.seeCv")}
        </button>
 
        <button
         onClick={handleBackHome}
         className="px-8 py-2 rounded-full bg-transparent text-gray-400 underline underline-offset-4 active:text-gray-200"
        >
-        Retour à l'accueil
+        {t("resume.finalization.backHome")}
        </button>
       </div>
      </div>
@@ -211,18 +321,20 @@ export default function Finalization() {
    <Modal
     isOpen={showMediasModal}
     onClose={() => setShowMediasModal(false)}
-    title="Photo & CV vidéo"
+    title={t("resume.finalization.modalTitle")}
     onSave={saveMedias}
    >
     {/* PHOTO DE PROFIL */}
-    <Section title="Photo de profil">
+    <Section title={t("resume.finalization.profilePhoto")}>
      <Photo ref={photoRef} user={user} mode="resume" />
     </Section>
 
-    <FormSeparator />
+    <FormSeparator compact />
+
+    <div className="mt-4" />
 
     {/* CV VIDÉO */}
-    <Section title="CV vidéo">
+    <Section title={t("resume.finalization.cvVideo")}>
      <div className="relative">
       <button
        type="button"
@@ -259,8 +371,8 @@ export default function Finalization() {
           ? videos.find((v) => v.id === selectedVideoId)?.title ||
             `CV vidéo #${selectedVideoId}`
           : videos.length === 0
-            ? "Aucun CV vidéo disponible"
-            : "Sélectionner un CV vidéo"}
+            ? t("resume.finalization.noVideo")
+            : t("resume.finalization.selectVideo")}
         </span>
        </div>
 
@@ -309,30 +421,42 @@ export default function Finalization() {
      </div>
 
      <p className="text-sm text-gray-400 mt-2">
-      Ce CV vidéo sera accessible via le QR code du CV.
+      {t("resume.finalization.videoHint")}
      </p>
     </Section>
    </Modal>
 
    {showPreview && (
     <div
-     className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
+     className="fixed inset-0 z-50 bg-black/80 flex flex-col items-center justify-center py-8"
      onClick={() => setShowPreview(false)}
     >
      <button
       onClick={() => setShowPreview(false)}
-      className="absolute top-6 right-6 text-white text-2xl hover:text-gray-300 transition"
+      className="absolute top-6 right-6 text-white text-2xl hover:text-gray-300 transition z-10"
      >
       ✕
      </button>
+
+     {/* ATS banner */}
+     {resume?.ats && (
+      <div className="flex flex-col items-center gap-4 mb-4" onClick={(e) => e.stopPropagation()}>
+       <div className="px-4 py-2 rounded-lg bg-amber-500/20 text-amber-200 text-sm">
+        {t("resume.finalization.atsBanner")}
+       </div>
+      </div>
+     )}
+
      {loading ? (
       <PulseLoader color="#10b981" />
      ) : (
       <iframe
+       ref={previewIframeRef}
        srcDoc={previewHtml}
        title="CV"
        onClick={(e) => e.stopPropagation()}
        className="w-[794px] h-[1123px] bg-white rounded-lg shadow-2xl"
+       onLoad={() => runPaginationWhenReady(previewIframeRef, previewHtml)}
       />
      )}
     </div>
@@ -340,8 +464,8 @@ export default function Finalization() {
 
    <ConfirmModal
     isOpen={showExitModal}
-    title="Veux-tu vraiment revenir à l'accueil ?"
-    message="Tu pourras toujours éditer ton CV depuis le site Jobissim."
+    title={t("resume.finalization.exitTitle")}
+    message={t("resume.finalization.exitMessage")}
     onCancel={cancelBackHome}
     onConfirm={confirmBackHome}
     confirmClass="bg-emerald-600"

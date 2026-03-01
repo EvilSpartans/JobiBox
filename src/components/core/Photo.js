@@ -5,6 +5,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCamera,
@@ -16,6 +17,7 @@ const Photo = forwardRef(function Photo(
   { onPhotoTaken, user, mode = "video" },
   ref
 ) {
+  const { t } = useTranslation();
   const isResume = mode === "resume";
 
   const [photoConfirmed, setPhotoConfirmed] = useState(false);
@@ -200,7 +202,7 @@ const Photo = forwardRef(function Photo(
         `}
       >
         <FontAwesomeIcon icon={faCamera} />
-        {isResume ? "Créer ma photo de CV" : "Créer ma photo CV vidéo"}
+        {isResume ? t("resume.photo.createResumePhoto") : t("resume.photo.createVideoPhoto")}
         {photoConfirmed && (
           <FontAwesomeIcon icon={faCheckCircle} className="text-white ml-2" />
         )}
@@ -209,8 +211,8 @@ const Photo = forwardRef(function Photo(
       {/* ===== DESCRIPTION ===== */}
       <p className="text-center text-sm text-gray-400">
         {isResume
-          ? "Cette photo sera utilisée sur votre CV papier."
-          : "Cette image sera affichée comme miniature de votre vidéo."}
+          ? t("resume.photo.descriptionResumePhoto")
+          : t("resume.photo.descriptionVideoPhoto")}
       </p>
 
       {/* ===== MODAL ===== */}

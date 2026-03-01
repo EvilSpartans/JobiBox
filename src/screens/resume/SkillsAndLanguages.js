@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Logout from "../../components/core/Logout";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
-import GoBack from "../../components/core/GoBack";
+import ResumeHeader from "../../components/resume/ResumeHeader";
 import Footer from "../../components/resume/Footer";
 import CVStepper from "../../components/resume/Stepper";
 import RemovableTag from "../../components/resume/RemovableTag";
@@ -15,7 +15,7 @@ import { getCategories } from "../../store/slices/categorySlice";
 import { getSoftSkills } from "../../store/slices/softSkillSlice";
 import FormSeparator from "../../components/resume/FormSeparator";
 import GlowBackground from "../../components/resume/GlowBackground";
-import { LANGUAGE_LEVELS, LANGUAGES_RESUME } from "../../utils/IAResume";
+import { CV_STEPS_STEPPER, LANGUAGE_LEVELS, LANGUAGES_RESUME } from "../../utils/IAResume";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -26,6 +26,8 @@ const LEVELS = LANGUAGE_LEVELS;
 export default function SkillsAndLanguages() {
  const navigate = useNavigate();
  const dispatch = useDispatch();
+ const { t, i18n } = useTranslation();
+ const userLang = i18n.language || "fr";
 
  const user = useSelector((state) => state.user.user);
  const { resume, status } = useSelector((state) => state.resume);
@@ -48,8 +50,8 @@ export default function SkillsAndLanguages() {
 
  // onglets
  const [activeTab, setActiveTab] = useState("hard");
- const currentStep = 3;
- const completedSteps = [1, 2];
+ const currentStep = 4;
+ const completedSteps = [1, 2, 3];
 
  // soft skills
  const softSkillState = useSelector((state) => state.softSkill);
@@ -66,8 +68,8 @@ export default function SkillsAndLanguages() {
   if (!resumeId || !user?.token) return;
 
   dispatch(getResume({ token: user.token, id: resumeId }));
-  dispatch(getCategories(user.token));
- }, [dispatch, user]);
+  dispatch(getCategories({ token: user.token, lang: userLang }));
+ }, [dispatch, user, userLang]);
 
  useEffect(() => {
   if (!resume) return;
@@ -106,13 +108,17 @@ export default function SkillsAndLanguages() {
  useEffect(() => {
   if (!categoryId || !user?.token) return;
 
+  const techParams = { categoryId };
+  if (userLang && userLang !== "fr") techParams.lang = userLang;
+
   axios
-   .get(`${BASE_URL}/technicalSkills?categoryId=${categoryId}`, {
+   .get(`${BASE_URL}/technicalSkills`, {
+    params: techParams,
     headers: { Authorization: `Bearer ${user.token}` },
    })
    .then((res) => setAvailableSkills(res.data?.items || []))
    .catch(() => setAvailableSkills([]));
- }, [categoryId, user]);
+ }, [categoryId, user, userLang]);
 
  useEffect(() => {
   if (!selectedLang || !selectedLevel) return;
@@ -131,8 +137,8 @@ export default function SkillsAndLanguages() {
  // Fetch softSkills
  // Fetch soft skills (initial + filtre)
  useEffect(() => {
-  dispatch(getSoftSkills(softSkillInput || ""));
- }, [dispatch, softSkillInput]);
+  dispatch(getSoftSkills({ query: softSkillInput || "", lang: userLang }));
+ }, [dispatch, softSkillInput, userLang]);
 
  // Remplacement direct des propositions (pas de merge)
  useEffect(() => {
@@ -225,9 +231,9 @@ export default function SkillsAndLanguages() {
   setSoftSkillInput("");
  };
 
- const handleNext = async (step, direction) => {
+ const handleNavigate = async (step, direction) => {
   if (direction === "backward") {
-   navigate("/personalInfo");
+   navigate(step.path);
    return;
   }
 
@@ -246,6 +252,10 @@ export default function SkillsAndLanguages() {
    contractType: resume?.contractType || [],
    alternanceDuration: resume?.alternanceDuration || "",
    alternanceStartDate: resume?.alternanceStartDate || "",
+   interests: resume?.interests || [],
+   socialNetworks: resume?.socialNetworks || [],
+   drivingLicenses: resume?.drivingLicenses || [],
+   other: resume?.other,
    presentation: resume?.presentation || "",
    trainings: resume?.trainings || [],
    experiences: resume?.experiences || [],
@@ -264,18 +274,30 @@ export default function SkillsAndLanguages() {
    }),
   );
 
-  navigate("/smartGeneration");
+  navigate(step.path);
+ };
+
+ const handleNext = () => {
+  const nextStep = CV_STEPS_STEPPER.find((s) => s.id === currentStep + 1);
+  if (nextStep) handleNavigate(nextStep, "forward");
  };
 
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
-   <Logout />
-   <GoBack />
+   <ResumeHeader />
 
    <GlowBackground />
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
-    <div className="flex flex-col w-full max-w-5xl min-h-[85vh] max-h-[90vh] overflow-y-auto scrollbar-none p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
+    <div
+     className="flex flex-col w-full max-w-5xl
+                   h-[88vh]
+                   overflow-y-auto scrollbar-none
+                   p-6 sm:p-8 md:p-10
+                   rounded-3xl
+                   bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
+                   backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
+    >
      <CVStepper
       currentStep={currentStep}
       completedSteps={completedSteps}
@@ -283,16 +305,16 @@ export default function SkillsAndLanguages() {
        loading || languages.length === 0 || selectedSkills.length === 0
       }
       loading={loading}
-      onNavigate={handleNext}
+      onNavigate={handleNavigate}
      />
 
      {/* ================= LANGUES ================= */}
      <section className="mt-10">
       <h3 className="text-lg font-semibold text-emerald-300 mb-1">
-       🌍 Langues parlées
+       🌍 {t("resume.skills.languagesTitle")}
       </h3>
       <p className="text-sm text-gray-400 mb-6">
-       Choisis une langue puis son niveau (5 maximum).
+       {t("resume.skills.languagesHint")}
       </p>
 
       {/* Sélecteurs */}
@@ -303,7 +325,7 @@ export default function SkillsAndLanguages() {
         className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
        >
         <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
-         Choisir une langue
+         {t("resume.skills.chooseLanguage")}
         </option>
         {LANGUAGES.map((l) => (
          <option key={l} value={l} className="bg-dark_bg_2 text-white text-lg">
@@ -318,7 +340,7 @@ export default function SkillsAndLanguages() {
         className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
        >
         <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
-         Niveau
+         {t("resume.skills.level")}
         </option>
         {LEVELS.map((lvl) => (
          <option
@@ -337,7 +359,7 @@ export default function SkillsAndLanguages() {
        {languages.length === 0 ? (
         <div className="flex items-center gap-3 text-gray-500 text-sm">
          <span className="text-emerald-400 text-lg">🌐</span>
-         Aucune langue sélectionnée pour le moment
+         {t("resume.skills.noLanguage")}
         </div>
        ) : (
         <div className="flex flex-wrap gap-3">
@@ -353,7 +375,7 @@ export default function SkillsAndLanguages() {
       </div>
      </section>
 
-     <FormSeparator />
+     <FormSeparator compact />
 
      {/* ================= COMPÉTENCES ================= */}
      <section>
@@ -368,7 +390,7 @@ export default function SkillsAndLanguages() {
            : "text-gray-400 hover:text-white"
          }`}
         >
-         🧩 Savoir-faire
+         🧩 {t("resume.skills.hardSkills")}
         </button>
         <button
          onClick={() => setActiveTab("soft")}
@@ -378,7 +400,7 @@ export default function SkillsAndLanguages() {
            : "text-gray-400 hover:text-white"
          }`}
         >
-         💬 Savoir-être
+         💬 {t("resume.skills.softSkills")}
         </button>
        </div>
       </div>
@@ -387,10 +409,10 @@ export default function SkillsAndLanguages() {
       {activeTab === "hard" && (
        <>
         <h3 className="text-lg font-semibold text-emerald-300 mb-1">
-         🧩 Savoir-faire
+         🧩 {t("resume.skills.hardSkills")}
         </h3>
         <p className="text-sm text-gray-400 mb-6">
-         Domaine + jusqu’à 6 compétences techniques.
+         {t("resume.skills.hardSkillsHint")}
         </p>
 
         {/* Domaine + ajout */}
@@ -405,7 +427,7 @@ export default function SkillsAndLanguages() {
            className="w-full bg-dark_bg_1/80 border border-white/10 text-white rounded-2xl px-6 py-5 text-base focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
           >
            <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
-            Choisir un domaine d’activité
+            {t("resume.skills.chooseDomain")}
            </option>
            {categories.map((c) => (
             <option
@@ -426,7 +448,7 @@ export default function SkillsAndLanguages() {
           <AddItemInput
            value={customSkill}
            onChange={setCustomSkill}
-           placeholder="Compétence personnalisée"
+           placeholder={t("resume.skills.customSkill")}
            onAdd={addCustomSkill}
            maxItems={6}
            currentCount={selectedSkills.length}
@@ -439,7 +461,7 @@ export default function SkillsAndLanguages() {
          {availableSkills.length === 0 ? (
           <div className="flex-1 flex items-center justify-center text-gray-500 text-sm gap-3">
            <span className="text-emerald-400 text-xl">🧠</span>
-           Sélectionne un domaine pour voir les compétences
+           {t("resume.skills.selectDomain")}
           </div>
          ) : (
           <div className="flex-1 overflow-y-auto space-y-2 pr-1">
@@ -475,10 +497,10 @@ export default function SkillsAndLanguages() {
       {activeTab === "soft" && (
        <>
         <h3 className="text-lg font-semibold text-emerald-300 mb-1">
-         💬 Savoir-être
+         💬 {t("resume.skills.softSkills")}
         </h3>
         <p className="text-sm text-gray-400 mb-6">
-         Sélectionne jusqu’à 6 qualités humaines.
+         {t("resume.skills.softSkillsHint")}
         </p>
 
         {/* INPUT */}
@@ -486,7 +508,7 @@ export default function SkillsAndLanguages() {
          <AddItemInput
           value={softSkillInput}
           onChange={setSoftSkillInput}
-          placeholder="Rechercher ou ajouter un savoir-être"
+          placeholder={t("resume.skills.searchSoftSkill")}
           onAdd={addCustomSoftSkill}
           maxItems={6}
           currentCount={softSkills.length}

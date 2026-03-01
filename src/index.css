@@ -310,6 +310,30 @@
 .slick-slider .slick-slide {
     padding: 0 15px;
 }
+.template-slider-wrap .slick-slide {
+    padding: 8px 10px;
+}
+.template-slider-wrap .slick-list {
+    padding: 8px 0;
+}
+
+/* Flèches du slider templates CV */
+.template-slider-wrap .slick-prev,
+.template-slider-wrap .slick-next {
+  width: 28px !important;
+  height: 28px !important;
+}
+.template-slider-wrap .slick-prev:before,
+.template-slider-wrap .slick-next:before {
+  font-size: 28px !important;
+  opacity: 0.9;
+}
+.template-slider-wrap .slick-prev {
+  left: -36px !important;
+}
+.template-slider-wrap .slick-next {
+  right: -36px !important;
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar {

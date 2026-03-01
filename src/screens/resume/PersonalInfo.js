@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import GoBack from "../../components/core/GoBack";
 import Input from "../../components/resume/Input";
-import Logout from "../../components/core/Logout";
+import ResumeHeader from "../../components/resume/ResumeHeader";
 import Footer from "../../components/resume/Footer";
 import CVStepper from "../../components/resume/Stepper";
-import { CONTRACTS, CV_STEPS_STEPPER } from "../../utils/IAResume";
+import FormSeparator from "../../components/resume/FormSeparator";
+import { CONTRACTS, CV_STEPS_STEPPER, DRIVING_LICENSES } from "../../utils/IAResume";
 import GlowBackground from "../../components/resume/GlowBackground";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
 
 export default function PersonalInfo() {
+ const { t } = useTranslation();
  const user = useSelector((state) => state.user.user);
  const { status } = useSelector((state) => state.resume);
  const loading = status === "loading";
@@ -31,7 +33,9 @@ export default function PersonalInfo() {
   phone: "",
   address: "",
   website: "",
+  age: "",
   contractType: [],
+  drivingLicenses: [],
   alternanceDuration: "",
   alternanceStartDate: "",
  });
@@ -73,7 +77,9 @@ export default function PersonalInfo() {
    phone: resume.personalInfo?.phone || prev.phone,
    address: resume.personalInfo?.address || prev.address,
    website: resume.personalInfo?.website || prev.website,
+   age: resume.age ?? prev.age,
    contractType: resume.contractType || prev.contractType,
+   drivingLicenses: resume.drivingLicenses || prev.drivingLicenses,
    alternanceDuration: resume.alternanceDuration || prev.alternanceDuration,
    alternanceStartDate: resume.alternanceStartDate || prev.alternanceStartDate,
   }));
@@ -85,6 +91,15 @@ export default function PersonalInfo() {
    contractType: prev.contractType.includes(type)
     ? prev.contractType.filter((c) => c !== type)
     : [...prev.contractType, type],
+  }));
+ };
+
+ const toggleLicense = (license) => {
+  setForm((prev) => ({
+   ...prev,
+   drivingLicenses: prev.drivingLicenses.includes(license)
+    ? prev.drivingLicenses.filter((l) => l !== license)
+    : [...prev.drivingLicenses, license],
   }));
  };
 
@@ -130,6 +145,9 @@ export default function PersonalInfo() {
    title: resume?.title,
    template: resume?.template,
    mainColor: resume?.mainColor,
+   interests: resume?.interests || [],
+   socialNetworks: resume?.socialNetworks || [],
+   drivingLicenses: resume?.drivingLicenses || [],
    languages: resume?.languages || [],
    skills: resume?.skills || [],
    softSkills: resume?.softSkills || [],
@@ -146,7 +164,9 @@ export default function PersonalInfo() {
     address: form.address,
     website: form.website,
    },
+   age: form.age ? parseInt(form.age, 10) : undefined,
    contractType: form.contractType,
+   drivingLicenses: form.drivingLicenses,
   };
 
   try {
@@ -166,15 +186,14 @@ export default function PersonalInfo() {
 
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
-   <Logout />
-   <GoBack />
+   <ResumeHeader />
 
    <GlowBackground />
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
     <div
      className="flex flex-col w-full max-w-5xl
-                     min-h-[85vh] max-h-[90vh]
+                     h-[88vh]
                      overflow-y-auto scrollbar-none
                      p-6 sm:p-8 md:p-10
                      rounded-3xl
@@ -191,7 +210,7 @@ export default function PersonalInfo() {
 
      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
       <Input
-       label="Nom *"
+       label={t("resume.personalInfo.lastName")}
        name="lastName"
        value={form.lastName}
        onChange={handleChange}
@@ -200,7 +219,7 @@ export default function PersonalInfo() {
       />
 
       <Input
-       label="Prénom *"
+       label={t("resume.personalInfo.firstName")}
        name="firstName"
        value={form.firstName}
        onChange={handleChange}
@@ -209,7 +228,7 @@ export default function PersonalInfo() {
       />
 
       <Input
-       label="Email *"
+       label={t("resume.personalInfo.email")}
        name="email"
        type="email"
        value={form.email}
@@ -219,7 +238,7 @@ export default function PersonalInfo() {
       />
 
       <Input
-       label="Téléphone"
+       label={t("resume.personalInfo.phone")}
        name="phone"
        value={form.phone}
        onChange={handleChange}
@@ -227,7 +246,7 @@ export default function PersonalInfo() {
       />
 
       <Input
-       label="Adresse"
+       label={t("resume.personalInfo.address")}
        name="address"
        value={form.address}
        onChange={handleChange}
@@ -236,18 +255,51 @@ export default function PersonalInfo() {
       />
 
       <Input
-       label="Site web (facultatif)"
+       label={t("resume.personalInfo.website")}
        name="website"
        value={form.website}
        onChange={handleChange}
        placeholder="https://linkedin.com/in/..."
-       full
+      />
+
+      <Input
+       label={t("resume.personalInfo.age")}
+       name="age"
+       type="number"
+       value={form.age}
+       onChange={handleChange}
+       placeholder="Ex : 25"
       />
      </div>
 
      <div className="mt-12">
       <h3 className="text-lg font-semibold text-emerald-300 mb-4">
-       Type de contrat recherché *
+       {t("resume.personalInfo.licenses")}
+      </h3>
+      <div className="flex flex-wrap gap-3">
+       {DRIVING_LICENSES.map((license) => (
+        <button
+         key={license}
+         type="button"
+         onClick={() => toggleLicense(license)}
+         className={`px-4 py-2 rounded-full border text-sm transition
+                    ${
+                     form.drivingLicenses.includes(license)
+                      ? "bg-emerald-600/20 border-emerald-500 text-white"
+                      : "border-white/10 text-gray-300 hover:border-emerald-400"
+                    }`}
+        >
+         {license}
+        </button>
+       ))}
+      </div>
+     </div>
+
+     <FormSeparator compact />
+
+     <div className="mt-8">
+      <h3 className="text-lg font-semibold text-emerald-300 mb-4">
+       {t("resume.personalInfo.contractType")}
       </h3>
 
       <div className="flex flex-wrap gap-3">
@@ -272,7 +324,7 @@ export default function PersonalInfo() {
      {isAlternance && (
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
        <Input
-        label="Durée de l'alternance"
+        label={t("resume.personalInfo.alternanceDuration")}
         name="alternanceDuration"
         value={form.alternanceDuration}
         onChange={handleChange}
@@ -280,7 +332,7 @@ export default function PersonalInfo() {
        />
 
        <Input
-        label="Date de début"
+        label={t("resume.personalInfo.alternanceStartDate")}
         name="alternanceStartDate"
         type="date"
         value={form.alternanceStartDate}

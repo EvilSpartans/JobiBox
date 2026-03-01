@@ -34,15 +34,13 @@ export const getResume = createAsyncThunk(
 
 export const createResume = createAsyncThunk(
   "resume/create",
-  async ({ token, title, template, mainColor }, { rejectWithValue }) => {
+  async ({ token, title, template, mainColor, anonymous }, { rejectWithValue }) => {
     try {
+      const body = { title, template, mainColor };
+      if (anonymous !== undefined) body.anonymous = anonymous;
       const { data } = await axios.post(
         `${BASE_URL}/resume/create`,
-        {
-          title,
-          template,
-          mainColor,
-        },
+        body,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,12 +58,16 @@ export const createResume = createAsyncThunk(
 
 export const previewResume = createAsyncThunk(
   "resume/preview",
-  async ({ token, id }, { rejectWithValue }) => {
+  async ({ token, id, lang }, { rejectWithValue }) => {
     try {
+      const params = {};
+      if (lang) params.lang = lang;
+
       const { data } = await axios.get(`${BASE_URL}/resume/${id}/preview`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params,
       });
 
       return data;
@@ -98,6 +100,18 @@ export const updateResume = createAsyncThunk(
         formData.append("mainColor", payload.mainColor);
       }
 
+      if (payload.ats !== undefined) {
+        formData.append("ats", payload.ats ? "true" : "false");
+      }
+
+      if (payload.anonymous !== undefined) {
+        formData.append("anonymous", payload.anonymous ? "true" : "false");
+      }
+
+      if (payload.locale !== undefined) {
+        formData.append("locale", payload.locale);
+      }
+
       if (payload.qrcodePostId !== undefined) {
         formData.append("qrcodePostId", payload.qrcodePostId ?? "");
       }
@@ -111,6 +125,10 @@ export const updateResume = createAsyncThunk(
           "alternanceStartDate",
           payload.alternanceStartDate || ""
         );
+      }
+
+      if (payload.age !== undefined) {
+        formData.append("age", payload.age === "" || payload.age == null ? "" : String(payload.age));
       }
 
       if (payload.avatar instanceof File) {
@@ -174,6 +192,29 @@ export const updateResume = createAsyncThunk(
         });
       }
 
+      if (Array.isArray(payload.interests)) {
+        payload.interests.forEach((item, i) => {
+          formData.append(`interests[${i}]`, item);
+        });
+      }
+
+      if (payload.socialNetworks !== undefined) {
+        const networks = Array.isArray(payload.socialNetworks)
+          ? payload.socialNetworks.filter((sn) => sn && (sn.platform || sn.url))
+          : [];
+        formData.append("socialNetworks", JSON.stringify(networks));
+      }
+
+      if (Array.isArray(payload.drivingLicenses)) {
+        payload.drivingLicenses.forEach((license, i) => {
+          formData.append(`drivingLicenses[${i}]`, license);
+        });
+      }
+
+      if (payload.other !== undefined) {
+        formData.append("other", payload.other || "");
+      }
+
       const { data } = await axios.post(`${BASE_URL}/resume/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -189,11 +230,12 @@ export const updateResume = createAsyncThunk(
 
 export const uploadResumeAudio = createAsyncThunk(
   "resume/audio",
-  async ({ token, key, audio }, { rejectWithValue }) => {
+  async ({ token, key, audio, lang }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
       formData.append("key", key);
       formData.append("audio", audio);
+      formData.append("lang", lang || "fr");
 
       const { data } = await axios.post(`${BASE_URL}/resume/audio`, formData, {
         headers: {
@@ -208,10 +250,33 @@ export const uploadResumeAudio = createAsyncThunk(
   }
 );
 
-export const getResumeDownloadUrl = (id) => {
+export const getResumeDownloadUrl = (id, lang) => {
   if (!id) return "";
-  return `${BASE_URL}/resume/${id}/download`;
+  const url = `${BASE_URL}/resume/${id}/download`;
+  if (lang) return `${url}?lang=${encodeURIComponent(lang)}`;
+  return url;
 };
+
+export const translateResume = createAsyncThunk(
+  "resume/translate",
+  async ({ token, id, language, save = true }, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post(
+        `${BASE_URL}/resume/${id}/translate`,
+        { language, save },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 export const ResumeSlice = createSlice({
   name: "resume",
@@ -245,9 +310,23 @@ export const ResumeSlice = createSlice({
         state.previewHtml = action.payload;
       })
 
+      // TRANSLATE
+      .addCase(translateResume.fulfilled, (state, action) => {
+        if (action.payload && typeof action.payload === "object" && state.resume) {
+          state.resume = { ...state.resume, ...action.payload };
+        }
+      })
+
       // UPDATE
+      .addCase(updateResume.pending, (state) => {
+        state.status = "loading";
+      })
       .addCase(updateResume.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.resume = action.payload;
+      })
+      .addCase(updateResume.rejected, (state) => {
+        state.status = "failed";
       })
 
       // AUDIO

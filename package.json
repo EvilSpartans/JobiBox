@@ -1,6 +1,6 @@
 {
  "name": "jobibox",
- "version": "1.8.9",
+ "version": "1.9.0",
  "description": "La cabine accoustique pour créer un cv vidéo",
  "repository": "https://github.com/EvilSpartans/JobiBox",
  "main": "electron/main.js",
@@ -131,6 +131,7 @@
   "electron-updater": "^4.6.5",
   "express": "^4.18.2",
   "fflate": "^0.8.2",
+  "i18next": "^25.8.13",
   "intro.js-react": "^1.0.0",
   "postcss-loader": "^7.3.3",
   "qrcode.react": "^4.1.0",
@@ -142,6 +143,7 @@
   "react-dom": "^18.2.0",
   "react-dropzone": "^14.2.3",
   "react-hook-form": "^7.47.0",
+  "react-i18next": "^16.5.4",
   "react-media-recorder": "^1.6.6",
   "react-modal": "^3.16.1",
   "react-redux": "^8.1.2",

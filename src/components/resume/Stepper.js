@@ -1,8 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { CV_STEPS_STEPPER } from "../../utils/IAResume";
 
-const steps = CV_STEPS_STEPPER;
+const STEP_LABEL_KEYS = {
+  personnalisation: "personnalisation",
+  informations: "profilCandidat",
+  interests: "interests",
+  competences: "competences",
+  ia: "generation",
+  finalisation: "finalisation",
+};
 
 const StepIcon = ({ type, className }) => {
  const icons = {
@@ -67,6 +75,17 @@ const StepIcon = ({ type, className }) => {
     <polyline points="20 6 9 17 4 12" />
    </svg>
   ),
+  heart: (
+   <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+   >
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+   </svg>
+  ),
  };
  return icons[type] || null;
 };
@@ -79,6 +98,8 @@ export default function CVStepper({
  onNavigate,
 }) {
  const navigate = useNavigate();
+ const { t } = useTranslation();
+ const steps = CV_STEPS_STEPPER;
 
  const handleStepClick = (step) => {
   if (loading) return;
@@ -113,22 +134,22 @@ export default function CVStepper({
  };
 
  return (
-  <div className="w-full px-4 py-4">
+  <div className="w-full px-2 sm:px-4 py-4 overflow-hidden">
    <div
-    className="relative flex items-center justify-between
-                   p-3 sm:p-4
+    className="relative flex flex-nowrap items-center justify-between gap-1 sm:gap-2
+                   p-2 sm:p-3
                    rounded-2xl
                    bg-dark_bg_2/60
                    backdrop-blur-md
                    ring-1 ring-white/10
                    shadow-lg"
    >
-    <div className="absolute top-1/2 left-8 right-8 h-0.5 bg-white/10 -translate-y-1/2 hidden sm:block" />
+    <div className="absolute top-1/2 left-4 right-4 sm:left-6 sm:right-6 h-0.5 bg-white/10 -translate-y-1/2 hidden sm:block" />
 
     <div
-     className="absolute top-1/2 left-8 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400 -translate-y-1/2 transition-all duration-500 hidden sm:block"
+     className="absolute top-1/2 left-4 sm:left-6 h-0.5 bg-gradient-to-r from-emerald-500 to-emerald-400 -translate-y-1/2 transition-all duration-500 hidden sm:block"
      style={{
-      width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 4rem)`,
+      width: `calc(${((currentStep - 1) / (steps.length - 1)) * 100}% - 2rem)`,
      }}
     />
 
@@ -142,8 +163,8 @@ export default function CVStepper({
        onClick={() => handleStepClick(step)}
        disabled={!clickable}
        className={`
-                relative z-10 flex flex-col items-center
-                px-2 sm:px-4 py-2
+                relative z-10 flex flex-col items-center flex-1 min-w-0
+                px-0.5 sm:px-1 py-2
                 rounded-xl
                 transition-all duration-300 ease-out
                 group
@@ -153,8 +174,8 @@ export default function CVStepper({
       >
        <div
         className={`
-                  relative flex items-center justify-center
-                  w-10 h-10 sm:w-12 sm:h-12
+                  relative flex items-center justify-center flex-shrink-0
+                  w-8 h-8 sm:w-10 sm:h-10
                   rounded-full
                   transition-all duration-300
                   ${
@@ -168,7 +189,7 @@ export default function CVStepper({
        >
         {status === "completed" ? (
          <svg
-          className="w-5 h-5 sm:w-6 sm:h-6"
+          className="w-4 h-4 sm:w-5 sm:h-5"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -177,7 +198,7 @@ export default function CVStepper({
           <polyline points="20 6 9 17 4 12" />
          </svg>
         ) : (
-         <StepIcon type={step.icon} className="w-5 h-5 sm:w-6 sm:h-6" />
+         <StepIcon type={step.icon} className="w-4 h-4 sm:w-5 sm:h-5" />
         )}
 
         {status === "current" && (
@@ -190,10 +211,10 @@ export default function CVStepper({
         )}
        </div>
 
-       <div className="mt-2 text-center hidden sm:block">
+       <div className="mt-1 text-center hidden sm:block min-w-0 overflow-hidden">
         <p
          className={`
-                    text-[10px] sm:text-xs font-semibold tracking-wider
+                    text-[8px] sm:text-[9px] font-semibold tracking-wide truncate
                     transition-colors duration-300
                     ${
                      status === "completed"
@@ -204,7 +225,7 @@ export default function CVStepper({
                     }
                   `}
         >
-         {step.label}
+         {t(`resume.stepper.${STEP_LABEL_KEYS[step.key] || step.key}`)}
         </p>
        </div>
 

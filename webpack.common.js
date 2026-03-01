@@ -48,7 +48,7 @@ module.exports = {
     },
     plugins: [new Dotenv()],
     resolve: {
-        extensions: ['.js'],
+        extensions: ['.js', '.json'],
     },
     output: {
         filename: 'app.js',

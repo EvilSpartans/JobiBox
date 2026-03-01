@@ -11,12 +11,19 @@ const initialState = {
 
 export const getCategories = createAsyncThunk(
     "api/categories",
-    async (token, { rejectWithValue }) => {
+    async (arg, { rejectWithValue }) => {
         try {
+            const token = typeof arg === "string" ? arg : arg?.token;
+            const lang = typeof arg === "object" ? arg?.lang : undefined;
+
+            const params = {};
+            if (lang && lang !== "fr") params.lang = lang;
+
             const { data } = await axios.get(`${BASE_URL}/categories`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
+                params,
             });
             return data;
         } catch (error) {

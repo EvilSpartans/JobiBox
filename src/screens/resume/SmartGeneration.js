@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import PulseLoader from "react-spinners/PulseLoader";
 import { useDispatch, useSelector } from "react-redux";
 
-import Logout from "../../components/core/Logout";
-import GoBack from "../../components/core/GoBack";
+import ResumeHeader from "../../components/resume/ResumeHeader";
 
 import {
  getResume,
  uploadResumeAudio,
  updateResume,
 } from "../../store/slices/resumeSlice";
+import { getCurrentLang } from "../../i18n";
 import {
  SMART_GENERATION_STEP_KEYS,
  SMART_GENERATION_STEPS_CONFIG,
@@ -33,6 +34,7 @@ const STEPS_CONFIG = SMART_GENERATION_STEPS_CONFIG;
 export default function SmartGeneration() {
  const navigate = useNavigate();
  const dispatch = useDispatch();
+ const { t } = useTranslation();
 
  const user = useSelector((state) => state.user.user);
  const { resume, status } = useSelector((state) => state.resume);
@@ -52,8 +54,8 @@ export default function SmartGeneration() {
 
  const currentKey = STEP_KEYS[step];
  const current = STEPS_CONFIG.find((s) => s.id === step);
- const currentStep = 4;
- const completedSteps = [1, 2, 3];
+ const currentStep = 5;
+ const completedSteps = [1, 2, 3, 4];
 
  const [presentationDraft, setPresentationDraft] = useState("");
 
@@ -230,6 +232,7 @@ export default function SmartGeneration() {
      token: user.token,
      key,
      audio: audioFile,
+     lang: getCurrentLang() || "fr",
     }),
    ).unwrap();
 
@@ -305,6 +308,10 @@ export default function SmartGeneration() {
   contractType: resume.contractType || [],
   alternanceDuration: resume.alternanceDuration || "",
   alternanceStartDate: resume.alternanceStartDate || "",
+   interests: resume.interests || [],
+   socialNetworks: resume.socialNetworks || [],
+   drivingLicenses: resume.drivingLicenses || [],
+   other: resume.other,
   languages: resume.languages || [],
   skills: resume.skills || [],
   softSkills: resume.softSkills || [],
@@ -485,15 +492,15 @@ export default function SmartGeneration() {
     <div className="mt-6 space-y-4 text-left">
      <div className="flex items-center justify-between">
       <p className="text-sm text-emerald-300 font-semibold">
-       Tes formations ({resume.trainings.length}) :
+       {t("resume.smartGeneration.trainings")} ({resume.trainings.length}) :
       </p>
       {isSaving && (
        <span className="text-xs text-gray-400 flex items-center gap-2">
-        <PulseLoader color="#10b981" size={6} /> Enregistrement...
+        <PulseLoader color="#10b981" size={6} /> {t("resume.smartGeneration.saving")}
        </span>
       )}
      </div>
-     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+     <div className="space-y-4 max-h-[220px] overflow-y-auto overflow-x-hidden scrollbar-none pr-2">
       {resume.trainings.map((training, index) => (
        <TrainingForm
         key={index}
@@ -517,15 +524,15 @@ export default function SmartGeneration() {
     <div className="mt-6 space-y-4 text-left">
      <div className="flex items-center justify-between">
       <p className="text-sm text-emerald-300 font-semibold">
-       Tes expériences ({resume.experiences.length}) :
+       {t("resume.smartGeneration.experiencesList")} ({resume.experiences.length}) :
       </p>
       {isSaving && (
        <span className="text-xs text-gray-400 flex items-center gap-2">
-        <PulseLoader color="#10b981" size={6} /> Enregistrement...
+        <PulseLoader color="#10b981" size={6} /> {t("resume.smartGeneration.saving")}
        </span>
       )}
      </div>
-     <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+     <div className="space-y-4 max-h-[220px] overflow-y-auto overflow-x-hidden scrollbar-none pr-2">
       {resume.experiences.map((experience, index) => (
        <ExperienceForm
         key={index}
@@ -549,11 +556,11 @@ export default function SmartGeneration() {
     <div className="mt-6 space-y-3 text-left">
      <div className="flex items-center justify-between">
       <p className="text-sm text-emerald-300 font-semibold">
-       Ta présentation :
+       {t("resume.smartGeneration.presentation")}
       </p>
       {isSaving && (
        <span className="text-xs text-gray-400 flex items-center gap-2">
-        <PulseLoader color="#10b981" size={6} /> Enregistrement...
+        <PulseLoader color="#10b981" size={6} /> {t("resume.smartGeneration.saving")}
        </span>
       )}
      </div>
@@ -571,33 +578,37 @@ export default function SmartGeneration() {
  };
 
  const handleNavigate = async (step, direction) => {
-  if (direction === "backward") {
-   navigate("/skillsAndLanguages");
-   return;
-  }
-
-  navigate("/finalization");
+  navigate(step.path);
  };
 
  /* ---------------- RENDER ---------------- */
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
-   <Logout />
-   <GoBack />
+   <ResumeHeader />
 
    <GlowBackground />
 
    <div className="relative z-10 h-full flex items-center justify-center px-4">
-    <div className="flex flex-col w-full max-w-5xl min-h-[85vh] p-8 rounded-3xl bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80 backdrop-blur-xl shadow-2xl ring-1 ring-white/10">
-     <CVStepper
-      currentStep={currentStep}
-      completedSteps={completedSteps}
-      disabled={!allStepsCompleted}
-      loading={loading}
-      onNavigate={handleNavigate}
-     />
+    <div
+     className="flex flex-col w-full max-w-5xl
+                   h-[88vh]
+                   overflow-hidden
+                   p-6 sm:p-8 md:p-10
+                   rounded-3xl
+                   bg-gradient-to-br from-dark_bg_2/80 to-dark_bg_1/80
+                   backdrop-blur-xl shadow-2xl ring-1 ring-white/10"
+    >
+     <div className="flex-shrink-0">
+      <CVStepper
+       currentStep={currentStep}
+       completedSteps={completedSteps}
+       disabled={!allStepsCompleted}
+       loading={loading}
+       onNavigate={handleNavigate}
+      />
+     </div>
      {/* STEPS */}
-     <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+     <div className="mt-10 flex-shrink-0 grid grid-cols-1 md:grid-cols-3 gap-4">
       {STEPS_CONFIG.map((s) => (
        <div
         key={s.id}
@@ -615,24 +626,24 @@ export default function SmartGeneration() {
           ✔
          </span>
         )}
-        <p className="text-xs uppercase tracking-wide mb-1">Étape {s.id}</p>
-        <p className="font-semibold">{s.title}</p>
+        <p className="text-xs uppercase tracking-wide mb-1">{t("resume.smartGeneration.step")} {s.id}</p>
+        <p className="font-semibold">{t(s.titleKey)}</p>
        </div>
       ))}
      </div>
 
-     {/* CONTENT */}
-     <div className="mt-10 flex-1 flex flex-col justify-between">
+     {/* CONTENT — zone scrollable, stepper + onglets restent visibles */}
+     <div className="mt-10 flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none flex flex-col">
       <div className="space-y-6 text-center">
        <h3 className="text-lg font-semibold text-emerald-300">
-        {current.subtitle}
+        {t(current.subtitleKey)}
        </h3>
 
-       <p className="text-gray-300">{current.description}</p>
+       <p className="text-gray-300">{t(current.descKey)}</p>
 
        <div className="rounded-xl bg-white/5 border border-white/10 p-5">
-        <p className="text-sm text-emerald-300 mb-2">Exemple de réponse :</p>
-        <p className="text-sm text-gray-300 italic">{current.example}</p>
+        <p className="text-sm text-emerald-300 mb-2">{t("resume.smartGeneration.example")}</p>
+        <p className="text-sm text-gray-300 italic">{t(current.exampleKey)}</p>
        </div>
 
        {/* AUDIO */}
@@ -668,10 +679,10 @@ export default function SmartGeneration() {
           }`}
          >
           {recording
-           ? "Arrêter"
+           ? t("resume.smartGeneration.stop")
            : hasExistingAnswer
-             ? "Recommencer l’enregistrement"
-             : "Démarrer l’enregistrement"}
+             ? t("resume.smartGeneration.recordAgain")
+             : t("resume.smartGeneration.record")}
          </button>
         )}
        </div>
@@ -684,7 +695,7 @@ export default function SmartGeneration() {
           onClick={() => setStep(step + 1)}
           className="px-8 py-3 rounded-full bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition flex items-center gap-2"
          >
-          Étape suivante
+          {t("resume.smartGeneration.nextStep")}
           <span className="text-lg">→</span>
          </button>
         </div>

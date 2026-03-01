@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './i18n';
 import './index.css'
 import { Provider, useSelector } from 'react-redux';
 import { Store } from './store/Store';

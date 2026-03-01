@@ -11,10 +11,16 @@ const initialState = {
 
 export const getSoftSkills = createAsyncThunk(
  "softSkill/getSoftSkills",
- async (query, { rejectWithValue }) => {
+ async (arg, { rejectWithValue }) => {
   try {
+   const query = typeof arg === "string" ? arg : arg?.query ?? "";
+   const lang = typeof arg === "object" ? arg?.lang : undefined;
+
+   const params = { name: query, limit: 10 };
+   if (lang && lang !== "fr") params.lang = lang;
+
    const { data } = await axios.get(`${BASE_URL}/softSkills`, {
-    params: { name: query, limit: 10 },
+    params,
    });
    return data.items;
   } catch (error) {

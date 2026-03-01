@@ -10,7 +10,7 @@ export const CV_STEPS_STEPPER = [
  {
   id: 1,
   key: "personnalisation",
-  label: "PERSONNALISATION DU CV",
+  label: "PERSONNALISATION",
   path: "/personnalization",
   icon: "palette",
  },
@@ -23,22 +23,29 @@ export const CV_STEPS_STEPPER = [
  },
  {
   id: 3,
+  key: "interests",
+  label: "CENTRE D'INTÉRÊT",
+  path: "/interestsAndMore",
+  icon: "heart",
+ },
+ {
+  id: 4,
   key: "competences",
-  label: "COMPÉTENCES & LANGUES",
+  label: "COMPÉTENCES",
   path: "/skillsAndLanguages",
   icon: "skills",
  },
  {
-  id: 4,
+  id: 5,
   key: "ia",
-  label: "GÉNÉRATION INTELLIGENTE",
+  label: "GÉNÉRATION IA",
   path: "/smartGeneration",
   icon: "sparkles",
  },
  {
-  id: 5,
+  id: 6,
   key: "finalisation",
-  label: "FINALISATION DU CV",
+  label: "FINALISATION",
   path: "/finalization",
   icon: "check",
  },
@@ -57,17 +64,22 @@ export const RESUME_IA_STEPS = [
  },
  {
   step: "03",
+  title: "Centre d'intérêt & autres",
+  desc: "Centres d'intérêt, réseaux sociaux, permis et informations complémentaires",
+ },
+ {
+  step: "04",
   title: "Compétences & langues",
   desc: "Sélection de tes skills et langues clés",
  },
  {
-  step: "04",
+  step: "05",
   title: "Génération intelligente",
   desc:
    "L’IA génère automatiquement ta présentation, tes expériences et formations",
  },
  {
-  step: "05",
+  step: "06",
   title: "Finalisation",
   desc: "Ajout de la photo, du CV vidéo et validation du CV papier",
  },
@@ -87,12 +99,22 @@ export const COLORS = [
  { name: "Émeraude", value: "#10b981" },
  { name: "Bleu nuit", value: "#1e3a8a" },
  { name: "Bleu clair", value: "#2563eb" },
+ { name: "Bleu ciel", value: "#0ea5e9" },
+ { name: "Cyan", value: "#06b6d4" },
+ { name: "Turquoise", value: "#14b8a6" },
  { name: "Violet", value: "#6d28d9" },
  { name: "Prune", value: "#7c3aed" },
+ { name: "Fuchsia", value: "#a855f7" },
+ { name: "Rose", value: "#ec4899" },
  { name: "Rouge", value: "#dc2626" },
  { name: "Bordeaux", value: "#7f1d1d" },
+ { name: "Corail", value: "#f43f5e" },
  { name: "Orange", value: "#ea580c" },
+ { name: "Ambre", value: "#f59e0b" },
  { name: "Jaune doré", value: "#facc15" },
+ { name: "Vert lime", value: "#84cc16" },
+ { name: "Vert forêt", value: "#15803d" },
+ { name: "Gris ardoise", value: "#475569" },
  { name: "Noir", value: "#111827" },
 ];
 
@@ -104,6 +126,18 @@ export const CONTRACTS = [
  "Freelance",
  "Intérim",
  "Formation",
+];
+
+export const DRIVING_LICENSES = [
+ "B",
+ "BE",
+ "C",
+ "CE",
+ "C1",
+ "C1E",
+ "D",
+ "DE",
+ "En cours",
 ];
 
 export const LANGUAGES_RESUME = [
@@ -127,30 +161,24 @@ export const SMART_GENERATION_STEP_KEYS = {
 export const SMART_GENERATION_STEPS_CONFIG = [
  {
   id: 1,
-  title: "Présente-toi",
-  subtitle: "Qui es-tu ?",
-  description:
-   "Présente-toi librement en quelques phrases. Dis qui tu es, ce que tu recherches et ce qui te motive.",
-  example:
-   "« Je m’appelle Alex, j’ai 24 ans et je recherche un poste dans la logistique. J’aime le travail d’équipe et je suis motivé à apprendre et évoluer rapidement. »",
+  titleKey: "resume.smartGeneration.presenteToi",
+  subtitleKey: "resume.smartGeneration.subtitle1",
+  descKey: "resume.smartGeneration.desc1",
+  exampleKey: "resume.smartGeneration.example1",
  },
  {
   id: 2,
-  title: "Formations & parcours scolaire",
-  subtitle: "Ton parcours académique",
-  description:
-   "Parle de tes formations, diplômes ou apprentissages. Précise le nom de l’établissement, la période et ce que tu as appris.",
-  example:
-   "« J’ai suivi un CAP Matelot au lycée maritime d’Étaples entre 2023 et 2025. J’y ai appris la navigation, la sécurité en mer et le travail en équipe. »",
+  titleKey: "resume.smartGeneration.formations",
+  subtitleKey: "resume.smartGeneration.subtitle2",
+  descKey: "resume.smartGeneration.desc2",
+  exampleKey: "resume.smartGeneration.example2",
  },
  {
   id: 3,
-  title: "Expériences professionnelles",
-  subtitle: "Ton expérience terrain",
-  description:
-   "Parle de tes expériences professionnelles. Pour chaque expérience, indique où tu as travaillé, sur quelle période et ce que tu faisais concrètement.",
-  example:
-   "« En 2024, j’ai travaillé sur des chantiers de rénovation à Étaples : placo, peinture, menuiserie, revêtements de sol. J’ai aussi effectué un stage maritime. »",
+  titleKey: "resume.smartGeneration.experiences",
+  subtitleKey: "resume.smartGeneration.subtitle3",
+  descKey: "resume.smartGeneration.desc3",
+  exampleKey: "resume.smartGeneration.example3",
  },
 ];
 
