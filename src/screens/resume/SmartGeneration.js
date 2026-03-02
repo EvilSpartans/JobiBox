@@ -48,6 +48,7 @@ export default function SmartGeneration() {
  const [isUploading, setIsUploading] = useState(false);
  const [confirmOverwrite, setConfirmOverwrite] = useState(false);
  const [isSaving, setIsSaving] = useState(false);
+ const [editingItemIndex, setEditingItemIndex] = useState(null);
 
  const mediaRecorderRef = useRef(null);
  const audioChunksRef = useRef([]);
@@ -486,6 +487,12 @@ export default function SmartGeneration() {
   }
  };
 
+ const getTrainingTitle = (t) =>
+  joinDefined([clean(t.degree), clean(t.school)]) || t("resume.smartGeneration.untitledTraining");
+
+ const getExperienceTitle = (e) =>
+  joinDefined([clean(e.job) || clean(e.title), clean(e.company)]) || t("resume.smartGeneration.untitledExperience");
+
  const renderEditableResponse = () => {
   if (currentKey === "trainings" && resume?.trainings?.length > 0) {
    return (
@@ -500,19 +507,18 @@ export default function SmartGeneration() {
        </span>
       )}
      </div>
-     <div className="space-y-4 max-h-[220px] overflow-y-auto overflow-x-hidden scrollbar-none pr-2">
+     <p className="text-xs text-white/90 mb-3">{t("resume.smartGeneration.clickToEdit")}</p>
+     <div className="space-y-2">
       {resume.trainings.map((training, index) => (
-       <TrainingForm
+       <button
         key={index}
-        data={{
-         ...training,
-         __index: index,
-         startDate: parseDate(training.startDate),
-         endDate: parseDate(training.endDate),
-        }}
-        onChange={handleTrainingChange}
-        onDelete={handleTrainingDelete}
-       />
+        type="button"
+        onClick={() => setEditingItemIndex({ type: "training", index })}
+        className="w-full text-left px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-emerald-500/40 transition flex items-center justify-between gap-2"
+       >
+        <span className="font-medium text-white truncate">{getTrainingTitle(training)}</span>
+        <span className="text-emerald-400 text-sm flex-shrink-0">✎</span>
+       </button>
       ))}
      </div>
     </div>
@@ -532,19 +538,18 @@ export default function SmartGeneration() {
        </span>
       )}
      </div>
-     <div className="space-y-4 max-h-[220px] overflow-y-auto overflow-x-hidden scrollbar-none pr-2">
+     <p className="text-xs text-white/90 mb-3">{t("resume.smartGeneration.clickToEdit")}</p>
+     <div className="space-y-2">
       {resume.experiences.map((experience, index) => (
-       <ExperienceForm
+       <button
         key={index}
-        data={{
-         ...experience,
-         __index: index,
-         startDate: parseDate(experience.startDate),
-         endDate: parseDate(experience.endDate),
-        }}
-        onChange={handleExperienceChange}
-        onDelete={handleExperienceDelete}
-       />
+        type="button"
+        onClick={() => setEditingItemIndex({ type: "experience", index })}
+        className="w-full text-left px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-emerald-500/40 transition flex items-center justify-between gap-2"
+       >
+        <span className="font-medium text-white truncate">{getExperienceTitle(experience)}</span>
+        <span className="text-emerald-400 text-sm flex-shrink-0">✎</span>
+       </button>
       ))}
      </div>
     </div>
@@ -721,6 +726,63 @@ export default function SmartGeneration() {
      <span className="text-[160px] font-extrabold text-emerald-400 animate-pulse">
       {countdown}
      </span>
+    </div>
+   )}
+
+   {editingItemIndex && (
+    <div className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-black/90 p-4 sm:p-6">
+     <div className="flex-1 min-h-0 flex flex-col max-w-4xl w-full max-h-full bg-dark_bg_2 rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 flex-shrink-0 border-b border-white/5">
+       <h3 className="text-lg font-semibold text-emerald-300">
+        {editingItemIndex.type === "training"
+         ? t("resume.smartGeneration.editTraining")
+         : t("resume.smartGeneration.editExperience")}
+       </h3>
+       <button
+        onClick={() => setEditingItemIndex(null)}
+        className="w-10 h-10 rounded-full bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition text-xl leading-none"
+       >
+        ×
+       </button>
+      </div>
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none px-6 py-6 [&_label]:!text-gray-200 [&_input]:!text-white [&_textarea]:!text-white">
+       {editingItemIndex.type === "training" && resume?.trainings?.[editingItemIndex.index] && (
+        <TrainingForm
+         data={{
+          ...resume.trainings[editingItemIndex.index],
+          __index: editingItemIndex.index,
+          startDate: parseDate(resume.trainings[editingItemIndex.index].startDate),
+          endDate: parseDate(resume.trainings[editingItemIndex.index].endDate),
+         }}
+         onChange={(updated) => {
+          handleTrainingChange(updated);
+         }}
+         onDelete={(index) => {
+          handleTrainingDelete(index);
+          setEditingItemIndex(null);
+         }}
+        />
+       )}
+       {editingItemIndex.type === "experience" && resume?.experiences?.[editingItemIndex.index] && (
+        <ExperienceForm
+         data={{
+          ...resume.experiences[editingItemIndex.index],
+          title: resume.experiences[editingItemIndex.index].title ?? resume.experiences[editingItemIndex.index].job,
+          __index: editingItemIndex.index,
+          startDate: parseDate(resume.experiences[editingItemIndex.index].startDate),
+          endDate: parseDate(resume.experiences[editingItemIndex.index].endDate),
+         }}
+         onChange={(updated) => {
+          handleExperienceChange(updated);
+         }}
+         onDelete={(index) => {
+          handleExperienceDelete(index);
+          setEditingItemIndex(null);
+         }}
+        />
+       )}
+      </div>
+     </div>
     </div>
    )}
 

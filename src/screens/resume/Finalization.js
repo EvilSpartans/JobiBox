@@ -218,13 +218,13 @@ export default function Finalization() {
       loading={loading}
      />
 
-     <h2 className="text-4xl py-10 font-extrabold text-center text-white">{t("resume.finalization.congrats")} 🎉</h2>
+     <h2 className="text-4xl py-12 font-extrabold text-center text-white">{t("resume.finalization.congrats")} 🎉</h2>
 
-     <p className=" text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
+     <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
       {t("resume.finalization.ready")}
      </p>
 
-     <div className="mt-10 flex justify-center">
+     <div className="mt-14 flex justify-center">
       <button
        onClick={() => setShowMediasModal(true)}
        className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition flex items-center gap-4"
@@ -240,7 +240,7 @@ export default function Finalization() {
      </div>
 
      {/* Traduire et sauvegarder — directement sous le bouton Photo & CV vidéo */}
-     <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+     <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-3">
       <select
        value={translateLang}
        onChange={(e) => setTranslateLang(e.target.value)}
@@ -273,21 +273,21 @@ export default function Finalization() {
       </div>
      )}
 
-     <div className="mt-12 flex flex-col items-center">
-      <p className="mb-6 text-sm text-gray-400 text-center max-w-md">
+     <div className="mt-16 flex flex-col items-center">
+      <p className="mb-8 text-sm text-gray-400 text-center max-w-md">
        {t("resume.finalization.qrHint")}{" "}
        <span className="text-emerald-400 font-medium">jobissim.com</span>.
       </p>
 
-      <div className="bg-white p-5 rounded-2xl shadow-lg">
+      <div className="bg-white p-3 rounded-2xl shadow-lg">
        <QRCodeSVG
         value={getResumeDownloadUrl(resume?.id, resume?.locale)}
-        size={180}
+        size={100}
        />
       </div>
 
       {/* ATS + Traduction */}
-      <div className="mt-8 flex flex-col items-center gap-4">
+      <div className="mt-10 flex flex-col items-center gap-4">
        <label className="flex items-center gap-3 cursor-pointer">
         <input
          type="checkbox"
@@ -299,12 +299,13 @@ export default function Finalization() {
        </label>
       </div>
 
-      <div className="mt-6 flex flex-col items-center gap-4">
+      <div className="mt-10 flex flex-col items-center gap-5">
        <button
         onClick={() => setShowPreview(true)}
-        className="px-10 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold shadow-lg active:scale-[0.98] transition"
+        className="relative px-12 py-4 rounded-full bg-emerald-600 text-white font-bold text-lg hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg overflow-visible"
        >
-        {t("resume.finalization.seeCv")}
+        <span className="absolute inset-0 rounded-full bg-emerald-500/[0.18] animate-ping" />
+        <span className="relative">{t("resume.finalization.seeCv")}</span>
        </button>
 
        <button

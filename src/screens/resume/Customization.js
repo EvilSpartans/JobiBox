@@ -114,7 +114,7 @@ export default function Customization() {
        // ✏️ on écrase CE QUI CHANGE ICI
        title,
        template: selectedDesign,
-       mainColor: selectedColor,
+       mainColor: colorToSave,
       },
      }),
     ).unwrap();
@@ -129,7 +129,7 @@ export default function Customization() {
      token,
      title,
      template: selectedDesign,
-     mainColor: selectedColor,
+     mainColor: colorToSave,
     }),
    );
 
@@ -144,6 +144,9 @@ export default function Customization() {
    console.error("Erreur handleNavigate :", error);
   }
  };
+
+ const isValidHex = (hex) => /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
+ const colorToSave = isValidHex(selectedColor) ? selectedColor : (resume?.mainColor || "#10b981");
 
  const handleNext = () => {
   const nextStep = CV_STEPS_STEPPER.find((s) => s.id === currentStep + 1);
@@ -249,7 +252,7 @@ export default function Customization() {
        >
         <div
          className="w-12 h-12 rounded-xl ring-2 ring-white/20"
-         style={{ backgroundColor: selectedColor }}
+         style={{ backgroundColor: isValidHex(selectedColor) ? selectedColor : (resume?.mainColor || "#10b981") }}
         />
         <span className="text-white font-medium">
          {t("resume.customization.chooseColor")}
@@ -280,10 +283,43 @@ export default function Customization() {
          {/* Roue chromatique */}
          <div className="flex justify-center mb-6">
           <Wheel
-           color={selectedColor}
+           color={/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(selectedColor) ? selectedColor : "#10b981"}
            onChange={(color) => setSelectedColor(color.hex)}
            width={220}
            height={220}
+          />
+         </div>
+
+         {/* Code couleur personnalisé */}
+         <p className="text-sm text-gray-400 mb-2">{t("resume.customization.customCode")}</p>
+         <div className="flex items-center gap-3 mb-4">
+          <input
+           type="text"
+           value={selectedColor}
+           onChange={(e) => {
+            const val = e.target.value;
+            if (val.startsWith("#") && val.length <= 7) {
+             setSelectedColor(val);
+            } else if (!val.startsWith("#") && val.length <= 6) {
+             setSelectedColor(val ? `#${val}` : "#");
+            }
+           }}
+           onBlur={(e) => {
+            const val = e.target.value.trim();
+            const hex = val.startsWith("#") ? val : `#${val}`;
+            if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex)) {
+             const hex6 = hex.length === 4
+              ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+              : hex;
+             setSelectedColor(hex6);
+            }
+           }}
+           placeholder="#ffffff"
+           className="flex-1 px-3 py-2 rounded-lg bg-dark_bg_3 border border-white/10 text-white font-mono text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          />
+          <div
+           className="w-10 h-10 rounded-lg ring-2 ring-white/20 flex-shrink-0"
+           style={{ backgroundColor: /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(selectedColor) ? selectedColor : "#333" }}
           />
          </div>
 

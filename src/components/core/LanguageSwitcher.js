@@ -28,12 +28,12 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setShowDropdown((v) => !v)}
-        className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/10 border border-white/20 text-white hover:bg-white/15 transition text-sm font-medium"
+        className="flex items-center gap-2 px-4 py-4 rounded-full bg-emerald-600/25 border border-emerald-500/50 text-white hover:bg-emerald-500/35 hover:border-emerald-400/60 transition text-xl font-semibold"
         title={i18n.t(`languages.${displayLang}`)}
       >
-        <span className="text-lg">{FLAGS[displayLang] || "🌐"}</span>
+        <span className="text-2xl">{FLAGS[displayLang] || "🌐"}</span>
         <span className="hidden sm:inline">{i18n.t(`languages.${displayLang}`)}</span>
-        <span className="text-gray-400">▾</span>
+        <span className={`inline-block transition-transform duration-200 ${showDropdown ? "rotate-180" : ""}`}>▾</span>
       </button>
 
       {showDropdown && (
