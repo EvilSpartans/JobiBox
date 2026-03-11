@@ -10,6 +10,7 @@ import ResumeHeader from "../../components/resume/ResumeHeader";
 import {
  getResume,
  uploadResumeAudio,
+ uploadResumeText,
  updateResume,
 } from "../../store/slices/resumeSlice";
 import { getCurrentLang } from "../../i18n";
@@ -23,6 +24,8 @@ import TrainingForm from "../../components/resume/TrainingForm";
 import GlowBackground from "../../components/resume/GlowBackground";
 import ExperienceForm from "../../components/resume/ExperienceForm";
 import { formatDate, parseDate } from "../../utils/DateUtils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 /* ---------------- CONFIG ---------------- */
 
@@ -47,8 +50,12 @@ export default function SmartGeneration() {
  const [countdown, setCountdown] = useState(null);
  const [isUploading, setIsUploading] = useState(false);
  const [confirmOverwrite, setConfirmOverwrite] = useState(false);
+ const [confirmOverwriteMode, setConfirmOverwriteMode] = useState("audio");
  const [isSaving, setIsSaving] = useState(false);
  const [editingItemIndex, setEditingItemIndex] = useState(null);
+ const [inputMode, setInputMode] = useState("audio");
+ const [textInput, setTextInput] = useState("");
+ const [textError, setTextError] = useState(null);
 
  const mediaRecorderRef = useRef(null);
  const audioChunksRef = useRef([]);
@@ -164,6 +171,11 @@ export default function SmartGeneration() {
 
   setValidatedSteps(done);
  }, [resume]);
+
+ useEffect(() => {
+  setTextInput("");
+  setTextError(null);
+ }, [step]);
 
  /* ----------- RECORDING ----------- */
 
@@ -288,6 +300,88 @@ export default function SmartGeneration() {
    console.error("Erreur IA :", e);
   } finally {
    setIsUploading(false); // 🔓 unlock UI
+  }
+ };
+
+ const handleTextSend = async (textToSend) => {
+  if (!textToSend?.trim()) return;
+  if (!resume?.id || !user?.token) {
+   setTextError("CV non chargé. Actualise la page et réessaie.");
+   return;
+  }
+
+  setIsUploading(true);
+  setTextError(null);
+
+  try {
+   const key = STEP_KEYS[step];
+
+   const aiResult = await dispatch(
+    uploadResumeText({
+     token: user.token,
+     resumeId: resume.id,
+     key,
+     text: textToSend.trim(),
+     lang: getCurrentLang() || "fr",
+    }),
+   ).unwrap();
+
+   const payload = {
+    title: resume.title,
+    template: resume.template,
+    mainColor: resume.mainColor,
+    qrcodePostId: resume.qrcodePostId,
+    personalInfo: resume.personalInfo,
+    contractType: resume.contractType || [],
+    alternanceDuration: resume.alternanceDuration || "",
+    alternanceStartDate: resume.alternanceStartDate || "",
+    languages: resume.languages || [],
+    skills: resume.skills || [],
+    softSkills: resume.softSkills || [],
+    presentation: resume.presentation ?? "",
+    trainings: resume.trainings ?? [],
+    experiences: resume.experiences ?? [],
+    ...(key === "presentation" && {
+     presentation: typeof aiResult === "string" ? aiResult : (aiResult?.text || ""),
+    }),
+    ...(key === "trainings" &&
+     Array.isArray(aiResult?.json?.trainings) && {
+     trainings: aiResult.json.trainings.map((t) => ({
+      ...t,
+      startDate: formatDate(parseDate(t.startDate)),
+      endDate: formatDate(parseDate(t.endDate)),
+     })),
+    }),
+    ...(key === "experiences" &&
+     Array.isArray(aiResult?.json?.experiences) && {
+     experiences: aiResult.json.experiences.map((e) => ({
+      ...e,
+      startDate: formatDate(parseDate(e.startDate)),
+      endDate: formatDate(parseDate(e.endDate)),
+     })),
+    }),
+   };
+
+   await dispatch(
+    updateResume({
+     token: user.token,
+     id: resume.id,
+     payload,
+    }),
+   ).unwrap();
+
+   setValidatedSteps((prev) => [...new Set([...prev, step])]);
+   setTextInput("");
+   setTextError(null);
+  } catch (e) {
+   console.error("Erreur IA texte :", e);
+   const msg =
+    (typeof e === "object" && (e?.message || e?.error)) ||
+    (typeof e === "string" ? e : null) ||
+    "Une erreur est survenue. Réessaie.";
+   setTextError(msg);
+  } finally {
+   setIsUploading(false);
   }
  };
 
@@ -651,46 +745,115 @@ export default function SmartGeneration() {
         <p className="text-sm text-gray-300 italic">{t(current.exampleKey)}</p>
        </div>
 
-       {/* AUDIO */}
-       <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-8 flex flex-col items-center">
-        <div
-         className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
-          recording
-           ? "bg-red-500/20 ring-2 ring-red-500"
-           : "bg-emerald-600/20 ring-2 ring-emerald-500"
+       <p className="text-sm text-gray-400">{t("resume.smartGeneration.speakInstruction")}</p>
+
+       {/* Bascule Parler / Écrire */}
+       <div className="flex justify-center gap-2">
+        <button
+         type="button"
+         onClick={() => setInputMode("audio")}
+         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition ${
+          inputMode === "audio"
+           ? "bg-emerald-600 text-white ring-2 ring-emerald-500"
+           : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10"
          }`}
         >
-         🎙️
-        </div>
+         <FontAwesomeIcon icon={faMicrophone} className="w-4 h-4" />
+         {t("resume.smartGeneration.recordModeLabel")}
+        </button>
+        <button
+         type="button"
+         onClick={() => setInputMode("text")}
+         className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition ${
+          inputMode === "text"
+           ? "bg-emerald-600 text-white ring-2 ring-emerald-500"
+           : "bg-white/5 text-gray-400 hover:bg-white/10 border border-white/10"
+         }`}
+        >
+         <FontAwesomeIcon icon={faPenToSquare} className="w-4 h-4" />
+         {t("resume.smartGeneration.textModeLabel")}
+        </button>
+       </div>
 
-        {isUploading ? (
-         <div className="flex items-center justify-center px-6 py-2 rounded-full bg-white/10">
-          <PulseLoader color="#10b981" size={10} />
-         </div>
-        ) : (
-         <button
-          ref={recordButtonRef}
-          disabled={countdown}
-          onClick={() => {
-           if (!recording && validatedSteps.includes(step)) {
-            setConfirmOverwrite(true);
-            return;
-           }
-
-           recording ? stopRecording() : startCountdownAndRecord();
-          }}
-          className={`px-6 py-2 rounded-full font-semibold transition ${
-           recording ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+       {/* Zone audio ou texte selon le mode */}
+       {inputMode === "audio" ? (
+        <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-8 flex flex-col items-center justify-center h-[200px]">
+         <div
+          className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
+           recording
+            ? "bg-red-500/20 ring-2 ring-red-500"
+            : "bg-emerald-600/20 ring-2 ring-emerald-500"
           }`}
          >
-          {recording
-           ? t("resume.smartGeneration.stop")
-           : hasExistingAnswer
-             ? t("resume.smartGeneration.recordAgain")
-             : t("resume.smartGeneration.record")}
-         </button>
-        )}
-       </div>
+          🎙️
+         </div>
+
+         {isUploading ? (
+          <div className="flex items-center justify-center px-6 py-2 rounded-full bg-white/10">
+           <PulseLoader color="#10b981" size={10} />
+          </div>
+         ) : (
+          <button
+           ref={recordButtonRef}
+           disabled={countdown}
+           onClick={() => {
+            if (!recording && validatedSteps.includes(step)) {
+             setConfirmOverwriteMode("audio");
+             setConfirmOverwrite(true);
+             return;
+            }
+
+            recording ? stopRecording() : startCountdownAndRecord();
+           }}
+           className={`px-6 py-2 rounded-full font-semibold transition ${
+            recording ? "bg-red-600 text-white" : "bg-emerald-600 text-white"
+           }`}
+          >
+           {recording
+            ? t("resume.smartGeneration.stop")
+            : hasExistingAnswer
+              ? t("resume.smartGeneration.recordAgain")
+              : t("resume.smartGeneration.record")}
+          </button>
+         )}
+        </div>
+       ) : (
+        <div className="mt-6 rounded-2xl border border-dashed border-white/15 p-8 flex flex-col gap-4 h-[200px]">
+         <textarea
+          value={textInput}
+          onChange={(e) => setTextInput(e.target.value)}
+          placeholder=""
+          disabled={isUploading}
+          className="flex-1 min-h-0 w-full bg-white/5 text-white rounded-xl px-4 py-3 border border-white/10 focus:border-emerald-500 focus:outline-none resize-none placeholder-gray-500"
+         />
+         {isUploading ? (
+          <div className="flex justify-center py-2 flex-shrink-0">
+           <PulseLoader color="#10b981" size={10} />
+          </div>
+         ) : (
+          <>
+           {textError && (
+            <p className="text-sm text-red-400 flex-shrink-0">{textError}</p>
+           )}
+           <button
+            type="button"
+            onClick={() => {
+             if (hasExistingAnswer) {
+              setConfirmOverwriteMode("text");
+              setConfirmOverwrite(true);
+              return;
+             }
+             handleTextSend(textInput);
+            }}
+            disabled={!textInput?.trim()}
+            className="px-6 py-2.5 rounded-full font-semibold bg-emerald-600 text-white hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mx-auto flex-shrink-0"
+           >
+            {t("resume.smartGeneration.sendToAI")}
+           </button>
+          </>
+         )}
+        </div>
+       )}
 
        {renderEditableResponse()}
 
@@ -789,10 +952,9 @@ export default function SmartGeneration() {
    {confirmOverwrite && (
     <div className="fixed inset-0 z-[10000] bg-black/80 flex items-center justify-center">
      <div className="bg-dark_bg_2 rounded-2xl p-8 max-w-md w-full text-center shadow-xl">
-      <h3 className="text-xl font-bold text-white mb-4">Attention</h3>
+      <h3 className="text-xl font-bold text-white mb-4">{t("resume.smartGeneration.overwriteTitle")}</h3>
       <p className="text-gray-300 mb-6">
-       Cette action va remplacer l’enregistrement existant pour cette étape.
-       Souhaites-tu continuer ?
+       {t("resume.smartGeneration.overwriteMessage")}
       </p>
 
       <div className="flex justify-center gap-4">
@@ -807,17 +969,21 @@ export default function SmartGeneration() {
         }}
         className="px-6 py-2 rounded-full bg-white/10 text-gray-300"
        >
-        Annuler
+        {t("resume.smartGeneration.cancel")}
        </button>
 
        <button
         onClick={() => {
          setConfirmOverwrite(false);
-         startCountdownAndRecord();
+         if (confirmOverwriteMode === "text") {
+          handleTextSend(textInput);
+         } else {
+          startCountdownAndRecord();
+         }
         }}
         className="px-6 py-2 rounded-full bg-red-600 text-white font-semibold"
        >
-        Remplacer
+        {t("resume.smartGeneration.replace")}
        </button>
       </div>
      </div>

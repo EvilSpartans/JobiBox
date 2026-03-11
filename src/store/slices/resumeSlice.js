@@ -250,6 +250,29 @@ export const uploadResumeAudio = createAsyncThunk(
   }
 );
 
+export const uploadResumeText = createAsyncThunk(
+  "resume/text",
+  async ({ token, resumeId, key, text, lang }, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("key", key);
+      formData.append("text", text);
+      formData.append("lang", lang || "fr");
+      if (resumeId) formData.append("resumeId", resumeId);
+
+      const { data } = await axios.post(`${BASE_URL}/resume/audio`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 export const getResumeDownloadUrl = (id, lang) => {
   if (!id) return "";
   const url = `${BASE_URL}/resume/${id}/download`;
@@ -337,6 +360,18 @@ export const ResumeSlice = createSlice({
         state.status = "succeeded";
       })
       .addCase(uploadResumeAudio.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+      // TEXT
+      .addCase(uploadResumeText.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(uploadResumeText.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(uploadResumeText.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

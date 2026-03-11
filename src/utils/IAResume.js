@@ -5,6 +5,15 @@ import template4 from "../../assets/images/resume/template4.png";
 import template5 from "../../assets/images/resume/template5.png";
 import template6 from "../../assets/images/resume/template6.png";
 import template7 from "../../assets/images/resume/template7.png";
+import template8 from "../../assets/images/resume/template8.jpg";
+import template9 from "../../assets/images/resume/template9.jpg";
+import template10 from "../../assets/images/resume/template10.jpg";
+import template11 from "../../assets/images/resume/template11.jpg";
+import template12 from "../../assets/images/resume/template12.jpg";
+import template13 from "../../assets/images/resume/template13.jpg";
+import template14 from "../../assets/images/resume/template14.jpg";
+import template15 from "../../assets/images/resume/template15.jpg";
+import template16 from "../../assets/images/resume/template16.jpg";
 
 export const CV_STEPS_STEPPER = [
  {
@@ -93,6 +102,15 @@ export const TEMPLATES = [
  { key: "template5", label: "Classique Moderne", image: template5 },
  { key: "template6", label: "Focus Contenu", image: template6 },
  { key: "template7", label: "Proportionnel", image: template7 },
+ { key: "template8", label: "Template 8", image: template8 },
+ { key: "template9", label: "Template 9", image: template9 },
+ { key: "template10", label: "Template 10", image: template10 },
+ { key: "template11", label: "Template 11", image: template11 },
+ { key: "template12", label: "Template 12", image: template12 },
+ { key: "template13", label: "Template 13", image: template13 },
+ { key: "template14", label: "Template 14", image: template14 },
+ { key: "template15", label: "Template 15", image: template15 },
+ { key: "template16", label: "Template 16", image: template16 },
 ];
 
 export const COLORS = [
