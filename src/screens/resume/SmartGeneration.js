@@ -269,7 +269,7 @@ export default function SmartGeneration() {
     experiences: resume.experiences ?? [],
 
     // ✅ SEULEMENT la clé courante est modifiée
-    ...(key === "presentation" && { presentation: aiResult.text || "" }),
+    ...(key === "presentation" && { presentation: aiResult.json?.presentation || aiResult.text || "" }),
     ...(key === "trainings" && {
   trainings: aiResult.json?.trainings?.map((t) => ({
     ...t,
@@ -342,7 +342,7 @@ export default function SmartGeneration() {
     trainings: resume.trainings ?? [],
     experiences: resume.experiences ?? [],
     ...(key === "presentation" && {
-     presentation: typeof aiResult === "string" ? aiResult : (aiResult?.text || ""),
+     presentation: typeof aiResult === "string" ? aiResult : (aiResult?.json?.presentation || aiResult?.text || ""),
     }),
     ...(key === "trainings" &&
      Array.isArray(aiResult?.json?.trainings) && {
