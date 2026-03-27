@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { RESUME_DAYS, RESUME_MONTHS, RESUME_YEARS } from "../../utils/IAResume";
+import { toDateSelectParts, datePartsToStorableObject } from "../../utils/DateUtils";
 
 export default function DateSelect({
  label,
@@ -10,18 +11,24 @@ export default function DateSelect({
  const DAYS = RESUME_DAYS;
  const MONTHS = RESUME_MONTHS;
  const YEARS = RESUME_YEARS;
- const isOngoing = value === "En cours";
 
- const day = isOngoing ? "" : value?.day || "";
- const month = isOngoing ? "" : value?.month || "";
- const year = isOngoing ? "" : value?.year || "";
+ const parts = useMemo(() => toDateSelectParts(value), [value]);
+ const isOngoing = parts === "En cours";
+
+ const day = isOngoing ? "" : parts.day;
+ const month = isOngoing ? "" : parts.month;
+ const year = isOngoing ? "" : parts.year;
 
  const handleChange = (field, newValue) => {
-  if (isOngoing) {
-   onChange({ day: "", month: "", year: "", [field]: newValue });
-  } else {
-   onChange({ ...value, [field]: newValue });
-  }
+  if (isOngoing) return;
+
+  const base =
+   typeof parts === "object" && parts
+    ? { day: parts.day || "", month: parts.month || "", year: parts.year || "" }
+    : { day: "", month: "", year: "" };
+
+  const merged = { ...base, [field]: newValue };
+  onChange(datePartsToStorableObject(merged));
  };
 
  return (
@@ -33,7 +40,7 @@ export default function DateSelect({
    )}
 
    <div className="flex gap-2">
-    {/* Jour */}
+    {/* Jour — seulement si présent dans les données (jour + mois + année) */}
     <select
      value={day}
      onChange={(e) => handleChange("day", e.target.value)}
@@ -50,7 +57,6 @@ export default function DateSelect({
      ))}
     </select>
 
-    {/* Mois */}
     <select
      value={month}
      onChange={(e) => handleChange("month", e.target.value)}
@@ -59,6 +65,7 @@ export default function DateSelect({
       isOngoing ? "opacity-50 cursor-not-allowed" : ""
      }`}
     >
+     <option value="">Mois</option>
      {MONTHS.map((m) => (
       <option key={m.value} value={m.value}>
        {m.label}
@@ -66,7 +73,6 @@ export default function DateSelect({
      ))}
     </select>
 
-    {/* Année */}
     <select
      value={year}
      onChange={(e) => handleChange("year", e.target.value)}
@@ -77,7 +83,7 @@ export default function DateSelect({
     >
      <option value="">Année</option>
      {YEARS.filter((y) => y).map((y) => (
-      <option key={y} value={y}>
+      <option key={y} value={String(y)}>
        {y}
       </option>
      ))}

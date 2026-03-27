@@ -23,7 +23,11 @@ import CVStepper from "../../components/resume/Stepper";
 import TrainingForm from "../../components/resume/TrainingForm";
 import GlowBackground from "../../components/resume/GlowBackground";
 import ExperienceForm from "../../components/resume/ExperienceForm";
-import { formatDate, parseDate } from "../../utils/DateUtils";
+import {
+ resumeDateForSave,
+ normalizeAiTrainingDates,
+ normalizeAiExperienceDates,
+} from "../../utils/DateUtils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
@@ -53,6 +57,8 @@ export default function SmartGeneration() {
  const [confirmOverwriteMode, setConfirmOverwriteMode] = useState("audio");
  const [isSaving, setIsSaving] = useState(false);
  const [editingItemIndex, setEditingItemIndex] = useState(null);
+ /** Copie locale pendant l’édition modale : Redux n’est pas à jour entre deux onChange, sinon la 2ᵉ date écrase la 1ʳᵉ. */
+ const [itemEditDraft, setItemEditDraft] = useState(null);
  const [inputMode, setInputMode] = useState("audio");
  const [textInput, setTextInput] = useState("");
  const [textError, setTextError] = useState(null);
@@ -271,18 +277,10 @@ export default function SmartGeneration() {
     // ✅ SEULEMENT la clé courante est modifiée
     ...(key === "presentation" && { presentation: aiResult.json?.presentation || aiResult.text || "" }),
     ...(key === "trainings" && {
-  trainings: aiResult.json?.trainings?.map((t) => ({
-    ...t,
-    startDate: formatDate(parseDate(t.startDate)),
-    endDate: formatDate(parseDate(t.endDate)),
-  })),
+  trainings: aiResult.json?.trainings?.map((t) => normalizeAiTrainingDates(t)),
 }),
    ...(key === "experiences" && {
-  experiences: aiResult.json?.experiences?.map((e) => ({
-    ...e,
-    startDate: formatDate(parseDate(e.startDate)),
-    endDate: formatDate(parseDate(e.endDate)),
-  })),
+  experiences: aiResult.json?.experiences?.map((e) => normalizeAiExperienceDates(e)),
 }),
 
    };
@@ -346,19 +344,11 @@ export default function SmartGeneration() {
     }),
     ...(key === "trainings" &&
      Array.isArray(aiResult?.json?.trainings) && {
-     trainings: aiResult.json.trainings.map((t) => ({
-      ...t,
-      startDate: formatDate(parseDate(t.startDate)),
-      endDate: formatDate(parseDate(t.endDate)),
-     })),
+     trainings: aiResult.json.trainings.map((t) => normalizeAiTrainingDates(t)),
     }),
     ...(key === "experiences" &&
      Array.isArray(aiResult?.json?.experiences) && {
-     experiences: aiResult.json.experiences.map((e) => ({
-      ...e,
-      startDate: formatDate(parseDate(e.startDate)),
-      endDate: formatDate(parseDate(e.endDate)),
-     })),
+     experiences: aiResult.json.experiences.map((e) => normalizeAiExperienceDates(e)),
     }),
    };
 
@@ -474,19 +464,28 @@ export default function SmartGeneration() {
   };
  }, []);
 
+ const closeEditModal = () => {
+  setEditingItemIndex(null);
+  setItemEditDraft(null);
+ };
+
  const handleTrainingChange = async (updatedTraining) => {
   if (!resume?.id || !user?.token) return;
+
+  const idx = Number(updatedTraining.__index);
+  if (Number.isNaN(idx)) return;
 
   setIsSaving(true);
   try {
    const trainingToSave = {
     ...updatedTraining,
-    startDate: formatDate(updatedTraining.startDate),
-    endDate: formatDate(updatedTraining.endDate),
+    startDate: resumeDateForSave(updatedTraining.startDate),
+    endDate: resumeDateForSave(updatedTraining.endDate),
    };
+   delete trainingToSave.__index;
 
    const newTrainings = resume.trainings.map((t, i) =>
-    i === updatedTraining.__index ? trainingToSave : t,
+    i === idx ? trainingToSave : t,
    );
 
    await dispatch(
@@ -531,15 +530,20 @@ export default function SmartGeneration() {
  const handleExperienceChange = async (updatedExperience) => {
   if (!resume?.id || !user?.token) return;
 
+  const idx = Number(updatedExperience.__index);
+  if (Number.isNaN(idx)) return;
+
   setIsSaving(true);
   try {
    const experienceToSave = {
     ...updatedExperience,
-    startDate: formatDate(updatedExperience.startDate),
-    endDate: formatDate(updatedExperience.endDate),
+    startDate: resumeDateForSave(updatedExperience.startDate),
+    endDate: resumeDateForSave(updatedExperience.endDate),
    };
+   delete experienceToSave.__index;
+
    const newExperiences = resume.experiences.map((e, i) =>
-    i === updatedExperience.__index ? experienceToSave : e,
+    i === idx ? experienceToSave : e,
    );
 
    await dispatch(
@@ -581,8 +585,9 @@ export default function SmartGeneration() {
   }
  };
 
- const getTrainingTitle = (t) =>
-  joinDefined([clean(t.degree), clean(t.school)]) || t("resume.smartGeneration.untitledTraining");
+ const getTrainingTitle = (training) =>
+  joinDefined([clean(training.degree), clean(training.school)]) ||
+  t("resume.smartGeneration.untitledTraining");
 
  const getExperienceTitle = (e) =>
   joinDefined([clean(e.job) || clean(e.title), clean(e.company)]) || t("resume.smartGeneration.untitledExperience");
@@ -607,7 +612,10 @@ export default function SmartGeneration() {
        <button
         key={index}
         type="button"
-        onClick={() => setEditingItemIndex({ type: "training", index })}
+        onClick={() => {
+         setEditingItemIndex({ type: "training", index });
+         setItemEditDraft({ ...resume.trainings[index], __index: index });
+        }}
         className="w-full text-left px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-emerald-500/40 transition flex items-center justify-between gap-2"
        >
         <span className="font-medium text-white truncate">{getTrainingTitle(training)}</span>
@@ -638,7 +646,15 @@ export default function SmartGeneration() {
        <button
         key={index}
         type="button"
-        onClick={() => setEditingItemIndex({ type: "experience", index })}
+        onClick={() => {
+         setEditingItemIndex({ type: "experience", index });
+         const exp = resume.experiences[index];
+         setItemEditDraft({
+          ...exp,
+          title: exp.title ?? exp.job,
+          __index: index,
+         });
+        }}
         className="w-full text-left px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-emerald-500/40 transition flex items-center justify-between gap-2"
        >
         <span className="font-medium text-white truncate">{getExperienceTitle(experience)}</span>
@@ -874,7 +890,23 @@ export default function SmartGeneration() {
       {allStepsCompleted && step === 3 && (
        <div className="flex justify-end">
         <Footer
-         onClick={() => navigate("/finalization")}
+         onClick={() => {
+          if (resume?.id) {
+           try {
+            sessionStorage.setItem(
+             "jobiboxPdfAwait",
+             JSON.stringify({
+              resumeId: resume.id,
+              cvPdfPath: (resume?.cvPdfPath ?? resume?.cv_pdf_path ?? "").trim(),
+              snapshotUpdatedAt: resume?.updatedAt ?? resume?.updated_at ?? null,
+             }),
+            );
+           } catch {
+            /* ignore */
+           }
+          }
+          navigate("/finalization");
+         }}
          disabled={!allStepsCompleted}
          text="Générer mon CV"
         />
@@ -902,45 +934,36 @@ export default function SmartGeneration() {
          : t("resume.smartGeneration.editExperience")}
        </h3>
        <button
-        onClick={() => setEditingItemIndex(null)}
+        onClick={closeEditModal}
         className="w-10 h-10 rounded-full bg-white/10 text-gray-300 hover:text-white hover:bg-white/20 transition text-xl leading-none"
        >
         ×
        </button>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none px-6 py-6 [&_label]:!text-gray-200 [&_input]:!text-white [&_textarea]:!text-white">
-       {editingItemIndex.type === "training" && resume?.trainings?.[editingItemIndex.index] && (
+       {editingItemIndex.type === "training" && itemEditDraft && (
         <TrainingForm
-         data={{
-          ...resume.trainings[editingItemIndex.index],
-          __index: editingItemIndex.index,
-          startDate: parseDate(resume.trainings[editingItemIndex.index].startDate),
-          endDate: parseDate(resume.trainings[editingItemIndex.index].endDate),
-         }}
+         data={itemEditDraft}
          onChange={(updated) => {
+          setItemEditDraft(updated);
           handleTrainingChange(updated);
          }}
          onDelete={(index) => {
           handleTrainingDelete(index);
-          setEditingItemIndex(null);
+          closeEditModal();
          }}
         />
        )}
-       {editingItemIndex.type === "experience" && resume?.experiences?.[editingItemIndex.index] && (
+       {editingItemIndex.type === "experience" && itemEditDraft && (
         <ExperienceForm
-         data={{
-          ...resume.experiences[editingItemIndex.index],
-          title: resume.experiences[editingItemIndex.index].title ?? resume.experiences[editingItemIndex.index].job,
-          __index: editingItemIndex.index,
-          startDate: parseDate(resume.experiences[editingItemIndex.index].startDate),
-          endDate: parseDate(resume.experiences[editingItemIndex.index].endDate),
-         }}
+         data={itemEditDraft}
          onChange={(updated) => {
+          setItemEditDraft(updated);
           handleExperienceChange(updated);
          }}
          onDelete={(index) => {
           handleExperienceDelete(index);
-          setEditingItemIndex(null);
+          closeEditModal();
          }}
         />
        )}

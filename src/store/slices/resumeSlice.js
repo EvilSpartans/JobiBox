@@ -1,14 +1,146 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { normalizeAiTrainingDates } from "../../utils/DateUtils";
+
+/**
+ * ResumeUpdateDto : trainings[i][degree|school|startDate|endDate|description], idem experiences avec title|company|…
+ * Pas de JSON string pour tout le tableau — une clé par champ (multipart/form-data).
+ */
+function appendItemWithDateFields(formData, prefix, item) {
+ if (!item || typeof item !== "object") return;
+ const normalized = normalizeAiTrainingDates({ ...item });
+ Object.entries(normalized).forEach(([key, value]) => {
+  if (value === undefined) return;
+  if (key.startsWith("__")) return;
+  if (key === "startDate" || key === "endDate") return;
+  formData.append(`${prefix}[${key}]`, String(value ?? ""));
+ });
+
+ const sd = String(normalized.startDate ?? "");
+ const ed = String(normalized.endDate ?? "");
+ formData.append(`${prefix}[startDate]`, sd);
+ formData.append(`${prefix}[endDate]`, ed);
+ /** Symfony / DTO souvent en snake_case pour le multipart */
+ formData.append(`${prefix}[start_date]`, sd);
+ formData.append(`${prefix}[end_date]`, ed);
+}
+
+function isEmptyResumeDate(v) {
+ if (v === undefined || v === null) return true;
+ if (typeof v === "string" && v.trim() === "") return true;
+ return false;
+}
+
+function patchItemDatesFromSent(serverItem, sentItem) {
+ if (!sentItem) return serverItem;
+ /** Réponse API incomplète ou null : on garde ce qu’on a posté. */
+ if (!serverItem) return sentItem;
+ const next = { ...serverItem };
+ if (isEmptyResumeDate(next.startDate) && !isEmptyResumeDate(sentItem.startDate)) {
+  next.startDate = sentItem.startDate;
+ }
+ if (isEmptyResumeDate(next.endDate) && !isEmptyResumeDate(sentItem.endDate)) {
+  next.endDate = sentItem.endDate;
+ }
+ return next;
+}
+
+/** Réponse POST parfois sans startDate/endDate (année seule) : on réinjecte ce qu'on a envoyé. */
+function mergeResumeWithSentDates(serverResume, sentPayload) {
+ if (!serverResume || typeof serverResume !== "object" || !sentPayload || typeof sentPayload !== "object") {
+  return serverResume;
+ }
+ const next = { ...serverResume };
+
+ const mergeList = (key) => {
+  const sent = sentPayload[key];
+  if (!Array.isArray(sent) || sent.length === 0) return;
+  const st = serverResume[key];
+  if (!Array.isArray(st) || st.length === 0) {
+   next[key] = sent;
+   return;
+  }
+  if (st.length === sent.length) {
+   next[key] = st.map((item, i) => patchItemDatesFromSent(item, sent[i]));
+  } else {
+   next[key] = sent;
+  }
+ };
+
+ mergeList("trainings");
+ mergeList("experiences");
+
+ /** POST : la réponse Symfony omet parfois ats / anonymous alors que le CV est bien à jour. */
+ if (sentPayload.ats !== undefined) {
+  next.ats = sentPayload.ats;
+ }
+ if (sentPayload.anonymous !== undefined) {
+  next.anonymous = sentPayload.anonymous;
+ }
+
+ return next;
+}
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
-const AWS_RESUME_URL = process.env.REACT_APP_AWS_BASE_URL_RESUME;
+/** Base complète legacy — utilisée si REACT_APP_AWS_CLOUDFRONT est une autre distribution. */
+const AWS_URL_FOR_RESUME_PDFS =
+ process.env.REACT_APP_AWS_URL || process.env.REACT_APP_AWS_BASE_URL_RESUME || "";
+
+/** Distribution CloudFront des PDFs CV (identifiant seul). Surcharge via REACT_APP_AWS_CLOUDFRONT. */
+const DEFAULT_RESUME_CLOUDFRONT_DIST = "dfrad1ytun997";
+
+/**
+ * https://{id}.cloudfront.net — même logique que Symfony (AWS_CLOUDFRONT).
+ */
+function getCloudFrontPdfBaseUrlFromEnv() {
+ const id = (process.env.REACT_APP_AWS_CLOUDFRONT || DEFAULT_RESUME_CLOUDFRONT_DIST).trim();
+ if (/^https?:\/\//i.test(id)) {
+  return id.replace(/\/+$/, "");
+ }
+ return `https://${id}.cloudfront.net`;
+}
+
+function stripQueryAndHash(url) {
+ const s = String(url).trim();
+ const [base] = s.split(/[?#]/);
+ return base || s;
+}
+
+function firstNonEmptyString(...candidates) {
+ for (const c of candidates) {
+  if (c === undefined || c === null) continue;
+  const s = String(c).trim();
+  if (s !== "") return s;
+ }
+ return undefined;
+}
+
+/**
+ * Symfony / sérialiseur : cv_pdf_path, cv_pdf_url, assets_on_s3.
+ * On fusionne en camelCase pour tout le slice + écrans.
+ */
+function normalizeResumeFromApi(raw) {
+ if (!raw || typeof raw !== "object") return raw;
+ const cvPdfPath = firstNonEmptyString(raw.cvPdfPath, raw.cv_pdf_path);
+ const cvPdfUrl = firstNonEmptyString(raw.cvPdfUrl, raw.cv_pdf_url);
+ let assetsOnS3 = raw.assetsOnS3 ?? raw.assets_on_s3;
+ if (assetsOnS3 === "true" || assetsOnS3 === "1" || assetsOnS3 === 1) assetsOnS3 = true;
+ if (assetsOnS3 === "false" || assetsOnS3 === "0" || assetsOnS3 === 0) assetsOnS3 = false;
+
+ return {
+  ...raw,
+  cvPdfPath,
+  cvPdfUrl,
+  assetsOnS3,
+ };
+}
 
 const initialState = {
  status: "idle",
  error: null,
  resume: null,
- //  previewHtml: null,
+ /** Incrémenté quand cvPdfPath change → cache-buster visionneuse PDF (équivalent thumbnailVersions). */
+ pdfEmbedLocalVersion: 0,
 };
 
 export const getResume = createAsyncThunk(
@@ -77,6 +209,10 @@ export const previewResume = createAsyncThunk( // depreciated
  },
 );
 
+/**
+ * POST /api/resume/{id} — corps formulaire (multipart FormData), pas JSON seul pour trainings/experiences.
+ * JWT : Authorization Bearer. Champs imbriqués : trainings[i][startDate], experiences[i][title], etc.
+ */
 export const updateResume = createAsyncThunk(
  "resume/update",
  async ({ token, id, payload }, { getState, rejectWithValue }) => {
@@ -86,7 +222,8 @@ export const updateResume = createAsyncThunk(
 
    const formData = new FormData();
 
-   formData.append("title", payload.title ?? resume.title);
+   const title = String(payload.title ?? resume.title ?? "").trim();
+   formData.append("title", title || "CV");
 
    if (payload.presentation !== undefined) {
     formData.append("presentation", payload.presentation);
@@ -162,21 +299,13 @@ export const updateResume = createAsyncThunk(
 
    if (Array.isArray(payload.experiences)) {
     payload.experiences.forEach((exp, i) => {
-     Object.entries(exp).forEach(([key, value]) => {
-      if (value !== undefined) {
-       formData.append(`experiences[${i}][${key}]`, value);
-      }
-     });
+     appendItemWithDateFields(formData, `experiences[${i}]`, exp);
     });
    }
 
    if (Array.isArray(payload.trainings)) {
     payload.trainings.forEach((training, i) => {
-     Object.entries(training).forEach(([key, value]) => {
-      if (value !== undefined) {
-       formData.append(`trainings[${i}][${key}]`, value);
-      }
-     });
+     appendItemWithDateFields(formData, `trainings[${i}]`, training);
     });
    }
 
@@ -301,23 +430,68 @@ export const translateResume = createAsyncThunk(
  },
 );
 
+/**
+ * URL « brute » du PDF (sans ?v= ni #) : CloudFront + chemin issu du resume, ou URL complète renvoyée par l’API.
+ */
+export function getResumePdfUrl(resume) {
+ if (!resume || typeof resume !== "object") return null;
+ const r = normalizeResumeFromApi(resume);
+
+ const fromApi = r.cvPdfUrl;
+ if (fromApi != null && String(fromApi).trim() !== "") {
+  const u = String(fromApi).trim();
+  if (/^https?:\/\//i.test(u)) return stripQueryAndHash(u);
+ }
+
+ const path = r.cvPdfPath;
+ if (!path) return null;
+ const trimmed = String(path).trim();
+ if (/^https?:\/\//i.test(trimmed)) return stripQueryAndHash(trimmed);
+
+ const normalized = trimmed.replace(/^\//, "");
+ if (!normalized) return null;
+
+ const cfBase = getCloudFrontPdfBaseUrlFromEnv();
+ const fromCf = joinUrlBaseAndPath(cfBase, normalized);
+ if (fromCf) return fromCf;
+ const legacy = AWS_URL_FOR_RESUME_PDFS;
+ if (legacy) return joinUrlBaseAndPath(String(legacy).replace(/\/+$/, ""), normalized);
+ return null;
+}
+
+/** URL iframe : même base + ?v= cache-buster + #toolbar=… (comme l’aperçu Angular / navigateur). */
+export function getResumePdfEmbedUrl(resume, localVersion = 0) {
+ const url = getResumePdfUrl(resume);
+ if (!url) return null;
+ const serverTs = String(resume?.updatedAt ?? resume?.createdAt ?? "").replace(/\D/g, "");
+ const v =
+  (localVersion ?? 0) > 0
+   ? String(localVersion)
+   : serverTs.length >= 10
+    ? serverTs.slice(0, 13)
+    : String(resume?.id ?? "1");
+ const sep = url.includes("?") ? "&" : "?";
+ return `${url}${sep}v=${encodeURIComponent(v)}#toolbar=0&navpanes=0&scrollbar=0`;
+}
+
 export const selectResumePdfUrl = (state) => {
  const resume = state.resume.resume;
- if (!resume?.cvPdfPath) return null;
- const base = getResumePdfUrlBase(resume);
- return `${base}`;
+ if (!resume) return null;
+ return getResumePdfUrl(resume);
 };
 
-function getResumePdfUrlBase(resume) {
- const path = resume?.cvPdfPath;
- if (!path) return null;
- if (/^https?:\/\//i.test(path)) return path;
- const normalized = path.replace(/^\//, "");
- const base = resume?.assetsOnS3
-  ? AWS_RESUME_URL
-  : BASE_URL;
- if (!base) return null;
- return base.replace(/\/?$/, "/") + normalized;
+export const selectResumePdfEmbedUrl = (state) => {
+ const resume = state.resume.resume;
+ if (!resume) return null;
+ const localVersion = state.resume.pdfEmbedLocalVersion ?? 0;
+ return getResumePdfEmbedUrl(resume, localVersion);
+};
+
+function joinUrlBaseAndPath(base, pathSegment) {
+ if (!base || !pathSegment) return null;
+ const b = String(base).replace(/\/+$/, "");
+ const p = String(pathSegment).replace(/^\/+/, "");
+ return `${b}/${p}`;
 }
 
 export const ResumeSlice = createSlice({
@@ -331,7 +505,14 @@ export const ResumeSlice = createSlice({
    // GET
    .addCase(getResume.fulfilled, (state, action) => {
     console.log("📦 Resume stocké dans le state :", action.payload);
-    state.resume = action.payload;
+    const prevPath = state.resume?.cvPdfPath ?? state.resume?.cv_pdf_path ?? "";
+    const prevUrl = state.resume?.cvPdfUrl ?? state.resume?.cv_pdf_url ?? "";
+    state.resume = normalizeResumeFromApi(action.payload);
+    const nextPath = state.resume?.cvPdfPath ?? "";
+    const nextUrl = state.resume?.cvPdfUrl ?? "";
+    if (prevPath !== nextPath || prevUrl !== nextUrl) {
+     state.pdfEmbedLocalVersion = (state.pdfEmbedLocalVersion ?? 0) + 1;
+    }
    })
 
    // CREATE
@@ -340,7 +521,11 @@ export const ResumeSlice = createSlice({
    })
    .addCase(createResume.fulfilled, (state, action) => {
     state.status = "succeeded";
-    state.resume = action.payload;
+    state.resume = normalizeResumeFromApi(action.payload);
+    const p = action.payload;
+    if (p?.cvPdfPath || p?.cv_pdf_path || p?.cvPdfUrl || p?.cv_pdf_url) {
+     state.pdfEmbedLocalVersion = (state.pdfEmbedLocalVersion ?? 0) + 1;
+    }
    })
    .addCase(createResume.rejected, (state, action) => {
     state.status = "failed";
@@ -355,7 +540,14 @@ export const ResumeSlice = createSlice({
    // TRANSLATE
    .addCase(translateResume.fulfilled, (state, action) => {
     if (action.payload && typeof action.payload === "object" && state.resume) {
-     state.resume = { ...state.resume, ...action.payload };
+     const prevPath = state.resume.cvPdfPath ?? "";
+     const prevUrl = state.resume.cvPdfUrl ?? "";
+     state.resume = normalizeResumeFromApi({ ...state.resume, ...action.payload });
+     const nextPath = state.resume.cvPdfPath ?? "";
+     const nextUrl = state.resume.cvPdfUrl ?? "";
+     if (prevPath !== nextPath || prevUrl !== nextUrl) {
+      state.pdfEmbedLocalVersion = (state.pdfEmbedLocalVersion ?? 0) + 1;
+     }
     }
    })
 
@@ -365,7 +557,16 @@ export const ResumeSlice = createSlice({
    })
    .addCase(updateResume.fulfilled, (state, action) => {
     state.status = "succeeded";
-    state.resume = action.payload;
+    const prevPath = state.resume?.cvPdfPath ?? "";
+    const prevUrl = state.resume?.cvPdfUrl ?? "";
+    const sent = action.meta?.arg?.payload;
+    const merged = mergeResumeWithSentDates(action.payload, sent);
+    const nextPath = merged?.cvPdfPath ?? merged?.cv_pdf_path ?? "";
+    const nextUrl = merged?.cvPdfUrl ?? merged?.cv_pdf_url ?? "";
+    state.resume = normalizeResumeFromApi(merged);
+    if (prevPath !== nextPath || prevUrl !== nextUrl) {
+     state.pdfEmbedLocalVersion = (state.pdfEmbedLocalVersion ?? 0) + 1;
+    }
    })
    .addCase(updateResume.rejected, (state) => {
     state.status = "failed";

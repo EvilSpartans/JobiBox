@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import axios from "axios";
 import { useTranslation } from "react-i18next";
@@ -6,12 +6,12 @@ import Confetti from "react-confetti";
 import { QRCodeSVG } from "qrcode.react";
 import { useNavigate } from "react-router-dom";
 import PulseLoader from "react-spinners/PulseLoader";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, useStore } from "react-redux";
 
 import {
  getResume,
  updateResume,
- selectResumePdfUrl,
+ selectResumePdfEmbedUrl,
  translateResume,
  getResumeDownloadUrl,
  resetResumeState,
@@ -28,19 +28,25 @@ import ResumeAnalyzeAI from "../../components/resume/ResumeAnalyzeAI";
 
 const TRANSLATE_LANGS = supportedLangs.filter((l) => l !== "fr");
 
+/** Représente ats / anonymous comme le backend (évite état local désynchronisé). */
+function coerceResumeBool(v) {
+ if (v === true || v === 1 || v === "1" || v === "true") return true;
+ return false;
+}
+
 export default function Finalization() {
  const IMAGE_BASE_URL = process.env.REACT_APP_AWS_IMAGE_BASE_URL;
 
  const dispatch = useDispatch();
+ const store = useStore();
  const navigate = useNavigate();
  const { t } = useTranslation();
  const user = useSelector((state) => state.user.user);
- const { resume, status } = useSelector((state) => state.resume);
- const pdfUrl = useSelector(selectResumePdfUrl);
+ const { resume, status, pdfEmbedLocalVersion } = useSelector((state) => state.resume);
+ const pdfEmbedUrl = useSelector(selectResumePdfEmbedUrl);
  const loading = status === "loading";
 
  const [showMediasModal, setShowMediasModal] = useState(false);
- const [ats, setAts] = useState(false);
  const [translateLang, setTranslateLang] = useState("en");
  const [translating, setTranslating] = useState(false);
  const [toast, setToast] = useState(null);
@@ -116,7 +122,6 @@ export default function Finalization() {
  useEffect(() => {
   if (!resume) return;
   setSelectedVideoId(resume.qrcodePostId || null);
-  setAts(resume.ats ?? false);
  }, [resume]);
 
  /* ================= TOAST ================= */
@@ -131,68 +136,135 @@ useEffect(() => {
 }, []);
  const clearPdfPoll = () => {
   if (pdfPollRef.current) {
-    clearTimeout(pdfPollRef.current);
-    pdfPollRef.current = null;
+   clearTimeout(pdfPollRef.current);
+   pdfPollRef.current = null;
   }
-};
+ };
 
-const pollUntilPdfChanges = (previousPath) => {
-  if (pdfPollRef.current) clearTimeout(pdfPollRef.current);
-  setPdfReady(false);
-  setIsPolling(true); 
-  const maxAttempts = 45;
-  const intervalMs = 2000;
-  let attempts = 0;
+ /** Polling : nouveau fichier PDF (chemin différent) ou CV mis à jour (updatedAt) après régénération. */
+ const pollUntilPdfChanges = useCallback(
+  (previousPath, snapshotUpdatedAt = null) => {
+   const current = store.getState().resume.resume;
+   if (!current?.id || !user?.token) return;
+   if (pdfPollRef.current) clearTimeout(pdfPollRef.current);
+   setPdfReady(false);
+   setIsPolling(true);
+   const maxAttempts = 45;
+   const intervalMs = 2000;
+   let attempts = 0;
+   const resumeId = current.id;
 
-  const run = async () => {
+   const run = async () => {
     attempts++;
     if (attempts >= maxAttempts) {
-      setIsPolling(false);
-      setPdfReady(true);
-      return;
+     setIsPolling(false);
+     setPdfReady(true);
+     return;
     }
     try {
-      const { data } = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/resume/${resume.id}`,
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
-      const newPath = (data.cvPdfPath ?? "").trim();
-      const oldPath = (previousPath ?? "").trim();
-      const changed = oldPath
-        ? newPath.length > 0 && newPath !== oldPath
-        : newPath.length > 0;
+     const { data } = await axios.get(
+      `${process.env.REACT_APP_BASE_URL}/resume/${resumeId}`,
+      { headers: { Authorization: `Bearer ${user.token}` } },
+     );
+     const newPath = (data.cvPdfPath ?? data.cv_pdf_path ?? "").trim();
+     const newUpdatedAt = data.updatedAt ?? data.updated_at ?? null;
+     const oldPath = (previousPath ?? "").trim();
 
-      if (changed) {
-        await dispatch(getResume({ token: user.token, id: String(resume.id) }));
-        setIsPolling(false); 
-        setPdfReady(true);
-      } else {
-        pdfPollRef.current = setTimeout(run, intervalMs);
-      }
-    } catch {
+     const pathChanged =
+      oldPath.length > 0
+       ? newPath.length > 0 && newPath !== oldPath
+       : newPath.length > 0;
+
+     const resumeRefreshed =
+      snapshotUpdatedAt != null &&
+      newUpdatedAt != null &&
+      String(newUpdatedAt) !== String(snapshotUpdatedAt);
+
+     const changed = pathChanged || resumeRefreshed;
+
+     if (changed) {
+      await dispatch(getResume({ token: user.token, id: String(resumeId) }));
+      setIsPolling(false);
+      setPdfReady(true);
+     } else {
       pdfPollRef.current = setTimeout(run, intervalMs);
+     }
+    } catch {
+     pdfPollRef.current = setTimeout(run, intervalMs);
     }
-  };
+   };
 
-  run();
-};
+   run();
+  },
+  [store, user?.token, dispatch],
+ );
 
- // pdf from aws
-const handleShowPreview = () => {
-  setShowPreview(true);
-  if (!isPolling) {
-    setPdfReady(true); 
+ /** Arrivée depuis Smart Generation : attendre la fin de génération PDF côté serveur. */
+ useEffect(() => {
+  if (!resume?.id || !user?.token) return;
+  let raw;
+  try {
+   raw = sessionStorage.getItem("jobiboxPdfAwait");
+  } catch {
+   return;
   }
-};
+  if (!raw) return;
+  let parsed;
+  try {
+   parsed = JSON.parse(raw);
+  } catch {
+   return;
+  }
+  if (String(parsed.resumeId) !== String(resume.id)) return;
+  try {
+   sessionStorage.removeItem("jobiboxPdfAwait");
+  } catch {
+   /* ignore */
+  }
+  pollUntilPdfChanges(parsed.cvPdfPath ?? "", parsed.snapshotUpdatedAt ?? null);
+ }, [resume?.id, user?.token, pollUntilPdfChanges]);
+
+ /** Aperçu : loader tant que le PDF se régénère (traduction, ATS, médias, polling). */
+ const handleShowPreview = () => {
+  setShowPreview(true);
+  setPdfReady(!isPolling && !translating);
+ };
 
  /* ================= ATS TOGGLE ================= */
  const handleAtsToggle = async () => {
-  const newAts = !ats;
-  setAts(newAts);
-  const previousPath = resume?.cvPdfPath;
-  const payload = { ...resume, ats: newAts };
-  await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
-  pollUntilPdfChanges(previousPath);
+  const r = store.getState().resume.resume;
+  if (!r?.id || !user?.token) return;
+  const newAts = !coerceResumeBool(r.ats);
+  const previousPath = (r.cvPdfPath ?? r.cv_pdf_path ?? "").trim();
+  /** Sans ça, si le chemin PDF ne change pas, le poll ne voit jamais la régénération (updatedAt). */
+  const snapshotUpdatedAt = r.updatedAt ?? r.updated_at ?? null;
+  const payload = { ...r, ats: newAts };
+  setPdfReady(false);
+  try {
+   await dispatch(updateResume({ token: user.token, id: r.id, payload })).unwrap();
+   pollUntilPdfChanges(previousPath, snapshotUpdatedAt);
+  } catch {
+   setPdfReady(true);
+   setIsPolling(false);
+  }
+ };
+
+ /* ================= ANONYMOUS TOGGLE ================= */
+ const handleAnonymousToggle = async () => {
+  const r = store.getState().resume.resume;
+  if (!r?.id || !user?.token) return;
+  const newAnonymous = !coerceResumeBool(r.anonymous);
+  const previousPath = (r.cvPdfPath ?? r.cv_pdf_path ?? "").trim();
+  const snapshotUpdatedAt = r.updatedAt ?? r.updated_at ?? null;
+  const payload = { ...r, anonymous: newAnonymous };
+  setPdfReady(false);
+  try {
+   await dispatch(updateResume({ token: user.token, id: r.id, payload })).unwrap();
+   pollUntilPdfChanges(previousPath, snapshotUpdatedAt);
+  } catch {
+   setPdfReady(true);
+   setIsPolling(false);
+  }
  };
 
  /* ================= TRANSLATE ================= */
@@ -200,23 +272,28 @@ const handleShowPreview = () => {
   if (!translateLang || translateLang === "fr" || translating) return;
   if (resume?.locale === translateLang) return;
 
-   const previousPath = resume?.cvPdfPath;
+  const r0 = store.getState().resume.resume;
+  if (!r0?.id) return;
+  const previousPath = (r0?.cvPdfPath ?? r0?.cv_pdf_path ?? "").trim();
+  const snapshotUpdatedAt = r0?.updatedAt ?? r0?.updated_at ?? null;
+  setPdfReady(false);
   setTranslating(true);
   try {
    await dispatch(
     translateResume({
      token: user.token,
-     id: resume.id,
+     id: r0.id,
      language: translateLang,
      save: true,
     }),
    ).unwrap();
    setToast({ type: "success", msg: t("resume.finalization.translated") });
-   await dispatch(getResume({ token: user.token, id: resume.id }));
-    pollUntilPdfChanges(previousPath);
+   await dispatch(getResume({ token: user.token, id: r0.id }));
+   pollUntilPdfChanges(previousPath, snapshotUpdatedAt);
   //  dispatch(previewResume({ token: user.token, id: resume.id }));
   } catch {
    setToast({ type: "error", msg: t("resume.finalization.translateError") });
+   setPdfReady(true);
   } finally {
    setTranslating(false);
   }
@@ -224,16 +301,24 @@ const handleShowPreview = () => {
 
  /* ================= SAVE MEDIAS ================= */
  const saveMedias = async () => {
-   const previousPath = resume?.cvPdfPath;
+  const r = store.getState().resume.resume;
+  if (!r?.id) return;
+  const previousPath = (r.cvPdfPath ?? r.cv_pdf_path ?? "").trim();
+  const snapshotUpdatedAt = r.updatedAt ?? r.updated_at ?? null;
   const payload = {
-   ...resume,
+   ...r,
    qrcodePostId: selectedVideoId,
-   ats,
   };
 
-  await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
-  dispatch(getResume({ token: user.token, id: resume.id }));
-  pollUntilPdfChanges(previousPath);
+  setPdfReady(false);
+  try {
+   await dispatch(updateResume({ token: user.token, id: r.id, payload })).unwrap();
+   await dispatch(getResume({ token: user.token, id: r.id }));
+   pollUntilPdfChanges(previousPath, snapshotUpdatedAt);
+  } catch {
+   setPdfReady(true);
+   setIsPolling(false);
+  }
   setShowMediasModal(false);
  };
 
@@ -252,6 +337,9 @@ const handleShowPreview = () => {
  const cancelBackHome = () => {
   setShowExitModal(false);
  };
+
+ /** PDF en cours de régénération (ATS, anonyme, médias, traduction, etc.) */
+ const isPdfRegenerating = isPolling || translating;
 
  return (
   <div className="relative h-screen dark:bg-dark_bg_1 overflow-hidden">
@@ -365,35 +453,57 @@ const handleShowPreview = () => {
        />
       </div>
 
-      {/* ATS + Traduction */}
-      <div className="mt-10 flex flex-col items-center gap-4">
+      {/* ATS + mode anonyme (même ligne) */}
+      <div className="mt-10 flex flex-row flex-wrap items-center justify-center gap-x-8 gap-y-3">
        <label className="flex items-center gap-3 cursor-pointer">
         <input
          type="checkbox"
-         checked={ats}
+         checked={coerceResumeBool(resume?.ats)}
          onChange={handleAtsToggle}
          className="w-5 h-5 rounded text-emerald-500"
         />
-        <span className="text-gray-300">
+        <span className="text-gray-300 text-sm sm:text-base">
          {t("resume.finalization.atsToggle")}
+        </span>
+       </label>
+       <label className="flex items-center gap-3 cursor-pointer">
+        <input
+         type="checkbox"
+         checked={coerceResumeBool(resume?.anonymous)}
+         onChange={handleAnonymousToggle}
+         className="w-5 h-5 rounded text-emerald-500"
+        />
+        <span className="text-gray-300 text-sm sm:text-base whitespace-nowrap">
+         {t("resume.finalization.anonymousToggle")}
         </span>
        </label>
       </div>
 
-      <div className="mt-10 flex flex-col items-center gap-5">
+      <div className="mt-10 flex flex-col items-center">
        <button
+        type="button"
         onClick={handleShowPreview}
-        className="relative px-12 py-4 rounded-full bg-emerald-600 text-white font-bold text-lg hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg overflow-visible"
+        className="relative min-w-[min(100%,280px)] px-12 py-4 rounded-full bg-emerald-600 text-white font-bold text-lg shadow-lg transition hover:bg-emerald-500 active:scale-[0.98] overflow-visible"
        >
-        <span className="absolute inset-0 rounded-full bg-emerald-500/[0.18] animate-ping" />
-        <span className="relative">{t("resume.finalization.seeCv")}</span>
+        {!isPdfRegenerating && (
+         <span className="absolute inset-0 rounded-full bg-emerald-500/[0.18] animate-ping" />
+        )}
+        <span className="relative flex min-h-[1.5rem] items-center justify-center">
+         {isPdfRegenerating ? (
+          <PulseLoader color="#ffffff" size={12} />
+         ) : (
+          t("resume.finalization.seeCv")
+         )}
+        </span>
        </button>
 
-       <ResumeAnalyzeAI resume={resume} token={user.token} />
+       <div className="mt-10 sm:mt-12 w-full">
+        <ResumeAnalyzeAI resume={resume} token={user.token} />
+       </div>
 
        <button
         onClick={handleBackHome}
-        className="px-8 py-2 rounded-full bg-transparent text-gray-400 underline underline-offset-4 active:text-gray-200"
+        className="mt-8 px-8 py-2 rounded-full bg-transparent text-gray-400 underline underline-offset-4 active:text-gray-200"
        >
         {t("resume.finalization.backHome")}
        </button>
@@ -523,7 +633,7 @@ const handleShowPreview = () => {
      </button>
 
      {/* ATS banner */}
-     {resume?.ats && (
+     {coerceResumeBool(resume?.ats) && (
       <div
        className="flex flex-col items-center gap-4 mb-4"
        onClick={(e) => e.stopPropagation()}
@@ -534,16 +644,28 @@ const handleShowPreview = () => {
       </div>
      )}
 
-     {!pdfReady ? (
-      <PulseLoader color="#10b981" />
-     ) : pdfUrl && (
-      <iframe
-      key={pdfUrl}
-       src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-       title="CV"
+     {!pdfReady || isPolling || translating ? (
+      <div
+       className="flex flex-col items-center justify-center min-h-[min(1123px,78vh)] w-[min(794px,92vw)]"
        onClick={(e) => e.stopPropagation()}
-       className="w-[794px] h-[1123px] bg-white rounded-lg shadow-2xl"
-      />
+      >
+       <PulseLoader color="#10b981" />
+       <p className="mt-6 text-center text-gray-300 text-sm max-w-sm px-4">
+        {t("resume.finalization.generatingPdf")}
+       </p>
+      </div>
+     ) : (
+      <div
+       className="w-[min(794px,92vw)] h-[min(1123px,78vh)] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col"
+       onClick={(e) => e.stopPropagation()}
+      >
+       <iframe
+        key={`${pdfEmbedUrl ?? "pdf"}-${pdfEmbedLocalVersion ?? 0}`}
+        title="CV PDF"
+        src={pdfEmbedUrl || "about:blank"}
+        className="w-full flex-1 min-h-[min(1123px,78vh)] border-0 bg-white"
+       />
+      </div>
      )}
     </div>
    )}
