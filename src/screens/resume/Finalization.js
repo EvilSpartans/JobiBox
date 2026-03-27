@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
  getResume,
  updateResume,
- previewResume,
+ selectResumePdfUrl,
  translateResume,
  getResumeDownloadUrl,
  resetResumeState,
@@ -24,7 +24,7 @@ import ConfirmModal from "../../components/modals/ConfirmModal";
 import FormSeparator from "../../components/resume/FormSeparator";
 import GlowBackground from "../../components/resume/GlowBackground";
 import { supportedLangs } from "../../i18n";
-import { runPaginationWhenReady } from "../../utils/cvPreviewPagination";
+import ResumeAnalyzeAI from "../../components/resume/ResumeAnalyzeAI";
 
 const TRANSLATE_LANGS = supportedLangs.filter((l) => l !== "fr");
 
@@ -35,7 +35,8 @@ export default function Finalization() {
  const navigate = useNavigate();
  const { t } = useTranslation();
  const user = useSelector((state) => state.user.user);
- const { resume, previewHtml, status } = useSelector((state) => state.resume);
+ const { resume, status } = useSelector((state) => state.resume);
+ const pdfUrl = useSelector(selectResumePdfUrl);
  const loading = status === "loading";
 
  const [showMediasModal, setShowMediasModal] = useState(false);
@@ -46,6 +47,10 @@ export default function Finalization() {
  const [showPreview, setShowPreview] = useState(false);
  const [showConfetti, setShowConfetti] = useState(true);
  const [showExitModal, setShowExitModal] = useState(false);
+ //resume pdf from aws
+ const [pdfReady, setPdfReady] = useState(false);
+ const pdfPollRef = useRef(null);
+ const [isPolling, setIsPolling] = useState(false);
 
  // Stepper config
  const currentStep = 6;
@@ -69,7 +74,6 @@ export default function Finalization() {
   if (!resumeId || !user?.token) return;
 
   dispatch(getResume({ token: user.token, id: resumeId }));
-  dispatch(previewResume({ token: user.token, id: resumeId }));
  }, [dispatch, user]);
 
  useEffect(() => {
@@ -122,13 +126,73 @@ export default function Finalization() {
   return () => clearTimeout(timer);
  }, [toast]);
 
+useEffect(() => {
+  return () => clearPdfPoll();
+}, []);
+ const clearPdfPoll = () => {
+  if (pdfPollRef.current) {
+    clearTimeout(pdfPollRef.current);
+    pdfPollRef.current = null;
+  }
+};
+
+const pollUntilPdfChanges = (previousPath) => {
+  if (pdfPollRef.current) clearTimeout(pdfPollRef.current);
+  setPdfReady(false);
+  setIsPolling(true); 
+  const maxAttempts = 45;
+  const intervalMs = 2000;
+  let attempts = 0;
+
+  const run = async () => {
+    attempts++;
+    if (attempts >= maxAttempts) {
+      setIsPolling(false);
+      setPdfReady(true);
+      return;
+    }
+    try {
+      const { data } = await axios.get(
+        `${process.env.REACT_APP_BASE_URL}/resume/${resume.id}`,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      const newPath = (data.cvPdfPath ?? "").trim();
+      const oldPath = (previousPath ?? "").trim();
+      const changed = oldPath
+        ? newPath.length > 0 && newPath !== oldPath
+        : newPath.length > 0;
+
+      if (changed) {
+        await dispatch(getResume({ token: user.token, id: String(resume.id) }));
+        setIsPolling(false); 
+        setPdfReady(true);
+      } else {
+        pdfPollRef.current = setTimeout(run, intervalMs);
+      }
+    } catch {
+      pdfPollRef.current = setTimeout(run, intervalMs);
+    }
+  };
+
+  run();
+};
+
+ // pdf from aws
+const handleShowPreview = () => {
+  setShowPreview(true);
+  if (!isPolling) {
+    setPdfReady(true); 
+  }
+};
+
  /* ================= ATS TOGGLE ================= */
  const handleAtsToggle = async () => {
   const newAts = !ats;
   setAts(newAts);
+  const previousPath = resume?.cvPdfPath;
   const payload = { ...resume, ats: newAts };
   await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
-  dispatch(previewResume({ token: user.token, id: resume.id }));
+  pollUntilPdfChanges(previousPath);
  };
 
  /* ================= TRANSLATE ================= */
@@ -136,6 +200,7 @@ export default function Finalization() {
   if (!translateLang || translateLang === "fr" || translating) return;
   if (resume?.locale === translateLang) return;
 
+   const previousPath = resume?.cvPdfPath;
   setTranslating(true);
   try {
    await dispatch(
@@ -144,11 +209,12 @@ export default function Finalization() {
      id: resume.id,
      language: translateLang,
      save: true,
-    })
+    }),
    ).unwrap();
    setToast({ type: "success", msg: t("resume.finalization.translated") });
-   dispatch(getResume({ token: user.token, id: resume.id }));
-   dispatch(previewResume({ token: user.token, id: resume.id }));
+   await dispatch(getResume({ token: user.token, id: resume.id }));
+    pollUntilPdfChanges(previousPath);
+  //  dispatch(previewResume({ token: user.token, id: resume.id }));
   } catch {
    setToast({ type: "error", msg: t("resume.finalization.translateError") });
   } finally {
@@ -158,6 +224,7 @@ export default function Finalization() {
 
  /* ================= SAVE MEDIAS ================= */
  const saveMedias = async () => {
+   const previousPath = resume?.cvPdfPath;
   const payload = {
    ...resume,
    qrcodePostId: selectedVideoId,
@@ -165,7 +232,8 @@ export default function Finalization() {
   };
 
   await dispatch(updateResume({ token: user.token, id: resume.id, payload }));
-  dispatch(previewResume({ token: user.token, id: resume.id }));
+  dispatch(getResume({ token: user.token, id: resume.id }));
+  pollUntilPdfChanges(previousPath);
   setShowMediasModal(false);
  };
 
@@ -218,7 +286,9 @@ export default function Finalization() {
       loading={loading}
      />
 
-     <h2 className="text-4xl py-12 font-extrabold text-center text-white">{t("resume.finalization.congrats")} 🎉</h2>
+     <h2 className="text-4xl py-12 font-extrabold text-center text-white">
+      {t("resume.finalization.congrats")} 🎉
+     </h2>
 
      <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mx-auto">
       {t("resume.finalization.ready")}
@@ -247,7 +317,9 @@ export default function Finalization() {
        className="bg-dark_bg_2 border border-white/20 text-white rounded-lg px-4 py-2 min-w-[180px]"
       >
        <option value="">{t("resume.finalization.selectLanguage")}</option>
-       <option value="fr" className="bg-dark_bg_2">{t("languages.fr")}</option>
+       <option value="fr" className="bg-dark_bg_2">
+        {t("languages.fr")}
+       </option>
        {TRANSLATE_LANGS.map((l) => (
         <option key={l} value={l} className="bg-dark_bg_2">
          {t(`languages.${l}`)}
@@ -256,7 +328,12 @@ export default function Finalization() {
       </select>
       <button
        onClick={handleTranslate}
-       disabled={!translateLang || translateLang === "fr" || resume?.locale === translateLang || translating}
+       disabled={
+        !translateLang ||
+        translateLang === "fr" ||
+        resume?.locale === translateLang ||
+        translating
+       }
        className="px-6 py-2 rounded-lg bg-emerald-600 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
        {translating ? <PulseLoader color="#fff" size={8} /> : null}
@@ -266,7 +343,9 @@ export default function Finalization() {
      {toast && (
       <div
        className={`mt-3 px-4 py-2 rounded-lg text-sm text-center ${
-        toast.type === "success" ? "bg-emerald-600/30 text-emerald-200" : "bg-red-600/30 text-red-200"
+        toast.type === "success"
+         ? "bg-emerald-600/30 text-emerald-200"
+         : "bg-red-600/30 text-red-200"
        }`}
       >
        {toast.msg}
@@ -295,18 +374,22 @@ export default function Finalization() {
          onChange={handleAtsToggle}
          className="w-5 h-5 rounded text-emerald-500"
         />
-        <span className="text-gray-300">{t("resume.finalization.atsToggle")}</span>
+        <span className="text-gray-300">
+         {t("resume.finalization.atsToggle")}
+        </span>
        </label>
       </div>
 
       <div className="mt-10 flex flex-col items-center gap-5">
        <button
-        onClick={() => setShowPreview(true)}
+        onClick={handleShowPreview}
         className="relative px-12 py-4 rounded-full bg-emerald-600 text-white font-bold text-lg hover:bg-emerald-500 active:scale-[0.98] transition shadow-lg overflow-visible"
        >
         <span className="absolute inset-0 rounded-full bg-emerald-500/[0.18] animate-ping" />
         <span className="relative">{t("resume.finalization.seeCv")}</span>
        </button>
+
+       <ResumeAnalyzeAI resume={resume} token={user.token} />
 
        <button
         onClick={handleBackHome}
@@ -441,23 +524,25 @@ export default function Finalization() {
 
      {/* ATS banner */}
      {resume?.ats && (
-      <div className="flex flex-col items-center gap-4 mb-4" onClick={(e) => e.stopPropagation()}>
+      <div
+       className="flex flex-col items-center gap-4 mb-4"
+       onClick={(e) => e.stopPropagation()}
+      >
        <div className="px-4 py-2 rounded-lg bg-amber-500/20 text-amber-200 text-sm">
         {t("resume.finalization.atsBanner")}
        </div>
       </div>
      )}
 
-     {loading ? (
+     {!pdfReady ? (
       <PulseLoader color="#10b981" />
-     ) : (
+     ) : pdfUrl && (
       <iframe
-       ref={previewIframeRef}
-       srcDoc={previewHtml}
+      key={pdfUrl}
+       src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
        title="CV"
        onClick={(e) => e.stopPropagation()}
        className="w-[794px] h-[1123px] bg-white rounded-lg shadow-2xl"
-       onLoad={() => runPaginationWhenReady(previewIframeRef, previewHtml)}
       />
      )}
     </div>
