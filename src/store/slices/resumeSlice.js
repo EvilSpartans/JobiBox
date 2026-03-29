@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { normalizeAiTrainingDates } from "../../utils/DateUtils";
+import { mapResumeSettingsFromApi } from "../../utils/resumeCvtheque";
 
 /**
  * ResumeUpdateDto : trainings[i][degree|school|startDate|endDate|description], idem experiences avec title|company|…
@@ -141,7 +142,27 @@ const initialState = {
  resume: null,
  /** Incrémenté quand cvPdfPath change → cache-buster visionneuse PDF (équivalent thumbnailVersions). */
  pdfEmbedLocalVersion: 0,
+ /** Config CVthèque (GET business/{id}/resume-settings), camelCase dérivé du JSON API. */
+ resumeSettings: null,
+ resumeSettingsStatus: "idle",
+ resumeSettingsError: null,
 };
+
+export const fetchResumeSettings = createAsyncThunk(
+ "resume/settings",
+ async ({ token, businessId }, { rejectWithValue }) => {
+  try {
+   const { data } = await axios.get(`${BASE_URL}/business/${businessId}/resume-settings`, {
+    headers: {
+     Authorization: `Bearer ${token}`,
+    },
+   });
+   return mapResumeSettingsFromApi(data);
+  } catch (error) {
+   return rejectWithValue(error.response?.data || error.message);
+  }
+ },
+);
 
 export const getResume = createAsyncThunk(
  "resume/get",
@@ -502,6 +523,21 @@ export const ResumeSlice = createSlice({
  },
  extraReducers: (builder) => {
   builder
+   .addCase(fetchResumeSettings.pending, (state) => {
+    state.resumeSettingsStatus = "loading";
+    state.resumeSettingsError = null;
+    state.resumeSettings = null;
+   })
+   .addCase(fetchResumeSettings.fulfilled, (state, action) => {
+    state.resumeSettingsStatus = "succeeded";
+    state.resumeSettings = action.payload;
+    state.resumeSettingsError = null;
+   })
+   .addCase(fetchResumeSettings.rejected, (state, action) => {
+    state.resumeSettingsStatus = "failed";
+    state.resumeSettingsError = action.payload ?? "resume-settings error";
+    state.resumeSettings = null;
+   })
    // GET
    .addCase(getResume.fulfilled, (state, action) => {
     console.log("📦 Resume stocké dans le state :", action.payload);

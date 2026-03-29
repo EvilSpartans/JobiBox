@@ -29,6 +29,12 @@ export const signInSchema = Yup.object({
     password: Yup.string().required("Le mot de passe est requis"),
 });
 
+export const forgotPasswordSchema = Yup.object({
+    email: Yup.string()
+        .required("L'adresse e-mail est requise.")
+        .email("Adresse e-mail non valide."),
+});
+
 export const PostSchema = Yup.object().shape({
     title: Yup.string().required("Le titre est requis."),
     category: Yup.string().required("La catégorie est requise."),

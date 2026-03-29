@@ -6,6 +6,8 @@ const BASE_URL = `${process.env.REACT_APP_BASE_URL}`;
 const initialState = {
  status: "",
  error: "",
+ resetPasswordStatus: "idle",
+ resetPasswordError: "",
  user: {
   id: "",
   username: "",
@@ -39,6 +41,18 @@ export const loginUser = createAsyncThunk(
    const { data } = await axios.post(`${BASE_URL}/login`, {
     ...values,
    });
+   return data;
+  } catch (error) {
+   return rejectWithValue(error.response);
+  }
+ },
+);
+
+export const requestPasswordReset = createAsyncThunk(
+ "api/resetPassword",
+ async ({ email }, { rejectWithValue }) => {
+  try {
+   const { data } = await axios.post(`${BASE_URL}/resetPassword`, { email });
    return data;
   } catch (error) {
    return rejectWithValue(error.response);
@@ -120,6 +134,10 @@ export const userSlice = createSlice({
     state.user.offerCandidacyIds.push(newOfferId);
    }
   },
+  clearResetPasswordState: (state) => {
+   state.resetPasswordStatus = "idle";
+   state.resetPasswordError = "";
+  },
  },
  extraReducers(builder) {
   builder
@@ -172,10 +190,28 @@ export const userSlice = createSlice({
    .addCase(loginUser.rejected, (state, action) => {
     state.status = "failed";
     state.error = action.payload.data.message;
+   })
+   .addCase(requestPasswordReset.pending, (state) => {
+    state.resetPasswordStatus = "loading";
+    state.resetPasswordError = "";
+   })
+   .addCase(requestPasswordReset.fulfilled, (state) => {
+    state.resetPasswordStatus = "succeeded";
+    state.resetPasswordError = "";
+   })
+   .addCase(requestPasswordReset.rejected, (state, action) => {
+    state.resetPasswordStatus = "failed";
+    state.resetPasswordError =
+     action.payload?.data?.message || action.payload?.data?.detail || "";
    });
  },
 });
 
-export const { logout, changeStatus, updateQuestionLists, addCandidacy } =
- userSlice.actions;
+export const {
+ logout,
+ changeStatus,
+ updateQuestionLists,
+ addCandidacy,
+ clearResetPasswordState,
+} = userSlice.actions;
 export default userSlice.reducer;

@@ -32,7 +32,8 @@
    "chooseColor": "Choose a color",
    "customCode": "Custom code (e.g. #f23ff0)",
    "presetColors": "Preset colors",
-   "confirmColor": "Confirm"
+   "confirmColor": "Confirm",
+   "loadingCvtheque": "Loading your organisation's options…"
   },
   "personalInfo": {
    "lastName": "Last name *",
