@@ -24,6 +24,7 @@ export default function Film() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const selectedQuestionRef = useRef(null);
   const [videoBase64, setVideoBase64] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
   const [recording, setRecording] = useState(false);
   const [timer, setTimer] = useState(0);
   const [countDown, setCountdown] = useState(0);
@@ -43,6 +44,8 @@ export default function Film() {
   const currentQuestionIdRef = useRef();
   const isKeyPressed = useRef(false);
   const isCountdownActive = useRef(false);
+  const selfieSegmentationRef = useRef(null);
+  const backgroundImageRef = useRef(null);
 
   const selectedGreenFilter = JSON.parse(localStorage.getItem("selectedGreenFilter"));
   const beginnerInProgress = localStorage.getItem('beginnerInProgress');
@@ -56,7 +59,24 @@ export default function Film() {
       window.removeEventListener("keydown", handleKeyPress);
       window.removeEventListener("keyup", handleKeyRelease);
     };
-  }, [recording, videoBase64, countDown, isFilterApplied, showIntro]);
+  }, [recording, videoBase64, countDown, isFilterApplied, showIntro, mediaStream]);
+
+  useEffect(() => {
+    selfieSegmentationRef.current = new SelfieSegmentation({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (videoBase64) {
+      const url = URL.createObjectURL(videoBase64);
+      setVideoUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setVideoUrl(null);
+    }
+  }, [videoBase64]);
 
   useEffect(() => {
     currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
@@ -100,32 +120,31 @@ export default function Film() {
   const initializeCamera = async () => {
     try {
       setCameraLoading(true);
-      const stream = await navigator.mediaDevices
-        .getUserMedia({
-          video: {
-            facingMode: "portrait",
-            width: { ideal: 640 }, 
-            height: { ideal: 1136 }, 
-          },
-          audio: true,
-        })
-        .then((stream) => (videoCameraRef.current.srcObject = stream));
-      setMediaStream(stream);
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          const chunks = videoBase64 ? [...videoBase64, e.data] : [e.data];
-          setVideoBase64(chunks);
-        }
+
+      const videoConstraints = {
+        facingMode: "portrait",
+        width: { ideal: 640 },
+        height: { ideal: 1136 },
       };
+
+      // Sans filtre fond vert, on limite à 30fps : le serveur re-encode à 30fps de toute façon
+      // Avec fond vert, on garde le framerate natif pour que MediaPipe ait plus de frames
+      if (!selectedGreenFilter) {
+        videoConstraints.frameRate = { ideal: 30, max: 30 };
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraints,
+        audio: true,
+      });
+
+      videoCameraRef.current.srcObject = stream;
+      setMediaStream(stream);
 
       if (selectedGreenFilter) {
         handleApplyBackground(selectedGreenFilter);
       }
-
     } catch (error) {
-      // console.error("Erreur lors de l'accès à la caméra : ", error);
       navigate("/malfunction");
     } finally {
       setCameraLoading(false);
@@ -144,9 +163,6 @@ export default function Film() {
   };
 
   const toggleRecording = async () => {
-    // const questionId = currentQuestionIdRef.current;
-    // const selectedQuestion = selectedQuestionRef.current;
-
     if (!recording) {
       try {
         dispatch(changeStatus("loading"));
@@ -154,26 +170,24 @@ export default function Film() {
         await startCountdown();
         setCountdown(0);
 
-        const audioStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-
-        const stream = isFilterApplied
-          ? canvasRef.current.captureStream()
-          : await navigator.mediaDevices.getUserMedia({
-              video: {
-                facingMode: "portrait",
-                width: { ideal: 640 },
-                height: { ideal: 1136 }, 
-              },
-            });
-
-        audioStream.getTracks().map((track) => stream.addTrack(track));
+        let stream;
+        if (isFilterApplied) {
+          stream = canvasRef.current.captureStream();
+          mediaStream.getAudioTracks().forEach((track) => stream.addTrack(track));
+        } else {
+          stream = mediaStream;
+        }
 
         refVideoRecord.current.srcObject = stream;
-        setMediaStream(stream);
 
-        const recorder = new MediaRecorder(stream);
+        const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+          ? "video/webm;codecs=vp8,opus"
+          : "video/webm";
+        const recorder = new MediaRecorder(stream, {
+          mimeType,
+          videoBitsPerSecond: 2_000_000,
+          audioBitsPerSecond: 128_000,
+        });
         setMediaRecorder(recorder);
 
         const chunks = [];
@@ -197,27 +211,6 @@ export default function Film() {
           }
         };
 
-        // recorder.onstop = async () => {
-        //   const blob = new Blob(chunks, { type: "video/webm" });
-        //   const videoFile = new File([blob], `video-${user.id}.mp4`, {
-        //     type: "video/mp4",
-        //   });
-
-        //   setVideoBase64(blob);
-        //   stream.getTracks().forEach((track) => track.stop());
-        //   setRecording(false);
-        //   setTimer(0);
-        //   clearInterval(timerIntervalId);
-
-        //   await saveVideoToDatabase(
-        //     videoFile,
-        //     questionId,
-        //     selectedQuestion,
-        //     token
-        //   );
-        //   handleNextQuestion();
-        // };
-
         recorder.start();
         setRecording(true);
 
@@ -227,7 +220,6 @@ export default function Film() {
 
         setTimerIntervalId(intervalId);
       } catch (error) {
-        // console.error("Erreur lors de l'accès à la caméra : ", error);
         navigate("/malfunction");
       }
     } else {
@@ -393,18 +385,11 @@ export default function Film() {
   };
 
   // GREEN FILTER
-  const selfieSegmentation = new SelfieSegmentation({
-    locateFile: (file) =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
-  });
-
-  let backgroundImage;
-
   const handleApplyBackground = async (filter) => {
       if (filter) {
         if (canvasRef.current && videoCameraRef.current) {
-          backgroundImage = new Image();
-          backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
+          backgroundImageRef.current = new Image();
+          backgroundImageRef.current.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
     
           const checkVideoDimensions = () => {
             const videoWidth = videoCameraRef.current.videoWidth;
@@ -414,18 +399,17 @@ export default function Film() {
               canvasRef.current.width = videoWidth;
               canvasRef.current.height = videoHeight;
               
-              selfieSegmentation.setOptions({
+              selfieSegmentationRef.current.setOptions({
                 modelSelection: 0,
                 selfieMode: false,
                 effect: 'mask',
               });
-              selfieSegmentation.onResults(onResults);
+              selfieSegmentationRef.current.onResults(onResults);
     
               sendToMediaPipe();
     
               setIsFilterApplied(true);
             } else {
-              // console.error("Video dimensions are not valid. Retrying...");
               setTimeout(checkVideoDimensions, 100);
             }
           };
@@ -467,7 +451,7 @@ export default function Film() {
     contextRef.current.save();
     contextRef.current.scale(-1, 1);
     contextRef.current.drawImage(
-      backgroundImage,
+      backgroundImageRef.current,
       -canvasRef.current.width,
       0,
       canvasRef.current.width,
@@ -488,10 +472,10 @@ export default function Film() {
   };
 
   async function sendToMediaPipe() {
-      if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
+      if (!selfieSegmentationRef.current || !videoCameraRef.current.videoWidth) {
         requestAnimationFrame(sendToMediaPipe);
       } else {
-        await selfieSegmentation.send({ image: videoCameraRef.current });
+        await selfieSegmentationRef.current.send({ image: videoCameraRef.current });
         requestAnimationFrame(sendToMediaPipe);
       }
   }
@@ -527,7 +511,7 @@ export default function Film() {
               <PulseLoader color="#808080" size={16} />
             ) : (
               <video
-                src={URL.createObjectURL(videoBase64)}
+                src={videoUrl}
                 controls
                 disablePictureInPicture
                 controlsList="nodownload"

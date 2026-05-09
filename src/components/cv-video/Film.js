@@ -30,6 +30,7 @@ export default function Film({ onStartSequence }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const selectedQuestionRef = useRef(null);
   const [videoBase64, setVideoBase64] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
   const [recording, setRecording] = useState(false);
   const [timer, setTimer] = useState(0);
   const [countDown, setCountdown] = useState(0);
@@ -50,6 +51,8 @@ export default function Film({ onStartSequence }) {
   const currentQuestionIdRef = useRef();
   const isKeyPressed = useRef(false);
   const isCountdownActive = useRef(false);
+  const selfieSegmentationRef = useRef(null);
+  const backgroundImageRef = useRef(null);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -58,7 +61,24 @@ export default function Film({ onStartSequence }) {
       window.removeEventListener("keydown", handleKeyPress);
       window.removeEventListener("keyup", handleKeyRelease);
     };
-  }, [recording, videoBase64, countDown, isFilterApplied, showIntro]);
+  }, [recording, videoBase64, countDown, isFilterApplied, showIntro, mediaStream]);
+
+  useEffect(() => {
+    selfieSegmentationRef.current = new SelfieSegmentation({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (videoBase64) {
+      const url = URL.createObjectURL(videoBase64);
+      setVideoUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setVideoUrl(null);
+    }
+  }, [videoBase64]);
 
   useEffect(() => {
     currentQuestionIdRef.current = questions[currentQuestionIndex]?.id;
@@ -115,12 +135,21 @@ export default function Film({ onStartSequence }) {
   const initializeCamera = async () => {
     try {
       setCameraLoading(true);
+
+      const videoConstraints = {
+        facingMode: "portrait",
+        width: { ideal: 640 },
+        height: { ideal: 1136 },
+      };
+
+      // Sans filtre fond vert, on limite à 30fps : le serveur re-encode à 30fps de toute façon
+      // Avec fond vert, on garde le framerate natif pour que MediaPipe ait plus de frames
+      if (!selectedGreenFilter) {
+        videoConstraints.frameRate = { ideal: 30, max: 30 };
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "portrait",
-          width: { ideal: 640 },
-          height: { ideal: 1136 },
-        },
+        video: videoConstraints,
         audio: true,
       });
 
@@ -157,26 +186,24 @@ export default function Film({ onStartSequence }) {
         await startCountdown();
         setCountdown(0);
 
-        const audioStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-
-        const stream = isFilterApplied
-          ? canvasRef.current.captureStream()
-          : await navigator.mediaDevices.getUserMedia({
-              video: {
-                facingMode: "portrait",
-                width: { ideal: 640 },
-                height: { ideal: 1136 },
-              },
-            });
-
-        audioStream.getTracks().map((track) => stream.addTrack(track));
+        let stream;
+        if (isFilterApplied) {
+          stream = canvasRef.current.captureStream();
+          mediaStream.getAudioTracks().forEach((track) => stream.addTrack(track));
+        } else {
+          stream = mediaStream;
+        }
 
         refVideoRecord.current.srcObject = stream;
-        setMediaStream(stream);
 
-        const recorder = new MediaRecorder(stream);
+        const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+          ? "video/webm;codecs=vp8,opus"
+          : "video/webm";
+        const recorder = new MediaRecorder(stream, {
+          mimeType,
+          videoBitsPerSecond: 2_000_000,
+          audioBitsPerSecond: 128_000,
+        });
         setMediaRecorder(recorder);
 
         const chunks = [];
@@ -369,18 +396,11 @@ export default function Film({ onStartSequence }) {
   };
 
   // GREEN FILTER
-  const selfieSegmentation = new SelfieSegmentation({
-    locateFile: (file) =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
-  });
-
-  let backgroundImage;
-
   const handleApplyBackground = async (filter) => {
     if (filter) {
       if (canvasRef.current && videoCameraRef.current) {
-        backgroundImage = new Image();
-        backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
+        backgroundImageRef.current = new Image();
+        backgroundImageRef.current.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
 
         const checkVideoDimensions = () => {
           const videoWidth = videoCameraRef.current.videoWidth;
@@ -390,18 +410,17 @@ export default function Film({ onStartSequence }) {
             canvasRef.current.width = videoWidth;
             canvasRef.current.height = videoHeight;
 
-            selfieSegmentation.setOptions({
+            selfieSegmentationRef.current.setOptions({
               modelSelection: 0,
               selfieMode: false,
               effect: "mask",
             });
-            selfieSegmentation.onResults(onResults);
+            selfieSegmentationRef.current.onResults(onResults);
 
             sendToMediaPipe();
 
             setIsFilterApplied(true);
           } else {
-            // console.error("Video dimensions are not valid. Retrying...");
             setTimeout(checkVideoDimensions, 100);
           }
         };
@@ -444,7 +463,7 @@ export default function Film({ onStartSequence }) {
     contextRef.current.save();
     contextRef.current.scale(-1, 1);
     contextRef.current.drawImage(
-      backgroundImage,
+      backgroundImageRef.current,
       -canvasRef.current.width,
       0,
       canvasRef.current.width,
@@ -465,10 +484,10 @@ export default function Film({ onStartSequence }) {
   };
 
   async function sendToMediaPipe() {
-    if (!selfieSegmentation || !videoCameraRef.current.videoWidth) {
+    if (!selfieSegmentationRef.current || !videoCameraRef.current.videoWidth) {
       requestAnimationFrame(sendToMediaPipe);
     } else {
-      await selfieSegmentation.send({ image: videoCameraRef.current });
+      await selfieSegmentationRef.current.send({ image: videoCameraRef.current });
       requestAnimationFrame(sendToMediaPipe);
     }
   }
@@ -522,9 +541,9 @@ export default function Film({ onStartSequence }) {
         ) : null}
 
         <div className="relative w-full md:w-[60%] tall:w-full h-96 tall:h-[68rem] mx-auto flex items-center justify-center">
-          {videoBase64 && (
+          {videoUrl && (
             <video
-              src={URL.createObjectURL(videoBase64)}
+              src={videoUrl}
               controls
               disablePictureInPicture
               controlsList="nodownload"

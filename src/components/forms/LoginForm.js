@@ -14,8 +14,20 @@ import {
 } from "../../store/slices/userSlice";
 import { sendWelcomeNotification } from "../core/Notification";
 
-const authCardClass =
-  "flex flex-col justify-center min-h-[60%] h-fit tall:h-[90%] w-fit min-w-[60%] tall:w-[90%] space-y-8 tall:space-y-20 p-10 dark:bg-dark_bg_2 rounded-xl";
+const formWrapClass =
+  "flex flex-1 flex-col justify-center px-8 sm:px-10 py-10 tall:px-12 min-h-0";
+
+const AuthHeader = ({ title, subtitle }) => (
+  <div className="text-center dark:text-dark_text_1 relative">
+    <p className="text-sm uppercase tracking-[0.25em] dark:text-dark_text_2 opacity-50 font-medium mb-3">
+      <span className="text-blue_3">J</span>obiBox
+    </p>
+    <h2 className="text-5xl font-bold">{title}</h2>
+    {subtitle && (
+      <p className="mt-4 text-xl dark:text-dark_text_2">{subtitle}</p>
+    )}
+  </div>
+);
 
 export default function LoginForm() {
   const dispatch = useDispatch();
@@ -66,17 +78,19 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
+    <>
       {!showForgotPassword ? (
-        <div className={authCardClass}>
-          <div className="text-center dark:text-dark_text_1">
-            <h2 className="mt-6 text-4xl font-bold">Connexion</h2>
-            <p className="mt-6 text-xl">
-              Tu peux te connecter avec tes{" "}
-              <span className="text-blue-400">identifiants</span> Jobissim.
-            </p>
-          </div>
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
+        <div className={formWrapClass}>
+          <AuthHeader
+            title="Connexion"
+            subtitle={
+              <>
+                Connecte-toi avec tes{" "}
+                <span className="text-blue_1 font-medium">identifiants</span> Jobissim.
+              </>
+            }
+          />
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6 relative">
             <Input
               name="email"
               type="text"
@@ -99,20 +113,18 @@ export default function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-lg text-blue-500 hover:text-blue-400 underline cursor-pointer transition ease-in duration-300"
+                className="text-lg text-blue_1 hover:text-blue_3 underline cursor-pointer transition ease-in duration-300"
               >
                 Mot de passe oublié ?
               </button>
             </div>
             {error ? (
-              <div>
-                <p className="text-red-400">{error}</p>
+              <div className="px-4 py-3 rounded-xl dark:bg-red-900/20 border border-red-500/20">
+                <p className="text-red-400 text-base">{error}</p>
               </div>
             ) : null}
             <button
-              className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide
-          font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300
-          "
+              className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
               type="submit"
             >
               {status === "loading" ? (
@@ -121,11 +133,11 @@ export default function LoginForm() {
                 "Valider"
               )}
             </button>
-            <p className="text-lg flex flex-col items-center justify-center mt-10 text-center text-md dark:text-dark_text_1">
+            <p className="text-lg flex flex-col items-center justify-center mt-10 text-center dark:text-dark_text_2">
               <span>Pas encore membre ?</span>
               <Link
                 to="/register"
-                className=" underline cursor-pointer transition ease-in duration-300 text-blue-500 text-xl"
+                className="underline cursor-pointer transition ease-in duration-300 text-blue_1 hover:text-blue_3 text-xl mt-1"
               >
                 Inscription
               </Link>
@@ -133,36 +145,41 @@ export default function LoginForm() {
           </form>
         </div>
       ) : resetPasswordStatus === "succeeded" ? (
-        <div className={authCardClass}>
-          <div className="text-center dark:text-dark_text_1 space-y-6">
-            <h2 className="mt-6 text-4xl font-bold">E-mail envoyé</h2>
-            <p className="mt-6 text-xl text-left">
-              Un e-mail t’a été envoyé avec un lien pour réinitialiser ton mot
+        <div className={formWrapClass}>
+          <div className="text-center dark:text-dark_text_1 space-y-6 relative">
+            <p className="text-sm uppercase tracking-[0.25em] dark:text-dark_text_2 opacity-50 font-medium">
+              <span className="text-blue_3">J</span>obiBox
+            </p>
+            <h2 className="text-5xl font-bold">E-mail envoyé</h2>
+            <p className="text-xl dark:text-dark_text_2 text-left">
+              Un e-mail t'a été envoyé avec un lien pour réinitialiser ton mot
               de passe. Ouvre ce lien sur le site Jobissim pour choisir un
               nouveau mot de passe.
             </p>
             <button
               type="button"
               onClick={goBackToLogin}
-              className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300 mt-6"
+              className="text-xl w-full flex justify-center bg-blue_3 text-gray-100 p-4 rounded-full tracking-wide font-semibold focus:outline-none hover:bg-blue_4 shadow-lg cursor-pointer transition ease-in duration-300"
             >
               Retour à la connexion
             </button>
           </div>
         </div>
       ) : (
-        <div className={authCardClass}>
-          <div className="text-center dark:text-dark_text_1">
-            <h2 className="mt-6 text-4xl font-bold">Mot de passe oublié</h2>
-            <p className="mt-6 text-xl">
-              Saisis ton adresse e-mail : nous t’enverrons un lien pour
-              réinitialiser ton mot de passe sur le site{" "}
-              <span className="text-blue-400">Jobissim</span>.
-            </p>
-          </div>
+        <div className={formWrapClass}>
+          <AuthHeader
+            title="Mot de passe oublié"
+            subtitle={
+              <>
+                Saisis ton adresse e-mail : nous t'enverrons un lien pour
+                réinitialiser ton mot de passe sur{" "}
+                <span className="text-blue_1 font-medium">Jobissim</span>.
+              </>
+            }
+          />
           <form
             onSubmit={handleSubmitForgot(onSubmitForgot)}
-            className="mt-6 space-y-6"
+            className="mt-6 space-y-6 relative"
           >
             <Input
               name="email"
@@ -173,7 +190,9 @@ export default function LoginForm() {
               error={errorsForgot?.email?.message}
             />
             {resetPasswordError ? (
-              <p className="text-red-400">{resetPasswordError}</p>
+              <div className="px-4 py-3 rounded-xl dark:bg-red-900/20 border border-red-500/20">
+                <p className="text-red-400 text-base">{resetPasswordError}</p>
+              </div>
             ) : null}
             <button
               type="submit"
@@ -186,11 +205,11 @@ export default function LoginForm() {
                 "Envoyer le lien"
               )}
             </button>
-            <p className="text-lg text-center dark:text-dark_text_1">
+            <p className="text-lg text-center dark:text-dark_text_2">
               <button
                 type="button"
                 onClick={goBackToLogin}
-                className="text-blue-500 hover:text-blue-400 underline cursor-pointer transition ease-in duration-300"
+                className="text-blue_1 hover:text-blue_3 underline cursor-pointer transition ease-in duration-300"
               >
                 Retour à la connexion
               </button>
@@ -198,6 +217,6 @@ export default function LoginForm() {
           </form>
         </div>
       )}
-    </div>
+    </>
   );
 }

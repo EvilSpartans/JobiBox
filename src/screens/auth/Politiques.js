@@ -173,7 +173,7 @@ export default function Politiques() {
                 <p>Les durées de conservation retenues sont les suivantes :</p>
                 <ul className="list-disc list-inside ml-4">
                   <li>
-                    Les données des Utilisateurs sont conservées 3 ans après la
+                    Les données des Utilisateurs sont conservées 2 ans après la
                     dernière interaction émanant de l’Utilisateur ;
                   </li>
                   <li>

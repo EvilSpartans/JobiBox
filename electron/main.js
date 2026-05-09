@@ -10,6 +10,10 @@ const {
 const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const isDev = !app.isPackaged;
+
+// Délègue le décodage vidéo et le rendu canvas au GPU intégré Intel (Quick Sync / GPU rasterizer)
+app.commandLine.appendSwitch("enable-accelerated-video-decode");
+app.commandLine.appendSwitch("enable-gpu-rasterization");
 const fs = require("fs");
 
 const Store = require("electron-store");
