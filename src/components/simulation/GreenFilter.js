@@ -25,6 +25,8 @@ export default function GreenFilter() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
+  const selfieSegmentationRef = useRef(null);
+  const backgroundImageRef = useRef(null);
 
   const sliderSettings = {
     infinite: true,
@@ -34,6 +36,13 @@ export default function GreenFilter() {
   };
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    selfieSegmentationRef.current = new SelfieSegmentation({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+    });
+  }, []);
 
   useEffect(() => {
     const existingSelectedGreenFilter = localStorage.getItem("selectedGreenFilter");
@@ -69,8 +78,9 @@ export default function GreenFilter() {
         .getUserMedia({
           video: {
             facingMode: "portrait",
-            width: { ideal: 320 }, 
+            width: { ideal: 320 },
             height: { ideal: 568 },
+            frameRate: { ideal: 30, max: 30 },
           },
           audio: false,
         });
@@ -116,19 +126,11 @@ export default function GreenFilter() {
     }
   };
   
-  // Apply Green Filter
-  const selfieSegmentation = new SelfieSegmentation({
-    locateFile: (file) =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
-  });
-
-  let backgroundImage;
-
   const handleApplyBackground = async (index) => {
     if (index !== null && index >= 0 && greenFilters[index]) {
       if (canvasRef.current && videoRef.current) {
-        backgroundImage = new Image();
-        backgroundImage.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[index].image}`;
+        backgroundImageRef.current = new Image();
+        backgroundImageRef.current.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[index].image}`;
   
         const checkVideoDimensions = () => {
           const videoWidth = videoRef.current.videoWidth;
@@ -138,12 +140,12 @@ export default function GreenFilter() {
             canvasRef.current.width = videoWidth;
             canvasRef.current.height = videoHeight;
   
-            selfieSegmentation.setOptions({
+            selfieSegmentationRef.current.setOptions({
               modelSelection: 0,
               selfieMode: false,
               effect: 'mask',
             });
-            selfieSegmentation.onResults(onResults);
+            selfieSegmentationRef.current.onResults(onResults);
   
             sendToMediaPipe();
   
@@ -200,7 +202,7 @@ export default function GreenFilter() {
     contextRef.current.save();
     contextRef.current.scale(-1, 1);
     contextRef.current.drawImage(
-      backgroundImage,
+      backgroundImageRef.current,
       -canvasRef.current.width,
       0,
       canvasRef.current.width,
@@ -221,12 +223,12 @@ export default function GreenFilter() {
   };
 
   async function sendToMediaPipe() {
-      if (!selfieSegmentation || !videoRef.current.videoWidth) {
-        requestAnimationFrame(sendToMediaPipe);
-      } else {
-        await selfieSegmentation.send({ image: videoRef.current });
-        requestAnimationFrame(sendToMediaPipe);
-      }
+    if (!selfieSegmentationRef.current || !videoRef.current.videoWidth) {
+      requestAnimationFrame(sendToMediaPipe);
+    } else {
+      await selfieSegmentationRef.current.send({ image: videoRef.current });
+      requestAnimationFrame(sendToMediaPipe);
+    }
   }
 
   const handleRemoveBackground = () => {

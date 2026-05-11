@@ -46,6 +46,7 @@ export default function Film() {
   const isCountdownActive = useRef(false);
   const selfieSegmentationRef = useRef(null);
   const backgroundImageRef = useRef(null);
+  const animFrameRef = useRef(null);
 
   const selectedGreenFilter = JSON.parse(localStorage.getItem("selectedGreenFilter"));
   const beginnerInProgress = localStorage.getItem('beginnerInProgress');
@@ -99,6 +100,12 @@ export default function Film() {
     }
   }, [mediaStream, showIntro]);
 
+  useEffect(() => {
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
+
   // Make Pad working
   const handleKeyPress = (event) => {
     if (
@@ -125,13 +132,8 @@ export default function Film() {
         facingMode: "portrait",
         width: { ideal: 640 },
         height: { ideal: 1136 },
+        frameRate: { ideal: 30, max: 30 },
       };
-
-      // Sans filtre fond vert, on limite à 30fps : le serveur re-encode à 30fps de toute façon
-      // Avec fond vert, on garde le framerate natif pour que MediaPipe ait plus de frames
-      if (!selectedGreenFilter) {
-        videoConstraints.frameRate = { ideal: 30, max: 30 };
-      }
 
       const stream = await navigator.mediaDevices.getUserMedia({
         video: videoConstraints,
@@ -178,9 +180,9 @@ export default function Film() {
           stream = mediaStream;
         }
 
-        refVideoRecord.current.srcObject = stream;
-
-        const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+        const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+          ? "video/webm;codecs=vp9,opus"
+          : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
           ? "video/webm;codecs=vp8,opus"
           : "video/webm";
         const recorder = new MediaRecorder(stream, {
@@ -198,6 +200,7 @@ export default function Film() {
         };
 
         recorder.onstop = async () => {
+          if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
           const blob = new Blob(chunks, { type: "video/webm" });
           setVideoBase64(blob);
           stream.getTracks().forEach((track) => track.stop());
@@ -472,12 +475,12 @@ export default function Film() {
   };
 
   async function sendToMediaPipe() {
-      if (!selfieSegmentationRef.current || !videoCameraRef.current.videoWidth) {
-        requestAnimationFrame(sendToMediaPipe);
-      } else {
-        await selfieSegmentationRef.current.send({ image: videoCameraRef.current });
-        requestAnimationFrame(sendToMediaPipe);
-      }
+    if (!selfieSegmentationRef.current || !videoCameraRef.current.videoWidth) {
+      animFrameRef.current = requestAnimationFrame(sendToMediaPipe);
+    } else {
+      await selfieSegmentationRef.current.send({ image: videoCameraRef.current });
+      animFrameRef.current = requestAnimationFrame(sendToMediaPipe);
+    }
   }
 
   return (
@@ -573,13 +576,8 @@ export default function Film() {
               />
               <video
                 ref={refVideoRecord}
-                className={`w-full h-full object-contain tall:object-cover ${
-                  videoBase64 ? "hidden" : ""
-                } ${recording ? "" : "hidden"}`}
-                style={{
-                  position: "absolute",
-                  transform: isFilterApplied ? "scaleX(-1)" : "scaleX(-1)",
-                }}
+                className="hidden"
+                style={{ position: "absolute", transform: "scaleX(-1)" }}
                 autoPlay
                 disablePictureInPicture
                 controlsList="nodownload"

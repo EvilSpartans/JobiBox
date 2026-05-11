@@ -14,6 +14,22 @@ const isDev = !app.isPackaged;
 // Délègue le décodage vidéo et le rendu canvas au GPU intégré Intel (Quick Sync / GPU rasterizer)
 app.commandLine.appendSwitch("enable-accelerated-video-decode");
 app.commandLine.appendSwitch("enable-gpu-rasterization");
+app.commandLine.appendSwitch("enable-accelerated-2d-canvas");
+app.commandLine.appendSwitch("enable-zero-copy");
+
+// Instance unique : si l'app est déjà ouverte, on focus la fenêtre existante
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    if (mainApp) {
+      if (mainApp.isMinimized()) mainApp.restore();
+      mainApp.focus();
+    }
+  });
+}
+
 const fs = require("fs");
 
 const Store = require("electron-store");
