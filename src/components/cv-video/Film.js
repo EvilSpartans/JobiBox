@@ -54,6 +54,8 @@ export default function Film({ onStartSequence }) {
   const selfieSegmentationRef = useRef(null);
   const backgroundImageRef = useRef(null);
   const animFrameRef = useRef(null);
+  const lastFrameTimeRef = useRef(0);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -65,10 +67,12 @@ export default function Film({ onStartSequence }) {
   }, [recording, videoBase64, countDown, isFilterApplied, showIntro, mediaStream]);
 
   useEffect(() => {
-    selfieSegmentationRef.current = new SelfieSegmentation({
-      locateFile: (file) =>
-        `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
-    });
+    if (selectedGreenFilter) {
+      selfieSegmentationRef.current = new SelfieSegmentation({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -114,6 +118,10 @@ export default function Film({ onStartSequence }) {
   useEffect(() => {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+      if (selfieSegmentationRef.current) {
+        selfieSegmentationRef.current.close?.();
+      }
     };
   }, []);
 
@@ -139,15 +147,37 @@ export default function Film({ onStartSequence }) {
   //     setModalAddOpen(true);
   // };
 
+  // Boucle de dessin simple (sans MediaPipe) : cover-crop caméra → canvas 640×1088
+  function startPassthroughLoop(timestamp) {
+    const video = videoCameraRef.current;
+    const canvas = canvasRef.current;
+    if (video?.videoWidth && canvas) {
+      if (timestamp - lastFrameTimeRef.current >= 33) {
+        lastFrameTimeRef.current = timestamp;
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        const cw = canvas.width;
+        const ch = canvas.height;
+        const ratio = Math.max(cw / vw, ch / vh);
+        const offsetX = (cw - vw * ratio) / 2;
+        const offsetY = (ch - vh * ratio) / 2;
+        ctx.drawImage(video, offsetX, offsetY, vw * ratio, vh * ratio);
+      }
+    }
+    animFrameRef.current = requestAnimationFrame(startPassthroughLoop);
+  }
+
   const initializeCamera = async () => {
     try {
       setCameraLoading(true);
 
       const videoConstraints = {
-        facingMode: "portrait",
-        width: { ideal: 640 },
-        height: { ideal: 1136 },
-        frameRate: { ideal: 30, max: 30 },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        frameRate: { min: 30, ideal: 60 },
       };
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -160,6 +190,19 @@ export default function Film({ onStartSequence }) {
 
       if (selectedGreenFilter) {
         handleApplyBackground(selectedGreenFilter);
+      } else {
+        // Pas de filtre : démarrer la boucle passthrough dès que la vidéo est prête
+        const waitAndStart = () => {
+          if (videoCameraRef.current?.videoWidth > 0 && canvasRef.current) {
+            canvasRef.current.width = 640;
+            canvasRef.current.height = 1088;
+            if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+            animFrameRef.current = requestAnimationFrame(startPassthroughLoop);
+          } else {
+            setTimeout(waitAndStart, 100);
+          }
+        };
+        waitAndStart();
       }
     } catch (error) {
       console.error("Erreur lors de l'accès à la caméra : ", error);
@@ -188,13 +231,9 @@ export default function Film({ onStartSequence }) {
         await startCountdown();
         setCountdown(0);
 
-        let stream;
-        if (isFilterApplied) {
-          stream = canvasRef.current.captureStream();
-          mediaStream.getAudioTracks().forEach((track) => stream.addTrack(track));
-        } else {
-          stream = mediaStream;
-        }
+        // Toujours enregistrer depuis le canvas (cover-crop 640×1088 garanti)
+        const stream = canvasRef.current.captureStream(30);
+        mediaStream.getAudioTracks().forEach((track) => stream.addTrack(track));
 
         const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
           ? "video/webm;codecs=vp9,opus"
@@ -203,7 +242,7 @@ export default function Film({ onStartSequence }) {
           : "video/webm";
         const recorder = new MediaRecorder(stream, {
           mimeType,
-          videoBitsPerSecond: 2_000_000,
+          videoBitsPerSecond: 5_000_000,
           audioBitsPerSecond: 128_000,
         });
         setMediaRecorder(recorder);
@@ -402,6 +441,12 @@ export default function Film({ onStartSequence }) {
   const handleApplyBackground = async (filter) => {
     if (filter) {
       if (canvasRef.current && videoCameraRef.current) {
+        // Stopper la boucle passthrough si elle tourne
+        if (animFrameRef.current) {
+          cancelAnimationFrame(animFrameRef.current);
+          animFrameRef.current = null;
+        }
+
         backgroundImageRef.current = new Image();
         backgroundImageRef.current.src = `${BASE_URL}/uploads/greenFilters/${filter.image}`;
 
@@ -410,8 +455,8 @@ export default function Film({ onStartSequence }) {
           const videoHeight = videoCameraRef.current.videoHeight;
 
           if (videoWidth > 0 && videoHeight > 0) {
-            canvasRef.current.width = videoWidth;
-            canvasRef.current.height = videoHeight;
+            canvasRef.current.width = 640;
+            canvasRef.current.height = 1088;
 
             selfieSegmentationRef.current.setOptions({
               modelSelection: 0,
@@ -436,7 +481,10 @@ export default function Film({ onStartSequence }) {
   };
 
   const onResults = (results) => {
+    isProcessingRef.current = false;
     contextRef.current = canvasRef.current.getContext("2d");
+    contextRef.current.imageSmoothingEnabled = true;
+    contextRef.current.imageSmoothingQuality = "high";
     contextRef.current.save();
     contextRef.current.clearRect(
       0,
@@ -486,13 +534,18 @@ export default function Film({ onStartSequence }) {
     contextRef.current.restore();
   };
 
-  async function sendToMediaPipe() {
-    if (!selfieSegmentationRef.current || !videoCameraRef.current.videoWidth) {
-      animFrameRef.current = requestAnimationFrame(sendToMediaPipe);
-    } else {
-      await selfieSegmentationRef.current.send({ image: videoCameraRef.current });
-      animFrameRef.current = requestAnimationFrame(sendToMediaPipe);
+  function sendToMediaPipe(timestamp) {
+    if (
+      selfieSegmentationRef.current &&
+      videoCameraRef.current?.videoWidth &&
+      !isProcessingRef.current &&
+      timestamp - lastFrameTimeRef.current >= 33
+    ) {
+      lastFrameTimeRef.current = timestamp;
+      isProcessingRef.current = true;
+      selfieSegmentationRef.current.send({ image: videoCameraRef.current });
     }
+    animFrameRef.current = requestAnimationFrame(sendToMediaPipe);
   }
 
   return showIntro ? (
@@ -569,10 +622,7 @@ export default function Film({ onStartSequence }) {
             <>
               <video
                 ref={videoCameraRef}
-                className={`w-full h-full object-contain tall:object-cover ${
-                  videoBase64 ? "hidden" : ""
-                }`}
-                style={{ transform: "scaleX(-1)" }}
+                className="hidden"
                 autoPlay
                 disablePictureInPicture
                 controlsList="nodownload"
@@ -583,7 +633,7 @@ export default function Film({ onStartSequence }) {
                 ref={canvasRef}
                 className={`w-full h-full object-contain tall:object-cover ${
                   videoBase64 ? "hidden" : ""
-                } ${isFilterApplied ? "" : "hidden"}`}
+                }`}
                 style={{
                   position: "absolute",
                   transform: "scaleX(-1)",
