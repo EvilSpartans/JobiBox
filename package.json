@@ -22,8 +22,11 @@
    ]
   }
  ],
- "build": {
-  "productName": "jobibox",
+  "build": {
+   "electronRebuild": {
+    "skipModules": ["@parcel/watcher"]
+   },
+   "productName": "jobibox",
   "appId": "com.jobibox",
   "publish": {
    "provider": "github",
