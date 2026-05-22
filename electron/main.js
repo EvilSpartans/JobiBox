@@ -69,7 +69,7 @@ const createWindow = () => {
     backgroundColor: "white",
     webPreferences: {
       nodeIntegration: false,
-      worldSafeExecuteJavascript: true,
+      worldSafeExecuteJavaScript: true,
       contextIsolation: true,
       preload: path.join(__dirname, "preload.js"),
       backgroundThrottling: false,
@@ -163,12 +163,12 @@ app.whenReady().then(async () => {
 });
 
 // ---- Gestion des updates ----
-autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
+autoUpdater.on("update-available", (info) => {
   const dialogOpts = {
     type: "info",
     buttons: ["Ok"],
     title: "Mise à jour disponible",
-    message: process.platform === "win32" ? releaseNotes : releaseName,
+    message: process.platform === "win32" ? info.releaseNotes : info.releaseName,
     detail:
       "Une nouvelle version est disponible, elle est en cours de téléchargement.",
   };
@@ -176,12 +176,12 @@ autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
   updateInterval = null;
 });
 
-autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+autoUpdater.on("update-downloaded", (info) => {
   const dialogOpts = {
     type: "info",
     buttons: ["Redémarrer", "Plus tard"],
     title: "Installation requise",
-    message: process.platform === "win32" ? releaseNotes : releaseName,
+    message: process.platform === "win32" ? info.releaseNotes : info.releaseName,
     detail:
       "Une mise à jour a été téléchargée. Redémarrez l'application pour l'installer.",
   };
@@ -227,7 +227,7 @@ ipcMain.handle("clear-cache", async () => {
     await mainApp.webContents.session.clearStorageData({
       storages: [
         "cookies",
-        "indexdb",
+        "indexeddb",
         "websql",
         "filesystem",
         "shadercache",

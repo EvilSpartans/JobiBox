@@ -5,13 +5,13 @@ import Logout from "../../components/core/Logout";
 
 export default function Themes() {
   return (
-    <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-y-auto">
       <Logout />
       <GoBack />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
-        <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center overflow-y-auto">
           {/* Container */}
           <Theme />
         </div>

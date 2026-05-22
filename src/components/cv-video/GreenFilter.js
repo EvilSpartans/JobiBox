@@ -20,6 +20,7 @@ export default function GreenFilter() {
   const [greenFilters, setGreenFilters] = useState([]);
   const [mediaStream, setMediaStream] = useState(null);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [selectedGreenFilterIndex, setSelectedGreenFilterIndex] = useState(-1);
 
   const videoRef = useRef(null);
@@ -30,6 +31,7 @@ export default function GreenFilter() {
   const animFrameRef = useRef(null);
   const lastFrameTimeRef = useRef(0);
   const isProcessingRef = useRef(false);
+  const filterLoadingRef = useRef(false);
 
   const sliderSettings = {
     infinite: true,
@@ -91,19 +93,19 @@ export default function GreenFilter() {
   const initializeCamera = async () => {
     try {
       setLoading(true);
-      const stream = await navigator.mediaDevices
-        .getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { min: 30, ideal: 60 },
-          },
-          audio: false,
-        });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play();
-        }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 1088 },
+          frameRate: { ideal: 30, max: 30 },
+        },
+        audio: false,
+      });
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
       setMediaStream(stream);
 
     } catch (error) {
@@ -144,6 +146,8 @@ export default function GreenFilter() {
   
   const handleApplyBackground = async (index) => {
     if (index !== null && index >= 0 && greenFilters[index]) {
+      filterLoadingRef.current = true;
+      setFilterLoading(true);
       if (canvasRef.current && videoRef.current) {
         backgroundImageRef.current = new Image();
         backgroundImageRef.current.src = `${BASE_URL}/uploads/greenFilters/${greenFilters[index].image}`;
@@ -163,8 +167,9 @@ export default function GreenFilter() {
             });
             selfieSegmentationRef.current.onResults(onResults);
   
-            sendToMediaPipe();
-  
+            lastFrameTimeRef.current = performance.now() - 34;
+            sendToMediaPipe(performance.now());
+
             setIsFilterApplied(true);
           } else {
             console.error("Video dimensions are not valid. Retrying...");
@@ -181,6 +186,10 @@ export default function GreenFilter() {
 
   const onResults = (results) => {
     isProcessingRef.current = false;
+    if (filterLoadingRef.current) {
+      filterLoadingRef.current = false;
+      setFilterLoading(false);
+    }
     contextRef.current = canvasRef.current.getContext("2d");
     contextRef.current.imageSmoothingEnabled = true;
     contextRef.current.imageSmoothingQuality = "high";
@@ -293,6 +302,11 @@ export default function GreenFilter() {
                   className="rounded-lg mx-auto absolute top-0 left-0 transform scale-x-[-1]"
                   style={{ height: '100%', width: '100%', display: isFilterApplied ? 'block' : 'none', objectFit: 'cover' }}
                 />
+                {filterLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <PulseLoader color="#fff" size={16} />
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -5,13 +5,13 @@ import GreenFilter from "../../components/cv-video/GreenFilter";
 
 export default function GreenFilters() {
   return (
-    <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-y-auto">
       <Logout />
       <GoBack itemsToRemove={["selectedMusic"]} />
       {/*Container*/}
       <div className="flex w-full mx-auto h-full">
         {/*Login Form */}
-        <div className="min-h-screen w-full flex items-center justify-center overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center overflow-y-auto">
           {/* Container */}
           <GreenFilter />
         </div>

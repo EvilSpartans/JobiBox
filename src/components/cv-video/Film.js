@@ -56,6 +56,7 @@ export default function Film({ onStartSequence }) {
   const animFrameRef = useRef(null);
   const lastFrameTimeRef = useRef(0);
   const isProcessingRef = useRef(false);
+  const captureIntervalRef = useRef(null);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
@@ -175,9 +176,9 @@ export default function Film({ onStartSequence }) {
       setCameraLoading(true);
 
       const videoConstraints = {
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-        frameRate: { min: 30, ideal: 60 },
+        width: { ideal: 640 },
+        height: { ideal: 1088 },
+        frameRate: { ideal: 30, max: 30 },
       };
 
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -232,8 +233,17 @@ export default function Film({ onStartSequence }) {
         setCountdown(0);
 
         // Toujours enregistrer depuis le canvas (cover-crop 640×1088 garanti)
-        const stream = canvasRef.current.captureStream(30);
+        // captureStream() sans fps : on force manuellement 30fps via requestFrame()
+        // pour garantir que la piste vidéo avance même quand MediaPipe est lent
+        const stream = canvasRef.current.captureStream();
+        const videoTrack = stream.getVideoTracks()[0];
         mediaStream.getAudioTracks().forEach((track) => stream.addTrack(track));
+
+        captureIntervalRef.current = setInterval(() => {
+          if (videoTrack.readyState === "live") {
+            videoTrack.requestFrame();
+          }
+        }, 1000 / 30);
 
         const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
           ? "video/webm;codecs=vp9,opus"
@@ -256,6 +266,10 @@ export default function Film({ onStartSequence }) {
 
         recorder.onstop = async () => {
           if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+          if (captureIntervalRef.current) {
+            clearInterval(captureIntervalRef.current);
+            captureIntervalRef.current = null;
+          }
           const blob = new Blob(chunks, { type: "video/webm" });
           setVideoBase64(blob);
           stream.getTracks().forEach((track) => track.stop());
@@ -465,7 +479,8 @@ export default function Film({ onStartSequence }) {
             });
             selfieSegmentationRef.current.onResults(onResults);
 
-            sendToMediaPipe();
+            lastFrameTimeRef.current = performance.now() - 34;
+            sendToMediaPipe(performance.now());
 
             setIsFilterApplied(true);
           } else {
