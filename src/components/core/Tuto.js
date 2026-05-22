@@ -1,51 +1,44 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect } from 'react';
 import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 
 export default function Tuto({ steps, className, tutorialKey }) {
-    const [completed, setCompleted] = useState(false);
 
     useLayoutEffect(() => {
+        const hasCompletedTutorial = localStorage.getItem(tutorialKey);
+        if (hasCompletedTutorial) return;
+
         const intro = introJs();
 
-        const startIntro = () => {
-            intro.setOptions({
-                steps: steps || [],
-                showStepNumbers: true,
-                showBullets: false,
-                showProgress: false,
-                exitOnOverlayClick: false,
-                hideNext: false,
-                stepNumbersOfLabel: "sur",
-                doneLabel: "J'ai compris",
-                nextLabel: 'Suivant',
-                prevLabel: 'Précédent',
-            });
+        intro.setOptions({
+            steps: steps || [],
+            showStepNumbers: true,
+            showBullets: false,
+            showProgress: false,
+            exitOnOverlayClick: false,
+            hideNext: false,
+            stepNumbersOfLabel: "sur",
+            doneLabel: "J'ai compris",
+            nextLabel: 'Suivant',
+            prevLabel: 'Précédent',
+        });
 
-            intro.oncomplete(() => {
-                setCompleted(true);
-                localStorage.setItem(tutorialKey, "completed");
-            });
+        intro.oncomplete(() => {
+            localStorage.setItem(tutorialKey, "completed");
+        });
 
-            intro.onskip(() => {
-                setCompleted(true);
-                localStorage.setItem(tutorialKey, "completed");
-            });
+        intro.onskip(() => {
+            localStorage.setItem(tutorialKey, "completed");
+        });
 
-            intro.start();
-        };
-
-        const hasCompletedTutorial = localStorage.getItem(tutorialKey);
-
-        if (!hasCompletedTutorial) {
-            // Démarrer Intro.js après un court délai
-            setTimeout(startIntro, 100); // Essayez avec différents délais si nécessaire
-        }
+        const timer = setTimeout(() => intro.start(), 100);
 
         return () => {
-            intro.exit();
+            clearTimeout(timer);
+            intro.exit(true);
         };
-    }, [steps, tutorialKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Une seule exécution au mount — steps et tutorialKey sont stables par instance
 
     return (
         <div className={className}>

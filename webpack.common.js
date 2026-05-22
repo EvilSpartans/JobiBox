@@ -28,7 +28,12 @@ module.exports = {
                 use: [
                     'style-loader',
                     'css-loader',
-                    'sass-loader',
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            api: 'modern',
+                        }
+                    },
                     'postcss-loader'
                 ],
             },
@@ -46,6 +51,12 @@ module.exports = {
             },
         ]
     },
+    ignoreWarnings: [
+        {
+            module: /react-datepicker/,
+            message: /Critical dependency/,
+        }
+    ],
     plugins: [new Dotenv()],
     resolve: {
         extensions: ['.js', '.json'],
