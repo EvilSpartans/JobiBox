@@ -23,9 +23,7 @@
   }
  ],
   "build": {
-   "electronRebuild": {
-    "skipModules": ["@parcel/watcher"]
-   },
+   "buildDependenciesFromSource": true,
    "productName": "jobibox",
   "appId": "com.jobibox",
   "publish": {
