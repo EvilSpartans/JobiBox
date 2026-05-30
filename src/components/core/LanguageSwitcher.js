@@ -10,6 +10,12 @@ const FLAGS = {
   it: "🇮🇹",
   pt: "🇵🇹",
   ar: "🇸🇦",
+  ro: "🇷🇴",
+  fa: "🇦🇫",
+  ps: "🇦🇫",
+  pl: "🇵🇱",
+  tr: "🇹🇷",
+  uk: "🇺🇦",
 };
 
 export default function LanguageSwitcher() {
