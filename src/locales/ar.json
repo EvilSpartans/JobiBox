@@ -32,7 +32,9 @@
    "chooseColor": "اختر لوناً",
    "customCode": "رمز مخصص (مثال: #f23ff0)",
    "presetColors": "ألوان محددة مسبقاً",
-   "confirmColor": "تأكيد"
+   "confirmColor": "تأكيد",
+   "textSizeLabel": "حجم النص",
+   "textSizeHint": "اضبط حجم النص في سيرتك الذاتية"
   },
   "personalInfo": {
    "lastName": "الاسم العائلي *",

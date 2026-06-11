@@ -33,6 +33,8 @@
    "customCode": "دودیز کوډ (مثال #f23ff0)",
    "presetColors": "مخکیني رنګونه",
    "confirmColor": "تایید",
+   "textSizeLabel": "د متن اندازه",
+   "textSizeHint": "د خپل CV د متن اندازه تنظیم کړئ",
    "loadingCvtheque": "د سازمان اختیارونه پورته کیږي…"
   },
   "personalInfo": {

@@ -33,6 +33,8 @@
    "customCode": "Власний код (напр. #f23ff0)",
    "presetColors": "Попередньо визначені кольори",
    "confirmColor": "Підтвердити",
+   "textSizeLabel": "Розмір тексту",
+   "textSizeHint": "Налаштуйте розмір тексту у вашому резюме",
    "loadingCvtheque": "Завантаження опцій організації…"
   },
   "personalInfo": {

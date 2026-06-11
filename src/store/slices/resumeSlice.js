@@ -189,11 +189,11 @@ export const getResume = createAsyncThunk(
 export const createResume = createAsyncThunk(
  "resume/create",
  async (
-  { token, title, template, mainColor, anonymous },
+  { token, title, template, mainColor, fontScale, anonymous },
   { rejectWithValue },
  ) => {
   try {
-   const body = { title, template, mainColor };
+   const body = { title, template, mainColor, fontScale: fontScale ?? 1.0 };
    if (anonymous !== undefined) body.anonymous = anonymous;
    const { data } = await axios.post(`${BASE_URL}/resume/create`, body, {
     headers: {
@@ -256,6 +256,10 @@ export const updateResume = createAsyncThunk(
 
    if (payload.mainColor !== undefined) {
     formData.append("mainColor", payload.mainColor);
+   }
+
+   if (payload.fontScale !== undefined) {
+    formData.append("fontScale", String(payload.fontScale));
    }
 
    if (payload.ats !== undefined) {

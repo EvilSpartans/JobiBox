@@ -33,6 +33,8 @@
    "customCode": "Cod personalizat (ex. #f23ff0)",
    "presetColors": "Culori predefinite",
    "confirmColor": "Validează",
+   "textSizeLabel": "Mărimea textului",
+   "textSizeHint": "Ajustați dimensiunea textului din CV-ul dvs.",
    "loadingCvtheque": "Se încarcă opțiunile organizației…"
   },
   "personalInfo": {

@@ -30,6 +30,16 @@ import {
 import Wheel from "@uiw/react-color-wheel";
 import GlowBackground from "../../components/resume/GlowBackground";
 
+const FONT_SCALE_TICKS = [
+ { value: 0.625, label: "2XS" },
+ { value: 0.75,  label: "XS"  },
+ { value: 0.875, label: "S"   },
+ { value: 1.0,   label: "M"   },
+ { value: 1.125, label: "L"   },
+ { value: 1.25,  label: "XL"  },
+ { value: 1.375, label: "2XL" },
+];
+
 export default function Customization() {
  const { t } = useTranslation();
  const user = useSelector((state) => state.user.user);
@@ -69,6 +79,7 @@ export default function Customization() {
  const [selectedDesign, setSelectedDesign] = useState(TEMPLATES[0]?.key ?? null);
  const [selectedColor, setSelectedColor] = useState("#10B981");
  const [showColorPicker, setShowColorPicker] = useState(false);
+ const [fontScale, setFontScale] = useState(1.0);
 
  const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
  const sliderRef = useRef(null);
@@ -110,6 +121,7 @@ export default function Customization() {
  useEffect(() => {
   if (!resume) return;
   if (resume.title) setTitle(resume.title);
+  if (resume.fontScale != null) setFontScale(resume.fontScale);
   if (!resume.mainColor) return;
   if (mainColorConstrained && allowedMainColors.length) {
    const norm = normalizeHexForCompare(resume.mainColor);
@@ -172,8 +184,9 @@ export default function Customization() {
    title,
    template: selectedDesign,
    mainColor: colorToSave,
+   fontScale,
   }),
-  [resume, title, selectedDesign, colorToSave],
+  [resume, title, selectedDesign, colorToSave, fontScale],
  );
 
  const handleNavigate = async (step, direction) => {
@@ -206,6 +219,7 @@ export default function Customization() {
      title,
      template: selectedDesign,
      mainColor: colorToSave,
+     fontScale,
     }),
    );
 
@@ -319,6 +333,33 @@ export default function Customization() {
          </div>
         ))}
        </Slider>
+      </div>
+     </div>
+
+     <FormSeparator compact />
+
+     <div className="mt-8">
+      <h3 className="text-lg font-semibold text-emerald-300 text-center mb-2">
+       {t("resume.customization.textSizeLabel")}
+      </h3>
+      <p className="text-center text-sm text-gray-400 mb-4">
+       {t("resume.customization.textSizeHint")}
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+       {FONT_SCALE_TICKS.map((tick) => (
+        <button
+         key={tick.value}
+         type="button"
+         onClick={() => setFontScale(tick.value)}
+         className={`px-4 py-2 rounded-full border text-sm font-semibold transition-all
+          ${fontScale === tick.value
+           ? "bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-110"
+           : "border-white/10 text-gray-300 hover:border-emerald-400 hover:text-emerald-300"
+          }`}
+        >
+         {tick.label}
+        </button>
+       ))}
       </div>
      </div>
 

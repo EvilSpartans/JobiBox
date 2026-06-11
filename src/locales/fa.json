@@ -32,7 +32,9 @@
    "chooseColor": "انتخاب لوناً",
    "customCode": "رمز مخصص (مثال: #f23ff0)",
    "presetColors": "ألوان محددة مسبقاً",
-   "confirmColor": "تأیید"
+   "confirmColor": "تأیید",
+   "textSizeLabel": "اندازه متن",
+   "textSizeHint": "اندازه متن رزومه خود را تنظیم کنید"
   },
   "personalInfo": {
    "lastName": "الاسم العائلي *",

@@ -33,6 +33,8 @@
    "customCode": "Custom code (e.g. #f23ff0)",
    "presetColors": "Preset colors",
    "confirmColor": "Confirm",
+   "textSizeLabel": "Text size",
+   "textSizeHint": "Adjust the text size on your CV",
    "loadingCvtheque": "Loading your organisation's options…"
   },
   "personalInfo": {

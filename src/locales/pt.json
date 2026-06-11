@@ -32,7 +32,9 @@
    "chooseColor": "Escolher uma cor",
    "customCode": "Código personalizado (ex. #f23ff0)",
    "presetColors": "Cores predefinidas",
-   "confirmColor": "Confirmar"
+   "confirmColor": "Confirmar",
+   "textSizeLabel": "Tamanho do texto",
+   "textSizeHint": "Ajuste o tamanho do texto no seu CV"
   },
   "personalInfo": {
    "lastName": "Apelido *",

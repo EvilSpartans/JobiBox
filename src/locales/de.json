@@ -32,7 +32,9 @@
    "chooseColor": "Farbe wählen",
    "customCode": "Eigener Code (z.B. #f23ff0)",
    "presetColors": "Vordefinierte Farben",
-   "confirmColor": "Bestätigen"
+   "confirmColor": "Bestätigen",
+   "textSizeLabel": "Textgröße",
+   "textSizeHint": "Passen Sie die Textgröße in Ihrem Lebenslauf an"
   },
   "personalInfo": {
    "lastName": "Nachname *",

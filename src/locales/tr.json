@@ -33,6 +33,8 @@
    "customCode": "Özel kod (örn. #f23ff0)",
    "presetColors": "Önceden tanımlı renkler",
    "confirmColor": "Onayla",
+   "textSizeLabel": "Metin boyutu",
+   "textSizeHint": "CV'nizdeki metin boyutunu ayarlayın",
    "loadingCvtheque": "Kurum seçenekleri yükleniyor…"
   },
   "personalInfo": {
