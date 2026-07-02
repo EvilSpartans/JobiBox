@@ -35,7 +35,13 @@
    "confirmColor": "Confirm",
    "textSizeLabel": "Text size",
    "textSizeHint": "Adjust the text size on your CV",
-   "loadingCvtheque": "Loading your organisation's options…"
+   "loadingCvtheque": "Loading your organisation's options…",
+   "templateFilter_all": "All",
+   "templateFilter_beginner": "Early career CV",
+   "templateFilter_confirmed": "Mid-career CV",
+   "templateFilter_experienced": "Experienced career CV",
+   "templateFilter_skills": "Skills & qualities focused CV",
+   "templateFilter_no_photo": "No photo"
   },
   "personalInfo": {
    "lastName": "Last name *",

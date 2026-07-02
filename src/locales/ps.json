@@ -35,7 +35,13 @@
    "confirmColor": "تایید",
    "textSizeLabel": "د متن اندازه",
    "textSizeHint": "د خپل CV د متن اندازه تنظیم کړئ",
-   "loadingCvtheque": "د سازمان اختیارونه پورته کیږي…"
+   "loadingCvtheque": "د سازمان اختیارونه پورته کیږي…",
+   "templateFilter_all": "ټول",
+   "templateFilter_beginner": "د مسلک پیل CV",
+   "templateFilter_confirmed": "تایید شوی مسلک CV",
+   "templateFilter_experienced": "تجربه لرونکی مسلک CV",
+   "templateFilter_skills": "د مهارتونو او ځانګړتیاوو تمرکز CV",
+   "templateFilter_no_photo": "پرته له عکس"
   },
   "personalInfo": {
    "lastName": "تخلص *",

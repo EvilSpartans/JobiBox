@@ -34,7 +34,13 @@
    "presetColors": "ألوان محددة مسبقاً",
    "confirmColor": "تأیید",
    "textSizeLabel": "اندازه متن",
-   "textSizeHint": "اندازه متن رزومه خود را تنظیم کنید"
+   "textSizeHint": "اندازه متن رزومه خود را تنظیم کنید",
+   "templateFilter_all": "همه",
+   "templateFilter_beginner": "رزومه شروع مسیر شغلی",
+   "templateFilter_confirmed": "رزومه مسیر شغلی تأییدشده",
+   "templateFilter_experienced": "رزومه مسیر شغلی باتجربه",
+   "templateFilter_skills": "رزومه متمرکز بر مهارت‌ها و ویژگی‌ها",
+   "templateFilter_no_photo": "بدون عکس"
   },
   "personalInfo": {
    "lastName": "الاسم العائلي *",

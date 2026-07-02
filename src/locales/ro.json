@@ -35,7 +35,13 @@
    "confirmColor": "Validează",
    "textSizeLabel": "Mărimea textului",
    "textSizeHint": "Ajustați dimensiunea textului din CV-ul dvs.",
-   "loadingCvtheque": "Se încarcă opțiunile organizației…"
+   "loadingCvtheque": "Se încarcă opțiunile organizației…",
+   "templateFilter_all": "Toate",
+   "templateFilter_beginner": "CV început de carieră",
+   "templateFilter_confirmed": "CV carieră confirmată",
+   "templateFilter_experienced": "CV carieră experimentată",
+   "templateFilter_skills": "CV axat pe competențe și calități",
+   "templateFilter_no_photo": "Fără fotografie"
   },
   "personalInfo": {
    "lastName": "Nume *",

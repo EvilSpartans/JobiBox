@@ -27,6 +27,10 @@ import {
  pickDefaultTemplate,
  resolveCvthequeBusinessId,
 } from "../../utils/resumeCvtheque";
+import {
+ buildDisplayTemplates,
+ getVisibleCategoryIds,
+} from "../../utils/cvTemplateCategories";
 import Wheel from "@uiw/react-color-wheel";
 import GlowBackground from "../../components/resume/GlowBackground";
 
@@ -75,6 +79,24 @@ export default function Customization() {
   return buildAllowedTemplates(resumeSettings.allowedTemplates ?? [], TEMPLATES);
  }, [businessId, resumeSettings, resumeSettingsStatus]);
 
+ const [templateCategoryId, setTemplateCategoryId] = useState("all");
+
+ const visibleTemplateCategoryIds = useMemo(
+  () => getVisibleCategoryIds(designs),
+  [designs],
+ );
+
+ const filteredDesigns = useMemo(
+  () => buildDisplayTemplates(designs, templateCategoryId),
+  [designs, templateCategoryId],
+ );
+
+ useEffect(() => {
+  if (!visibleTemplateCategoryIds.includes(templateCategoryId)) {
+   setTemplateCategoryId("all");
+  }
+ }, [visibleTemplateCategoryIds, templateCategoryId]);
+
  const [title, setTitle] = useState("");
  const [selectedDesign, setSelectedDesign] = useState(TEMPLATES[0]?.key ?? null);
  const [selectedColor, setSelectedColor] = useState("#10B981");
@@ -97,17 +119,17 @@ export default function Customization() {
  }, [dispatch, user]);
 
  useEffect(() => {
-  if (!designs.length) return;
+  if (!filteredDesigns.length) return;
   setSelectedDesign((prev) => {
-   if (designs.some((d) => d.key === prev)) return prev;
-   return pickDefaultTemplate(resume?.template, designs);
+   if (filteredDesigns.some((d) => d.key === prev)) return prev;
+   return pickDefaultTemplate(resume?.template, filteredDesigns);
   });
- }, [resume?.id, resume?.template, designs]);
+ }, [resume?.id, resume?.template, filteredDesigns]);
 
  useEffect(() => {
-  const idx = designs.findIndex((d) => d.key === selectedDesign);
+  const idx = filteredDesigns.findIndex((d) => d.key === selectedDesign);
   if (idx >= 0) setSelectedTemplateIndex(idx);
- }, [designs, selectedDesign]);
+ }, [filteredDesigns, selectedDesign]);
 
  useEffect(() => {
   if (!mainColorConstrained || !allowedMainColors.length) return;
@@ -135,26 +157,28 @@ export default function Customization() {
   }
  }, [resume, mainColorConstrained, allowedMainColors]);
 
- const sliderKey = `${resume?.id ?? "new"}-${designs.map((d) => d.key).join("|")}`;
+ const sliderKey = `${resume?.id ?? "new"}-${filteredDesigns.map((d) => d.key).join("|")}-${templateCategoryId}`;
 
  const sliderSettings = useMemo(
   () => ({
-   infinite: designs.length > 3,
+   infinite: filteredDesigns.length > 3,
    speed: 500,
-   slidesToShow: Math.min(3, designs.length),
+   slidesToShow: Math.min(3, filteredDesigns.length),
    slidesToScroll: 1,
    centerMode: false,
    arrows: true,
    initialSlide: Math.max(
     0,
-    resume?.template ? designs.findIndex((d) => d.key === resume.template) : 0,
+    resume?.template
+     ? filteredDesigns.findIndex((d) => d.key === resume.template)
+     : 0,
    ),
    afterChange: (index) => {
     setSelectedTemplateIndex(index);
-    setSelectedDesign(designs[index]?.key ?? null);
+    setSelectedDesign(filteredDesigns[index]?.key ?? null);
    },
   }),
-  [designs, resume?.template],
+  [filteredDesigns, resume?.template],
  );
 
  const isValidHex = (hex) => /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
@@ -297,9 +321,27 @@ export default function Customization() {
        {t("resume.customization.chooseDesign")}
       </h3>
 
+      <div className="flex flex-wrap justify-center gap-2 px-2 mb-4">
+       {visibleTemplateCategoryIds.map((categoryId) => (
+        <button
+         key={categoryId}
+         type="button"
+         onClick={() => setTemplateCategoryId(categoryId)}
+         aria-pressed={templateCategoryId === categoryId}
+         className={`px-3 py-1.5 rounded-full border text-xs sm:text-sm transition-all ${
+          templateCategoryId === categoryId
+           ? "bg-emerald-600/20 border-emerald-500 text-emerald-200 font-medium"
+           : "border-white/15 text-gray-300 hover:border-emerald-400 hover:text-emerald-300"
+         }`}
+        >
+         {t(`resume.customization.templateFilter_${categoryId}`)}
+        </button>
+       ))}
+      </div>
+
       <div className="template-slider-wrap flex-shrink-0 px-10 sm:px-12 py-2">
        <Slider ref={sliderRef} key={sliderKey} {...sliderSettings}>
-        {designs.map((design, index) => (
+        {filteredDesigns.map((design, index) => (
          <div
           key={design.key}
           className="flex justify-center cursor-pointer"

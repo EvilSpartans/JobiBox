@@ -34,7 +34,13 @@
    "presetColors": "Vordefinierte Farben",
    "confirmColor": "Bestätigen",
    "textSizeLabel": "Textgröße",
-   "textSizeHint": "Passen Sie die Textgröße in Ihrem Lebenslauf an"
+   "textSizeHint": "Passen Sie die Textgröße in Ihrem Lebenslauf an",
+   "templateFilter_all": "Alle",
+   "templateFilter_beginner": "CV Berufseinsteiger",
+   "templateFilter_confirmed": "CV Berufserfahren",
+   "templateFilter_experienced": "CV langjährige Berufserfahrung",
+   "templateFilter_skills": "CV Kompetenzen & Qualitäten",
+   "templateFilter_no_photo": "Ohne Foto"
   },
   "personalInfo": {
    "lastName": "Nachname *",

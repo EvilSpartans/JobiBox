@@ -35,7 +35,13 @@
    "confirmColor": "Valider",
    "textSizeLabel": "Taille du texte",
    "textSizeHint": "Ajustez la taille des textes sur votre CV",
-   "loadingCvtheque": "Chargement des options de ton organisme…"
+   "loadingCvtheque": "Chargement des options de ton organisme…",
+   "templateFilter_all": "Tous",
+   "templateFilter_beginner": "CV début de parcours",
+   "templateFilter_confirmed": "CV parcours confirmé",
+   "templateFilter_experienced": "CV parcours expérimenté",
+   "templateFilter_skills": "CV axé Compétences et Qualités",
+   "templateFilter_no_photo": "Sans photo"
   },
   "personalInfo": {
    "lastName": "Nom *",

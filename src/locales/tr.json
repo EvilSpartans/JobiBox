@@ -35,7 +35,13 @@
    "confirmColor": "Onayla",
    "textSizeLabel": "Metin boyutu",
    "textSizeHint": "CV'nizdeki metin boyutunu ayarlayın",
-   "loadingCvtheque": "Kurum seçenekleri yükleniyor…"
+   "loadingCvtheque": "Kurum seçenekleri yükleniyor…",
+   "templateFilter_all": "Tümü",
+   "templateFilter_beginner": "Kariyer başlangıcı CV",
+   "templateFilter_confirmed": "Onaylanmış kariyer CV",
+   "templateFilter_experienced": "Deneyimli kariyer CV",
+   "templateFilter_skills": "Yetkinlik ve nitelik odaklı CV",
+   "templateFilter_no_photo": "Fotoğrafsız"
   },
   "personalInfo": {
    "lastName": "Soyad *",

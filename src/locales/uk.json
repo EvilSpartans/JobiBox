@@ -35,7 +35,13 @@
    "confirmColor": "Підтвердити",
    "textSizeLabel": "Розмір тексту",
    "textSizeHint": "Налаштуйте розмір тексту у вашому резюме",
-   "loadingCvtheque": "Завантаження опцій організації…"
+   "loadingCvtheque": "Завантаження опцій організації…",
+   "templateFilter_all": "Усі",
+   "templateFilter_beginner": "CV початок кар'єри",
+   "templateFilter_confirmed": "CV підтверджена кар'єра",
+   "templateFilter_experienced": "CV досвідчена кар'єра",
+   "templateFilter_skills": "CV з акцентом на компетенції та якості",
+   "templateFilter_no_photo": "Без фото"
   },
   "personalInfo": {
    "lastName": "Прізвище *",

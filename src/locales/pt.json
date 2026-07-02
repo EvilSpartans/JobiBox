@@ -34,7 +34,13 @@
    "presetColors": "Cores predefinidas",
    "confirmColor": "Confirmar",
    "textSizeLabel": "Tamanho do texto",
-   "textSizeHint": "Ajuste o tamanho do texto no seu CV"
+   "textSizeHint": "Ajuste o tamanho do texto no seu CV",
+   "templateFilter_all": "Todos",
+   "templateFilter_beginner": "CV início de carreira",
+   "templateFilter_confirmed": "CV carreira confirmada",
+   "templateFilter_experienced": "CV carreira experiente",
+   "templateFilter_skills": "CV focado em competências e qualidades",
+   "templateFilter_no_photo": "Sem foto"
   },
   "personalInfo": {
    "lastName": "Apelido *",

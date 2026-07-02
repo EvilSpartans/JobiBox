@@ -34,7 +34,13 @@
    "presetColors": "ألوان محددة مسبقاً",
    "confirmColor": "تأكيد",
    "textSizeLabel": "حجم النص",
-   "textSizeHint": "اضبط حجم النص في سيرتك الذاتية"
+   "textSizeHint": "اضبط حجم النص في سيرتك الذاتية",
+   "templateFilter_all": "الكل",
+   "templateFilter_beginner": "سيرة ذاتية بداية المسار",
+   "templateFilter_confirmed": "سيرة ذاتية مسار مؤكد",
+   "templateFilter_experienced": "سيرة ذاتية مسار خبير",
+   "templateFilter_skills": "سيرة ذاتية تركز على المهارات والصفات",
+   "templateFilter_no_photo": "بدون صورة"
   },
   "personalInfo": {
    "lastName": "الاسم العائلي *",

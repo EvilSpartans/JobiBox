@@ -35,7 +35,13 @@
    "confirmColor": "Zatwierdź",
    "textSizeLabel": "Rozmiar tekstu",
    "textSizeHint": "Dostosuj rozmiar tekstu w swoim CV",
-   "loadingCvtheque": "Ładowanie opcji organizacji…"
+   "loadingCvtheque": "Ładowanie opcji organizacji…",
+   "templateFilter_all": "Wszystkie",
+   "templateFilter_beginner": "CV początek kariery",
+   "templateFilter_confirmed": "CV potwierdzona kariera",
+   "templateFilter_experienced": "CV doświadczona kariera",
+   "templateFilter_skills": "CV skupione na kompetencjach i cechach",
+   "templateFilter_no_photo": "Bez zdjęcia"
   },
   "personalInfo": {
    "lastName": "Nazwisko *",
