@@ -14,6 +14,9 @@ import ps from "./locales/ps.json";
 import pl from "./locales/pl.json";
 import tr from "./locales/tr.json";
 import uk from "./locales/uk.json";
+import zh from "./locales/zh.json";
+import hi from "./locales/hi.json";
+import ko from "./locales/ko.json";
 
 const STORAGE_KEY = "appLang";
 
@@ -39,9 +42,12 @@ const resources = {
   pl: { translation: pl },
   tr: { translation: tr },
   uk: { translation: uk },
+  zh: { translation: zh },
+  hi: { translation: hi },
+  ko: { translation: ko },
 };
 
-const supportedLangs = ["fr", "en", "es", "de", "it", "pt", "ar", "ro", "fa", "ps", "pl", "tr", "uk"];
+const supportedLangs = ["fr", "en", "es", "de", "it", "pt", "ar", "ro", "fa", "ps", "pl", "tr", "uk", "zh", "hi", "ko"];
 
 const detectLang = () => {
   const stored = getStoredLang();

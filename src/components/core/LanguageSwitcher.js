@@ -16,6 +16,9 @@ const FLAGS = {
   pl: "🇵🇱",
   tr: "🇹🇷",
   uk: "🇺🇦",
+  zh: "🇨🇳",
+  hi: "🇮🇳",
+  ko: "🇰🇷",
 };
 
 export default function LanguageSwitcher() {
