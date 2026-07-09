@@ -172,9 +172,6 @@ export const LANGUAGES_RESUME = [
   "Polonais",
   "Turc",
   "Ukrainien",
-  "Chinois",
-  "Hindi",
-  "Coréen",
 ];
 
 export const LANGUAGE_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2", "Natif"];

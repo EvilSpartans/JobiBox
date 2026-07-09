@@ -47,7 +47,7 @@ const resources = {
   ko: { translation: ko },
 };
 
-const supportedLangs = ["fr", "en", "es", "de", "it", "pt", "ar", "ro", "fa", "ps", "pl", "tr", "uk", "zh", "hi", "ko"];
+const supportedLangs = ["fr", "en", "es", "de", "it", "pt", "ar", "ro", "fa", "ps", "pl", "tr", "uk"];
 
 const detectLang = () => {
   const stored = getStoredLang();
