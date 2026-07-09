@@ -47,6 +47,7 @@ export default function Film() {
   const selfieSegmentationRef = useRef(null);
   const backgroundImageRef = useRef(null);
   const animFrameRef = useRef(null);
+  const mediaStreamRef = useRef(null);
 
   const selectedGreenFilter = JSON.parse(localStorage.getItem("selectedGreenFilter"));
   const beginnerInProgress = localStorage.getItem('beginnerInProgress');
@@ -142,6 +143,7 @@ export default function Film() {
 
       videoCameraRef.current.srcObject = stream;
       setMediaStream(stream);
+      mediaStreamRef.current = stream;
 
       if (selectedGreenFilter) {
         handleApplyBackground(selectedGreenFilter);
@@ -175,9 +177,9 @@ export default function Film() {
         let stream;
         if (isFilterApplied) {
           stream = canvasRef.current.captureStream();
-          mediaStream.getAudioTracks().forEach((track) => stream.addTrack(track));
+          mediaStreamRef.current.getAudioTracks().forEach((track) => stream.addTrack(track));
         } else {
-          stream = mediaStream;
+          stream = mediaStreamRef.current;
         }
 
         const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
@@ -344,6 +346,7 @@ export default function Film() {
       setCreatedVideoPath(null);
       setRecording(false);
       setMediaStream(null);
+      mediaStreamRef.current = null;
       setShowIntro(true);
       // setLostConnexion(null);
     } else {
