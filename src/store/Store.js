@@ -18,6 +18,7 @@ import subCategorySlice from "./slices/subCategorySlice";
 import citySlice from "./slices/citySlice";
 import softSkillSlice from "./slices/softSkillSlice";
 import ResumeSlice from "./slices/resumeSlice";
+import interviewSimulationSlice from "./slices/interviewSimulationSlice";
 
 // saveUserOnlyFilter
 const saveUserOnlyFilter = createFilter("user", ["user"]);
@@ -46,6 +47,7 @@ const rootReducer = combineReducers({
   city: citySlice,
   softSkill: softSkillSlice,
   resume: ResumeSlice,
+  interviewSimulation: interviewSimulationSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

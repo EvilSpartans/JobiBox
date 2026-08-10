@@ -3,13 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowCircleLeft } from "@fortawesome/free-solid-svg-icons";
 
-const GoBack = ({ itemsToRemove = [], to }) => {
+const GoBack = ({ itemsToRemove = [], to, onBack }) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
     itemsToRemove.forEach((item) => {
       localStorage.removeItem(item);
     });
+
+    if (typeof onBack === "function") {
+      onBack();
+      return;
+    }
 
     if (to) {
       navigate(to);

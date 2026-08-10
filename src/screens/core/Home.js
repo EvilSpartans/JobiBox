@@ -63,7 +63,7 @@ export default function Home() {
         {
           path: "/train",
           title: "Simulation d'entretien",
-          subtitle: "Questions réelles, caméra, puis analyse de ta performance.",
+          subtitle: "Entretien oral avec l'IA : questions, micro, bilan détaillé.",
           accent: "border-l-blue_3",
           iconWrap: "bg-blue_3/10 text-blue_3 ring-blue_3/25",
           icon: (

@@ -13,6 +13,7 @@ export const getCategories = createAsyncThunk(
     "api/categories",
     async (arg, { rejectWithValue }) => {
         try {
+            // Même pattern que Intermediate / Expert / PostForm
             const token = typeof arg === "string" ? arg : arg?.token;
             const lang = typeof arg === "object" ? arg?.lang : undefined;
 
