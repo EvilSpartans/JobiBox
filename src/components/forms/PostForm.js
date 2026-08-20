@@ -41,7 +41,6 @@ export default function PostForm() {
  const [contractOptions, setContractOptions] = useState([]);
  const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
  const businessId = localStorage.getItem("businessId") || null;
- const isTrainExam = localStorage.getItem("isTrainExam") || null;
  const showPortalCheckbox = businessId !== null && businessId !== 0;
  const [formError, setFormError] = useState("");
 
@@ -52,12 +51,6 @@ export default function PostForm() {
  // Suggestion de photo
  const [showPhotoReminder, setShowPhotoReminder] = useState(false);
  const photoRef = useRef(null);
-
- const simulationInProgress =
-  localStorage.getItem("beginnerInProgress") ||
-  localStorage.getItem("intermediateInProgress");
-
- const expertInProgress = localStorage.getItem("expertInProgress");
 
  // Form's options
  const {
@@ -250,11 +243,7 @@ export default function PostForm() {
    // console.log(res);
    if (res?.payload?.title) {
     localStorage.setItem("urlQrcode", res.payload.video);
-    if (simulationInProgress || expertInProgress) {
-     navigate("/evaluation");
-    } else {
-     navigate("/thanks");
-    }
+    navigate("/thanks");
     sendConfirmNotification();
    }
   } catch (error) {
@@ -266,8 +255,6 @@ export default function PostForm() {
    localStorage.removeItem("videoPath");
    localStorage.removeItem("videoId");
    localStorage.removeItem("textStyle");
-   localStorage.removeItem("examenInProgress");
-   localStorage.removeItem("isTrainExam");
    localStorage.removeItem("selectedGreenFilter");
    localStorage.removeItem("selectedAnimation");
    dispatch(changeStatus(""));
@@ -359,9 +346,8 @@ export default function PostForm() {
 
      <hr />
 
-     {/* Only for CV video */}
-     {isTrainExam !== "true" && (
-      <>
+     {/* CV video fields */}
+     <>
        <div className="flex justify-between space-x-2 !mt-0">
         <Input
          name="city"
@@ -444,8 +430,7 @@ export default function PostForm() {
         register={register}
         error={errors?.description?.message}
        />
-      </>
-     )}
+     </>
 
      {/*if we have an error*/}
      {error ? (

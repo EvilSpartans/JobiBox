@@ -35,10 +35,6 @@ export default function Home() {
   const resume = localStorage.getItem("resumeActivated");
   const offers = localStorage.getItem("offersActivated");
   const careerGuide = localStorage.getItem("careerGuideActivated");
-  const examenInProgress = localStorage.getItem("examenInProgress");
-  const beginnerInProgress = localStorage.getItem("beginnerInProgress");
-  const intermediateInProgress = localStorage.getItem("intermediateInProgress");
-  const expertInProgress = localStorage.getItem("expertInProgress");
   const existingSelectedGreenFilter = localStorage.getItem(
     "selectedGreenFilter",
   );
@@ -124,7 +120,6 @@ export default function Home() {
         const portalsData = response.payload;
 
         localStorage.setItem("trainingActivated", portalsData.training);
-        localStorage.setItem("examActivated", portalsData.exam);
         localStorage.setItem("resumeActivated", portalsData.resume);
         localStorage.setItem("offersActivated", portalsData.offers);
         if (portalsData.career !== undefined) {
@@ -180,34 +175,10 @@ export default function Home() {
 
     fetchJobibox();
 
-    if (examenInProgress === "true") {
-      localStorage.removeItem("examenInProgress");
-    }
-
-    if (beginnerInProgress) {
-      localStorage.removeItem("beginnerInProgress");
-    }
-
-    if (intermediateInProgress) {
-      localStorage.removeItem("intermediateInProgress");
-    }
-
-    if (expertInProgress) {
-      localStorage.removeItem("expertInProgress");
-    }
-
     if (existingSelectedGreenFilter) {
       localStorage.removeItem("selectedGreenFilter");
     }
-  }, [
-    navigate,
-    dispatch,
-    examenInProgress,
-    existingSelectedGreenFilter,
-    expertInProgress,
-    intermediateInProgress,
-    beginnerInProgress,
-  ]);
+  }, [navigate, dispatch, existingSelectedGreenFilter]);
 
   if (loading) {
     return (

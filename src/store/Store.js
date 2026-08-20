@@ -7,7 +7,6 @@ import userSlice from "./slices/userSlice";
 import postSlice from "./slices/postSlice";
 import jobiboxSlice from "./slices/jobiboxSlice";
 import videoProcessSlice from "./slices/videoProcessSlice";
-import questionVideoSlice from "./slices/questionVideoSlice";
 import questionSlice from "./slices/questionSlice";
 import groupQuestionSlice from "./slices/groupQuestionSlice";
 import categorySlice from "./slices/categorySlice";
@@ -35,7 +34,6 @@ const rootReducer = combineReducers({
   user: userSlice,
   post: postSlice,
   videoProcess: videoProcessSlice,
-  questionVideo: questionVideoSlice,
   jobibox: jobiboxSlice,
   question: questionSlice,
   groupQuestions: groupQuestionSlice,

@@ -41,10 +41,9 @@ export default function Clip() {
       dispatch(changeStatus("loading"));
       const response = await dispatch(getVideoProcesses(token));
       const payload = response.payload;
-      const filteredQuestions = payload.filter(question => question.type !== "TrainExam");
-      setQuestions(filteredQuestions);
+      setQuestions(payload);
   
-      if (filteredQuestions && filteredQuestions.length === 0) {
+      if (payload && payload.length === 0) {
         navigate("/questions");
       }
   

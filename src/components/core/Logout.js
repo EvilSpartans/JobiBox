@@ -48,7 +48,6 @@ export default function Logout({ position = "fixed" }) {
  const clearLocalStorage = () => {
   const keysToKeep = [
    "jobiboxId",
-   "examActivated",
    "trainingActivated",
    "businessId",
   ];

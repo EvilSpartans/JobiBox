@@ -17,7 +17,6 @@ const initialState = {
   avatar: "",
   token: "",
   referenceBusiness: {},
-  questionLists: [],
   offerCandidacyIds: [],
  },
 };
@@ -102,30 +101,11 @@ export const userSlice = createSlice({
      avatar: "",
      token: "",
      referenceBusiness: {},
-     questionLists: [],
      offerCandidacyIds: [],
     }));
   },
   changeStatus: (state, action) => {
    state.status = action.payload;
-  },
-  updateQuestionLists: (state, action) => {
-   if (state.user && state.user.questionLists) {
-    const newElement = action.payload;
-
-    if (!newElement || typeof newElement.id === "undefined") {
-     console.error("❌ Élément invalide reçu :", newElement);
-     return;
-    }
-
-    const exists = state.user.questionLists.some(
-     (questionList) => questionList.id === newElement.id,
-    );
-
-    if (!exists) {
-     state.user.questionLists.push(newElement);
-    }
-   }
   },
 
   addCandidacy: (state, action) => {
@@ -158,7 +138,6 @@ export const userSlice = createSlice({
      avatar: userData.avatar || "",
      token: action.payload.token,
      referenceBusiness: userData.referenceBusiness || {},
-     questionLists: userData.questionLists || [],
      offerCandidacyIds: userData.offerCandidacyIds || [],
     };
    })
@@ -183,7 +162,6 @@ export const userSlice = createSlice({
      avatar: userData.avatar || "",
      token: action.payload.token,
      referenceBusiness: userData.referenceBusiness || {},
-     questionLists: userData.questionLists || [],
      offerCandidacyIds: userData.offerCandidacyIds || [],
     };
    })
@@ -210,7 +188,6 @@ export const userSlice = createSlice({
 export const {
  logout,
  changeStatus,
- updateQuestionLists,
  addCandidacy,
  clearResetPasswordState,
 } = userSlice.actions;

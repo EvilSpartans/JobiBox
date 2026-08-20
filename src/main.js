@@ -10,7 +10,6 @@ import AuthRoutes from "./routes/AuthRoutes";
 import CvVideoRoutes from "./routes/CvVideoRoutes";
 import CoreRoutes from "./routes/CoreRoutes";
 import SimulationRoutes from "./routes/SimulationRoutes";
-import ExamRoutes from "./routes/ExamRoutes";
 import OfferRoutes from "./routes/OfferRoutes";
 import CareerRoutes from "./routes/CareerRoutes";
 import ResumeRoutes from './routes/ResumeRoutes';
@@ -30,7 +29,6 @@ export default function App() {
                             {CvVideoRoutes({ token })}
                             {ResumeRoutes({ token })}
                             {SimulationRoutes({ token })}
-                            {ExamRoutes({ token })}
                             {CoreRoutes({ token })}
                             {OfferRoutes({ token })}
                             {CareerRoutes({ token })}
