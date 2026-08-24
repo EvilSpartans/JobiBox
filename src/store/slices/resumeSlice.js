@@ -455,6 +455,27 @@ export const translateResume = createAsyncThunk(
  },
 );
 
+export const sendResumeByEmail = createAsyncThunk(
+ "resume/sendByEmail",
+ async ({ token, id }, { rejectWithValue }) => {
+  try {
+   const { data } = await axios.post(
+    `${BASE_URL}/resume/${id}/send-email`,
+    {},
+    {
+     headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+     },
+    },
+   );
+   return data;
+  } catch (error) {
+   return rejectWithValue(error.response?.data || error.message);
+  }
+ },
+);
+
 /**
  * URL « brute » du PDF (sans ?v= ni #) : CloudFront + chemin issu du resume, ou URL complète renvoyée par l’API.
  */

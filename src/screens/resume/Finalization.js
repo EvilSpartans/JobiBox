@@ -14,6 +14,7 @@ import {
  selectResumePdfEmbedUrl,
  translateResume,
  getResumeDownloadUrl,
+ sendResumeByEmail,
  resetResumeState,
 } from "../../store/slices/resumeSlice";
 import Photo from "../../components/core/Photo";
@@ -49,6 +50,7 @@ export default function Finalization() {
  const [showMediasModal, setShowMediasModal] = useState(false);
  const [translateLang, setTranslateLang] = useState("en");
  const [translating, setTranslating] = useState(false);
+ const [sendingEmail, setSendingEmail] = useState(false);
  const [toast, setToast] = useState(null);
  const [showPreview, setShowPreview] = useState(false);
  const [showConfetti, setShowConfetti] = useState(true);
@@ -299,6 +301,21 @@ useEffect(() => {
   }
  };
 
+ const handleSendToMailbox = async () => {
+  if (!resume?.id || !user?.token || sendingEmail) return;
+  setSendingEmail(true);
+  try {
+   await dispatch(
+    sendResumeByEmail({ token: user.token, id: resume.id }),
+   ).unwrap();
+   setToast({ type: "success", msg: t("resume.finalization.emailSent") });
+  } catch {
+   setToast({ type: "error", msg: t("resume.finalization.emailError") });
+  } finally {
+   setSendingEmail(false);
+  }
+ };
+
  /* ================= SAVE MEDIAS ================= */
  const saveMedias = async () => {
   const r = store.getState().resume.resume;
@@ -452,6 +469,30 @@ useEffect(() => {
         size={100}
        />
       </div>
+
+      <button
+       type="button"
+       onClick={handleSendToMailbox}
+       disabled={sendingEmail || !resume?.id}
+       className="mt-6 min-w-[min(100%,280px)] px-8 py-3 rounded-full border border-white/20 bg-white/5 text-white font-medium transition hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+       {sendingEmail ? (
+        <PulseLoader color="#fff" size={8} />
+       ) : (
+        t("resume.finalization.sendToMailbox")
+       )}
+      </button>
+      {toast && (
+       <div
+        className={`mt-3 px-4 py-2 rounded-lg text-sm text-center ${
+         toast.type === "success"
+          ? "bg-emerald-600/30 text-emerald-200"
+          : "bg-red-600/30 text-red-200"
+        }`}
+       >
+        {toast.msg}
+       </div>
+      )}
 
       {/* ATS + mode anonyme (même ligne) */}
       <div className="mt-10 flex flex-row flex-wrap items-center justify-center gap-x-8 gap-y-3">
