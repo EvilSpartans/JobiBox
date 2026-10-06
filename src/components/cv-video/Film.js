@@ -10,6 +10,8 @@ import PulseLoader from "react-spinners/PulseLoader";
 import { SelfieSegmentation } from "@mediapipe/selfie_segmentation";
 import IntroQuestion from "./IntroQuestion";
 
+const STOP_RECORDING_DELAY_MS = 1000;
+
 export default function Film({ onStartSequence }) {
   const BASE_URL = process.env.REACT_APP_WEB_BASE_URL;
 
@@ -51,6 +53,7 @@ export default function Film({ onStartSequence }) {
   const currentQuestionIdRef = useRef();
   const isKeyPressed = useRef(false);
   const isCountdownActive = useRef(false);
+  const stopRecordingTimeoutRef = useRef(null);
   const selfieSegmentationRef = useRef(null);
   const backgroundImageRef = useRef(null);
   const animFrameRef = useRef(null);
@@ -293,8 +296,15 @@ export default function Film({ onStartSequence }) {
       }
     } else {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
-        mediaRecorder.stop();
+        if (stopRecordingTimeoutRef.current) return;
         clearInterval(timerIntervalId);
+        const recorder = mediaRecorder;
+        stopRecordingTimeoutRef.current = setTimeout(() => {
+          stopRecordingTimeoutRef.current = null;
+          if (recorder.state !== "inactive") {
+            recorder.stop();
+          }
+        }, STOP_RECORDING_DELAY_MS);
       }
     }
   };
@@ -426,6 +436,10 @@ export default function Film({ onStartSequence }) {
   };
 
   const handleRedoRecording = () => {
+    if (stopRecordingTimeoutRef.current) {
+      clearTimeout(stopRecordingTimeoutRef.current);
+      stopRecordingTimeoutRef.current = null;
+    }
     setIsSavingVideo(false);
     setLostConnexion(null);
     setVideoBase64(null);
