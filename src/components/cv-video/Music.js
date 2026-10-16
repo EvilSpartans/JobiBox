@@ -4,6 +4,7 @@ import { getMusics } from "../../store/slices/musicSlice";
 import PulseLoader from "react-spinners/PulseLoader";
 // import ModalMusic from "../modals/ModalMusic";
 import { useNavigate } from "react-router-dom";
+import { getMusicFileLabel } from "../../utils/musicDisplayLabel";
 // import Tuto from "../Tuto";
 
 export default function Music() {
@@ -136,7 +137,13 @@ export default function Music() {
             {/* ------- */}
 
             {/* Music list */}
-            {musics && musics.map((music, index) => (
+            {musics && musics.map((music, index) => {
+              const fileLabel = getMusicFileLabel(music.music);
+              const displayLabel =
+                fileLabel.length > 10
+                  ? `${fileLabel.substring(0, 10)}...`
+                  : fileLabel;
+              return (
               <div key={index} className="w-1/3 mb-4 p-2">
                 <label
                   className={`block relative border-2 p-3 rounded-lg ${
@@ -160,13 +167,12 @@ export default function Music() {
                     onChange={() => handleSelectMusic(music, index)}
                   />
                   <span className="music-title text-xs font-semibold overflow-hidden whitespace-nowrap text-center flex items-center justify-center">
-                    {music.title.length > 10
-                      ? `${music.title.substring(0, 10)}...`
-                      : music.title}
+                    {displayLabel}
                   </span>
                 </label>
               </div>
-            ))}
+            );
+            })}
             {/* ------ */}
           </div>
         )}
