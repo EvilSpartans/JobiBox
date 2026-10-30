@@ -20,6 +20,7 @@ export const CV_TEMPLATE_CATEGORY_SLUGS = {
     "template13",
     "template14",
     "template16",
+    "template21",
   ],
   confirmed: [
     "template1",
@@ -27,10 +28,19 @@ export const CV_TEMPLATE_CATEGORY_SLUGS = {
     "template6",
     "template10",
     "template12",
+    "template18",
+    "template22",
   ],
-  experienced: ["template2", "template4", "template7", "template15"],
-  skills: ["template9", "template15"],
-  no_photo: ["template6", "template8", "template9"],
+  experienced: [
+    "template2",
+    "template4",
+    "template7",
+    "template15",
+    "template19",
+    "template22",
+  ],
+  skills: ["template9", "template15", "template17"],
+  no_photo: ["template6", "template8", "template9", "template20"],
 };
 
 /**

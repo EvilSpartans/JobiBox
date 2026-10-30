@@ -14,6 +14,12 @@ import template13 from "../../assets/images/resume/template13.jpg";
 import template14 from "../../assets/images/resume/template14.jpg";
 import template15 from "../../assets/images/resume/template15.jpg";
 import template16 from "../../assets/images/resume/template16.jpg";
+import template17 from "../../assets/images/resume/template17.jpg";
+import template18 from "../../assets/images/resume/template18.jpg";
+import template19 from "../../assets/images/resume/template19.jpg";
+import template20 from "../../assets/images/resume/template20.jpg";
+import template21 from "../../assets/images/resume/template21.jpg";
+import template22 from "../../assets/images/resume/template22.jpg";
 
 export const CV_STEPS_STEPPER = [
  {
@@ -111,6 +117,12 @@ export const TEMPLATES = [
  { key: "template14", label: "Template 14", image: template14 },
  { key: "template15", label: "Template 15", image: template15 },
  { key: "template16", label: "Template 16", image: template16 },
+ { key: "template17", label: "Template 17", image: template17 },
+ { key: "template18", label: "Template 18", image: template18 },
+ { key: "template19", label: "Template 19", image: template19 },
+ { key: "template20", label: "Template 20", image: template20 },
+ { key: "template21", label: "Template 21", image: template21 },
+ { key: "template22", label: "Template 22", image: template22 },
 ];
 
 export const COLORS = [
