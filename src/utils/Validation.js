@@ -38,7 +38,6 @@ export const forgotPasswordSchema = Yup.object({
 export const PostSchema = Yup.object().shape({
     title: Yup.string().required("Le titre est requis."),
     category: Yup.string().required("La catégorie est requise."),
-    subCategory: Yup.string().required("La classification est requise."),
     portal: Yup.array().nullable(),
     description: Yup.string(),
     city: Yup.string(),
