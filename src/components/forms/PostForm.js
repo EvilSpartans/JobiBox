@@ -139,11 +139,6 @@ export default function PostForm() {
   return () => clearTimeout(timeout);
  }, [cityQuery, dispatch]);
 
- const subCategoryOptions = [
-  { value: "Emploi", label: "Recruteur" },
-  { value: "CV", label: "En recherche d'emploi" },
- ];
-
  const commentOptions = [
   { value: "Oui", label: "Oui" },
   { value: "Non", label: "Non" },
@@ -219,7 +214,8 @@ export default function PostForm() {
    title: data.title,
    description: data.description,
    category: data.category,
-   subCategory: data.subCategory || "Portail",
+   // JobiBox : toujours un CV vidéo candidat (plus de choix recruteur)
+   subCategory: "CV",
    place: data.city,
    activateComments: true,
    formation: data.formation === "Oui",
@@ -312,14 +308,6 @@ export default function PostForm() {
       placeholder="Ex : Conseiller en vente, Assistant RH.."
       register={register}
       error={errors?.title?.message}
-      className="required-field"
-     />
-     <Select
-      name="subCategory"
-      placeholder="Es-tu recruteur ou en recherche d'emploi ?"
-      register={register}
-      error={errors?.subCategory?.message}
-      options={subCategoryOptions}
       className="required-field"
      />
      <Select
