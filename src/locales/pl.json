@@ -204,7 +204,7 @@
    "validate": "Zatwierdź",
    "maxReached": "Limit osiągnięty ({{max}}/{{max}})",
    "licenses": "Prawo jazdy",
-   "other": "Inne",
+   "other": "Inne (tekst dowolny)",
    "otherPlaceholder": "Dodatkowe informacje..."
   }
  },

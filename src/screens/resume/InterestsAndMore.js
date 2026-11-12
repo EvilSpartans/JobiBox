@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import Input from "../../components/resume/Input";
 import ResumeHeader from "../../components/resume/ResumeHeader";
 import Footer from "../../components/resume/Footer";
 import CVStepper from "../../components/resume/Stepper";
@@ -255,18 +254,18 @@ export default function InterestsAndMore() {
 
      <FormSeparator compact />
 
-     {/* Autre */}
+     {/* Texte libre */}
      <section className="mt-10">
       <h3 className="text-lg font-semibold text-emerald-300 mb-2">
        {t("resume.interests.other")}
       </h3>
-      <Input
-       label=""
+      <textarea
        name="other"
        value={other}
        onChange={(e) => setOther(e.target.value)}
        placeholder={t("resume.interests.otherPlaceholder")}
-       full
+       rows={2}
+       className="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500"
       />
      </section>
 

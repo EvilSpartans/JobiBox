@@ -203,7 +203,7 @@
    "validate": "Validar",
    "maxReached": "Limite atingido ({{max}}/{{max}})",
    "licenses": "Carta de condução",
-   "other": "Outro",
+   "other": "Outro (texto livre)",
    "otherPlaceholder": "Informações complementares..."
   }
  },

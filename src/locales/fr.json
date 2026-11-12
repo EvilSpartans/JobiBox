@@ -204,7 +204,7 @@
    "validate": "Valider",
    "maxReached": "Limite atteinte ({{max}}/{{max}})",
    "licenses": "Permis",
-   "other": "Autre",
+   "other": "Ajouter un texte libre",
    "otherPlaceholder": "Informations complémentaires..."
   }
  },

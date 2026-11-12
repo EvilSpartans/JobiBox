@@ -204,7 +204,7 @@
    "validate": "확인",
    "maxReached": "한도 도달({{max}}/{{max}})",
    "licenses": "운전면허",
-   "other": "기타",
+   "other": "기타(자유 입력)",
    "otherPlaceholder": "추가 정보..."
   }
  },

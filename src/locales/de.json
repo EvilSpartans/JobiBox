@@ -203,7 +203,7 @@
    "validate": "Bestätigen",
    "maxReached": "Limit erreicht ({{max}}/{{max}})",
    "licenses": "Führerschein",
-   "other": "Sonstiges",
+   "other": "Sonstiges (Freitext)",
    "otherPlaceholder": "Zusätzliche Informationen..."
   }
  },

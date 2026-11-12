@@ -204,7 +204,7 @@
    "validate": "确认",
    "maxReached": "已达上限（{{max}}/{{max}}）",
    "licenses": "驾驶执照",
-   "other": "其他",
+   "other": "其他（自由文本）",
    "otherPlaceholder": "附加信息……"
   }
  },

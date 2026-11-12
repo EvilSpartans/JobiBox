@@ -204,7 +204,7 @@
    "validate": "Onayla",
    "maxReached": "Limite ulaşıldı ({{max}}/{{max}})",
    "licenses": "Ehliyet",
-   "other": "Diğer",
+   "other": "Diğer (serbest metin)",
    "otherPlaceholder": "Ek bilgiler..."
   }
  },

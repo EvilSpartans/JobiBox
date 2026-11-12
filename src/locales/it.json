@@ -203,7 +203,7 @@
    "validate": "Conferma",
    "maxReached": "Limite raggiunto ({{max}}/{{max}})",
    "licenses": "Patente",
-   "other": "Altro",
+   "other": "Altro (testo libero)",
    "otherPlaceholder": "Informazioni aggiuntive..."
   }
  },

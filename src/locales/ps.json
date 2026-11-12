@@ -204,7 +204,7 @@
    "validate": "تایید",
    "maxReached": "حد ({{max}}/{{max}})",
    "licenses": "جواز",
-   "other": "نور",
+   "other": "نور (آزاد متن)",
    "otherPlaceholder": "اضافي معلومات..."
   }
  },

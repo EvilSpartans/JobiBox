@@ -204,7 +204,7 @@
    "validate": "Validează",
    "maxReached": "Limită atinsă ({{max}}/{{max}})",
    "licenses": "Permis",
-   "other": "Altul",
+   "other": "Altul (text liber)",
    "otherPlaceholder": "Informații suplimentare..."
   }
  },

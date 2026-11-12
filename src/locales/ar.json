@@ -203,7 +203,7 @@
    "validate": "تأكيد",
    "maxReached": "تم الوصول للحد ({{max}}/{{max}})",
    "licenses": "رخصة القيادة",
-   "other": "أخرى",
+   "other": "أخرى (نص حر)",
    "otherPlaceholder": "معلومات إضافية..."
   }
  },

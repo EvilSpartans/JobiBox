@@ -204,7 +204,7 @@
    "validate": "Validate",
    "maxReached": "Limit reached ({{max}}/{{max}})",
    "licenses": "Driving license",
-   "other": "Other",
+   "other": "Other (free text)",
    "otherPlaceholder": "Additional information..."
   }
  },
