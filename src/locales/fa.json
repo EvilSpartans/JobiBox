@@ -24,7 +24,7 @@
    "finalisationDesc": "افزودن الصورة وسيرة الفيديو والتحقق من رزومه الورقية"
   },
   "customization": {
-   "titleLabel": "عنوان رزومه",
+   "titleLabel": "عنوان شغل",
    "titlePlaceholder": "مثال: مطور Full Stack",
    "chooseDesign": "انتخاب تصميماً",
    "selected": "محدد",

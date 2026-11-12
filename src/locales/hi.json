@@ -24,7 +24,7 @@
    "finalisationDesc": "फ़ोटो, वीडियो सीवी जोड़ें और कागज़ी सीवी की पुष्टि करें"
   },
   "customization": {
-   "titleLabel": "सीवी शीर्षक",
+   "titleLabel": "पद का नाम",
    "titlePlaceholder": "उदा. Full Stack Developer",
    "chooseDesign": "डिज़ाइन चुनें",
    "selected": "चयनित",

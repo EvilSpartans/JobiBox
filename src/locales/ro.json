@@ -24,7 +24,7 @@
    "finalisationDesc": "Adăugare foto, CV video și validare CV"
   },
   "customization": {
-   "titleLabel": "Titlu CV",
+   "titleLabel": "Numele postului",
    "titlePlaceholder": "Ex: Dezvoltator Full Stack",
    "chooseDesign": "Alege un design",
    "selected": "Selectat",

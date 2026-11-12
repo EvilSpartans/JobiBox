@@ -24,7 +24,7 @@
    "finalisationDesc": "Ajout de la photo, du CV vidéo et validation du CV papier"
   },
   "customization": {
-   "titleLabel": "Titre du CV",
+   "titleLabel": "Nom du poste",
    "titlePlaceholder": "Ex : Développeur Full Stack",
    "chooseDesign": "Choisis un design",
    "selected": "Sélectionné",

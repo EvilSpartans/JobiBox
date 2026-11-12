@@ -24,7 +24,7 @@
    "finalisationDesc": "Foto hinzufügen, Video-Lebenslauf und Validierung des Papier-Lebenslaufs"
   },
   "customization": {
-   "titleLabel": "Lebenslauf-Titel",
+   "titleLabel": "Stellenbezeichnung",
    "titlePlaceholder": "z.B. Full-Stack-Entwickler",
    "chooseDesign": "Wählen Sie ein Design",
    "selected": "Ausgewählt",

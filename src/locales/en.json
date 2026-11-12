@@ -24,7 +24,7 @@
    "finalisationDesc": "Add photo, video CV and validate the paper CV"
   },
   "customization": {
-   "titleLabel": "CV title",
+   "titleLabel": "Job title",
    "titlePlaceholder": "e.g. Full Stack Developer",
    "chooseDesign": "Choose a design",
    "selected": "Selected",

@@ -24,7 +24,7 @@
    "finalisationDesc": "Foto, video CV ekleme ve CV onayı"
   },
   "customization": {
-   "titleLabel": "CV başlığı",
+   "titleLabel": "Pozisyon adı",
    "titlePlaceholder": "Örn: Full Stack Geliştirici",
    "chooseDesign": "Bir tasarım seçin",
    "selected": "Seçildi",

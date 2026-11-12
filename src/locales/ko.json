@@ -24,7 +24,7 @@
    "finalisationDesc": "사진, 영상 이력서 추가 및 종이 이력서 확인"
   },
   "customization": {
-   "titleLabel": "이력서 제목",
+   "titleLabel": "직무명",
    "titlePlaceholder": "예: 풀스택 개발자",
    "chooseDesign": "디자인 선택",
    "selected": "선택됨",

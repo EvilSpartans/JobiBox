@@ -24,7 +24,7 @@
    "finalisationDesc": "Aggiungi foto, CV video e convalida del CV cartaceo"
   },
   "customization": {
-   "titleLabel": "Titolo del CV",
+   "titleLabel": "Nome della posizione",
    "titlePlaceholder": "Es: Sviluppatore Full Stack",
    "chooseDesign": "Scegli un design",
    "selected": "Selezionato",

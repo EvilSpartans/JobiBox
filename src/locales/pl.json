@@ -24,7 +24,7 @@
    "finalisationDesc": "Dodanie zdjęcia, CV wideo i zatwierdzenie CV"
   },
   "customization": {
-   "titleLabel": "Tytuł CV",
+   "titleLabel": "Nazwa stanowiska",
    "titlePlaceholder": "Np.: Full Stack Developer",
    "chooseDesign": "Wybierz szablon",
    "selected": "Wybrano",

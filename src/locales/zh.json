@@ -24,7 +24,7 @@
    "finalisationDesc": "添加照片、视频简历并确认纸质简历"
   },
   "customization": {
-   "titleLabel": "简历标题",
+   "titleLabel": "职位名称",
    "titlePlaceholder": "例如：全栈开发工程师",
    "chooseDesign": "选择设计",
    "selected": "已选择",

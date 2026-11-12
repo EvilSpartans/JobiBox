@@ -24,7 +24,7 @@
    "finalisationDesc": "إضافة الصورة وسيرة الفيديو والتحقق من السيرة الذاتية الورقية"
   },
   "customization": {
-   "titleLabel": "عنوان السيرة الذاتية",
+   "titleLabel": "اسم الوظيفة",
    "titlePlaceholder": "مثال: مطور Full Stack",
    "chooseDesign": "اختر تصميماً",
    "selected": "محدد",
