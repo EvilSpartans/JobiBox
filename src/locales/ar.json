@@ -50,7 +50,7 @@
    "address": "العنوان",
    "website": "الموقع (اختياري)",
    "age": "العمر (اختياري)",
-   "contractType": "نوع العقد المطلوب *",
+   "contractType": "نوع العقد المطلوب",
    "alternanceDuration": "مدة التناوب",
    "alternanceStartDate": "تاريخ البدء",
    "licenses": "رخصة القيادة"

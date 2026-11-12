@@ -51,7 +51,7 @@
    "address": "Adres",
    "website": "Strona www (opcjonalnie)",
    "age": "Wiek (opcjonalnie)",
-   "contractType": "Poszukiwany typ umowy *",
+   "contractType": "Poszukiwany typ umowy",
    "alternanceDuration": "Czas trwania alternacji",
    "alternanceStartDate": "Data rozpoczęcia",
    "licenses": "Prawo jazdy"

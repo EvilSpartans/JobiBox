@@ -51,7 +51,7 @@
    "address": "पता",
    "website": "वेबसाइट (वैकल्पिक)",
    "age": "आयु (वैकल्पिक)",
-   "contractType": "वांछित अनुबंध प्रकार *",
+   "contractType": "वांछित अनुबंध प्रकार",
    "alternanceDuration": "अप्रेंटिसशिप अवधि",
    "alternanceStartDate": "प्रारंभ तिथि",
    "licenses": "ड्राइविंग लाइसेंस"

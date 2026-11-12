@@ -50,7 +50,7 @@
    "address": "Indirizzo",
    "website": "Sito web (facoltativo)",
    "age": "Età (facoltativo)",
-   "contractType": "Tipo di contratto ricercato *",
+   "contractType": "Tipo di contratto ricercato",
    "alternanceDuration": "Durata dell'alternanza",
    "alternanceStartDate": "Data di inizio",
    "licenses": "Patente"

@@ -51,7 +51,7 @@
    "address": "Adresă",
    "website": "Site web (opțional)",
    "age": "Vârstă (opțional)",
-   "contractType": "Tip contract dorit *",
+   "contractType": "Tip contract dorit",
    "alternanceDuration": "Durata alternanței",
    "alternanceStartDate": "Data începerii",
    "licenses": "Permis"

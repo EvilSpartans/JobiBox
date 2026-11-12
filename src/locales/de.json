@@ -50,7 +50,7 @@
    "address": "Adresse",
    "website": "Webseite (optional)",
    "age": "Alter (optional)",
-   "contractType": "Gesuchte Vertragsart *",
+   "contractType": "Gesuchte Vertragsart",
    "alternanceDuration": "Dauer der Ausbildung",
    "alternanceStartDate": "Startdatum",
    "licenses": "Führerschein"

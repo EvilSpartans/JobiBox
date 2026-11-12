@@ -51,7 +51,7 @@
    "address": "Adres",
    "website": "Web sitesi (isteğe bağlı)",
    "age": "Yaş (isteğe bağlı)",
-   "contractType": "Aranan sözleşme türü *",
+   "contractType": "Aranan sözleşme türü",
    "alternanceDuration": "Staj süresi",
    "alternanceStartDate": "Başlangıç tarihi",
    "licenses": "Ehliyet"

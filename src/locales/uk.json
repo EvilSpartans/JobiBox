@@ -51,7 +51,7 @@
    "address": "Адреса",
    "website": "Веб-сайт (необов'язково)",
    "age": "Вік (необов'язково)",
-   "contractType": "Бажаний тип контракту *",
+   "contractType": "Бажаний тип контракту",
    "alternanceDuration": "Тривалість навчання",
    "alternanceStartDate": "Дата початку",
    "licenses": "Посвідчення"

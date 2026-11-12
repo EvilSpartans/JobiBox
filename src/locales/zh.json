@@ -51,7 +51,7 @@
    "address": "地址",
    "website": "网站（可选）",
    "age": "年龄（可选）",
-   "contractType": "期望合同类型 *",
+   "contractType": "期望合同类型",
    "alternanceDuration": "学徒制时长",
    "alternanceStartDate": "开始日期",
    "licenses": "驾驶执照"

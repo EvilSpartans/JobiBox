@@ -78,7 +78,7 @@ export default function PersonalInfo() {
    address: resume.personalInfo?.address || prev.address,
    website: resume.personalInfo?.website || prev.website,
    age: resume.age ?? prev.age,
-   contractType: resume.contractType || prev.contractType,
+   contractType: Array.isArray(resume.contractType) ? resume.contractType : [],
    drivingLicenses: resume.drivingLicenses || prev.drivingLicenses,
    alternanceDuration: resume.alternanceDuration || prev.alternanceDuration,
    alternanceStartDate: resume.alternanceStartDate || prev.alternanceStartDate,
@@ -113,8 +113,7 @@ export default function PersonalInfo() {
  const isFormValid =
   form.firstName.trim() !== "" &&
   form.lastName.trim() !== "" &&
-  form.email.trim() !== "" &&
-  form.contractType.length > 0;
+  form.email.trim() !== "";
 
  const handleNavigate = async (step, direction) => {
   if (direction === "backward") {

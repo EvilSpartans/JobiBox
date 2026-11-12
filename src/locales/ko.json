@@ -51,7 +51,7 @@
    "address": "주소",
    "website": "웹사이트(선택)",
    "age": "나이(선택)",
-   "contractType": "희망 계약 유형 *",
+   "contractType": "희망 계약 유형",
    "alternanceDuration": "학습 기간",
    "alternanceStartDate": "시작일",
    "licenses": "운전면허"

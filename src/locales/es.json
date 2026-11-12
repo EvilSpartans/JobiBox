@@ -50,7 +50,7 @@
    "address": "Dirección",
    "website": "Sitio web (opcional)",
    "age": "Edad (opcional)",
-   "contractType": "Tipo de contrato buscado *",
+   "contractType": "Tipo de contrato buscado",
    "alternanceDuration": "Duración de la alternancia",
    "alternanceStartDate": "Fecha de inicio",
    "licenses": "Permiso de conducir"

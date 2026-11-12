@@ -50,7 +50,7 @@
    "address": "Morada",
    "website": "Site (opcional)",
    "age": "Idade (opcional)",
-   "contractType": "Tipo de contrato procurado *",
+   "contractType": "Tipo de contrato procurado",
    "alternanceDuration": "Duração da alternância",
    "alternanceStartDate": "Data de início",
    "licenses": "Carta de condução"

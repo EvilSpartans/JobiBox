@@ -51,7 +51,7 @@
    "address": "پته",
    "website": "ویب پاڼه (اختیاري)",
    "age": "عمر (اختیاري)",
-   "contractType": "د قرارداد ډول *",
+   "contractType": "د قرارداد ډول",
    "alternanceDuration": "د زده کړې موده",
    "alternanceStartDate": "د پیل نیټه",
    "licenses": "جواز"
