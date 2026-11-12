@@ -52,8 +52,6 @@ export default function SkillsAndLanguages() {
  const [selectedSkills, setSelectedSkills] = useState([]);
  const [customSkill, setCustomSkill] = useState("");
 
- // onglets
- const [activeTab, setActiveTab] = useState("hard");
  const currentStep = 4;
  const completedSteps = [1, 2, 3];
 
@@ -387,35 +385,8 @@ export default function SkillsAndLanguages() {
 
      {/* ================= COMPÉTENCES ================= */}
      <section>
-      {/* ONGLET SWITCH */}
-      <div className="flex justify-center mb-8">
-       <div className="inline-flex rounded-full bg-white/5 border border-white/10 p-1">
-        <button
-         onClick={() => setActiveTab("hard")}
-         className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
-          activeTab === "hard"
-           ? "bg-emerald-600 text-white"
-           : "text-gray-400 hover:text-white"
-         }`}
-        >
-         🧩 {t("resume.skills.hardSkills")}
-        </button>
-        <button
-         onClick={() => setActiveTab("soft")}
-         className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
-          activeTab === "soft"
-           ? "bg-emerald-600 text-white"
-           : "text-gray-400 hover:text-white"
-         }`}
-        >
-         💬 {t("resume.skills.softSkills")}
-        </button>
-       </div>
-      </div>
-
       {/* ================= SAVOIR-FAIRE ================= */}
-      {activeTab === "hard" && (
-       <>
+      <>
         <h3 className="text-lg font-semibold text-emerald-300 mb-1">
          🧩 {t("resume.skills.hardSkills")}
         </h3>
@@ -498,12 +469,12 @@ export default function SkillsAndLanguages() {
           </div>
          )}
         </div>
-       </>
-      )}
+      </>
+
+      <FormSeparator compact />
 
       {/* ================= SAVOIR-ÊTRE ================= */}
-      {activeTab === "soft" && (
-       <>
+      <>
         <h3 className="text-lg font-semibold text-emerald-300 mb-1">
          💬 {t("resume.skills.softSkills")}
         </h3>
@@ -589,8 +560,7 @@ export default function SkillsAndLanguages() {
           )}
          </div>
         </div>
-       </>
-      )}
+      </>
      </section>
 
      <ConfirmModal
