@@ -61,6 +61,7 @@
    "languagesHint": "Choose a language then its level (max 5).",
    "chooseLanguage": "Choose a language",
    "level": "Level",
+   "languageLevels": ["Beginner", "Intermediate", "Proficient", "Bilingual", "Native"],
    "noLanguage": "No language selected yet",
    "hardSkills": "Hard skills",
    "softSkills": "Soft skills",

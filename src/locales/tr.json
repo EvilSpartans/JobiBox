@@ -61,6 +61,7 @@
    "languagesHint": "Bir dil ve seviye seçin (en fazla 5).",
    "chooseLanguage": "Dil seçin",
    "level": "Seviye",
+   "languageLevels": ["Başlangıç", "Orta", "İleri", "İki dilli", "Ana dili"],
    "noLanguage": "Henüz dil seçilmedi",
    "hardSkills": "Teknik beceriler",
    "softSkills": "Kişisel beceriler",

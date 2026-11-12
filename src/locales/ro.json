@@ -61,6 +61,7 @@
    "languagesHint": "Alege o limbă și nivelul (maxim 5).",
    "chooseLanguage": "Alege o limbă",
    "level": "Nivel",
+   "languageLevels": ["Începător", "Intermediar", "Avansat", "Bilingv", "Nativ"],
    "noLanguage": "Nicio limbă selectată",
    "hardSkills": "Competențe tehnice",
    "softSkills": "Abilități transversale",

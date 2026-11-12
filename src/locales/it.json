@@ -60,6 +60,7 @@
    "languagesHint": "Scegli una lingua e il suo livello (max 5).",
    "chooseLanguage": "Scegli una lingua",
    "level": "Livello",
+   "languageLevels": ["Principiante", "Intermedio", "Avanzato", "Bilingue", "Madrelingua"],
    "noLanguage": "Nessuna lingua selezionata ancora",
    "hardSkills": "Competenze tecniche",
    "softSkills": "Competenze trasversali",

@@ -60,6 +60,7 @@
    "languagesHint": "Wählen Sie eine Sprache und ihr Niveau (max. 5).",
    "chooseLanguage": "Sprache wählen",
    "level": "Niveau",
+   "languageLevels": ["Anfänger", "Mittelstufe", "Fortgeschritten", "Zweisprachig", "Muttersprache"],
    "noLanguage": "Noch keine Sprache ausgewählt",
    "hardSkills": "Fachkompetenzen",
    "softSkills": "Soziale Kompetenzen",

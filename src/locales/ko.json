@@ -61,6 +61,7 @@
    "languagesHint": "언어와 수준을 선택하세요(최대 5개).",
    "chooseLanguage": "언어 선택",
    "level": "수준",
+   "languageLevels": ["초급", "중급", "고급", "이중 언어", "모국어"],
    "noLanguage": "아직 선택된 언어 없음",
    "hardSkills": "하드 스킬",
    "softSkills": "소프트 스킬",

@@ -61,6 +61,7 @@
    "languagesHint": "Wybierz język i poziom (maks. 5).",
    "chooseLanguage": "Wybierz język",
    "level": "Poziom",
+   "languageLevels": ["Początkujący", "Średniozaawansowany", "Zaawansowany", "Dwujęzyczny", "Ojczysty"],
    "noLanguage": "Nie wybrano języka",
    "hardSkills": "Umiejętności twarde",
    "softSkills": "Umiejętności miękkie",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -15,19 +15,23 @@ import { getCategories } from "../../store/slices/categorySlice";
 import { getSoftSkills } from "../../store/slices/softSkillSlice";
 import FormSeparator from "../../components/resume/FormSeparator";
 import GlowBackground from "../../components/resume/GlowBackground";
-import { CV_STEPS_STEPPER, LANGUAGE_LEVELS, LANGUAGES_RESUME } from "../../utils/IAResume";
+import { CV_STEPS_STEPPER, LANGUAGES_RESUME } from "../../utils/IAResume";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const LANGUAGES = LANGUAGES_RESUME;
-const LEVELS = LANGUAGE_LEVELS;
 
 export default function SkillsAndLanguages() {
  const navigate = useNavigate();
  const dispatch = useDispatch();
  const { t, i18n } = useTranslation();
  const userLang = i18n.language || "fr";
+
+ const languageLevels = useMemo(() => {
+  const levels = t("resume.skills.languageLevels", { returnObjects: true });
+  return Array.isArray(levels) ? levels : [];
+ }, [t, userLang]);
 
  const user = useSelector((state) => state.user.user);
  const { resume, status } = useSelector((state) => state.resume);
@@ -70,6 +74,10 @@ export default function SkillsAndLanguages() {
   dispatch(getResume({ token: user.token, id: resumeId }));
   dispatch(getCategories({ token: user.token, lang: userLang }));
  }, [dispatch, user, userLang]);
+
+ useEffect(() => {
+  setSelectedLevel("");
+ }, [userLang]);
 
  useEffect(() => {
   if (!resume) return;
@@ -342,7 +350,7 @@ export default function SkillsAndLanguages() {
         <option value="" className="bg-dark_bg_2 text-gray-400 text-lg">
          {t("resume.skills.level")}
         </option>
-        {LEVELS.map((lvl) => (
+        {languageLevels.map((lvl) => (
          <option
           key={lvl}
           value={lvl}

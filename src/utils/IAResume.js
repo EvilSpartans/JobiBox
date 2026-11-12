@@ -186,8 +186,6 @@ export const LANGUAGES_RESUME = [
   "Ukrainien",
 ];
 
-export const LANGUAGE_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2", "Natif"];
-
 export const SMART_GENERATION_STEP_KEYS = {
  1: "presentation",
  2: "trainings",

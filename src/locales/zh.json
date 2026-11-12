@@ -61,6 +61,7 @@
    "languagesHint": "选择语言及其水平（最多 5 种）。",
    "chooseLanguage": "选择语言",
    "level": "水平",
+   "languageLevels": ["初级", "中级", "高级", "双语", "母语"],
    "noLanguage": "尚未选择语言",
    "hardSkills": "硬技能",
    "softSkills": "软技能",
