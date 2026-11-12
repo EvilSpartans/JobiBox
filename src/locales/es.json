@@ -118,6 +118,9 @@
    "saving": "Guardando...",
    "overwriteTitle": "Atención",
    "overwriteMessage": "Esta acción reemplazará la grabación existente para este paso. ¿Deseas continuar?",
+   "audioTranscriptionEmpty": "La transcripción está vacía. Vuelve a grabar tu mensaje.",
+   "audioMicError": "No se puede acceder al micrófono. Comprueba los permisos e inténtalo de nuevo.",
+   "audioGenericError": "Se ha producido un error. Inténtalo de nuevo.",
    "cancel": "Cancelar",
    "replace": "Reemplazar"
   },

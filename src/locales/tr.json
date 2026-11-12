@@ -119,6 +119,9 @@
    "saving": "Zapisywanie...",
    "overwriteTitle": "Dikkat",
    "overwriteMessage": "Bu işlem bu adım için mevcut kaydı değiştirir. Devam?",
+   "audioTranscriptionEmpty": "Transkripsiyon boş. Mesajınızı yeniden kaydedin.",
+   "audioMicError": "Mikrofona erişilemiyor. İzinleri kontrol edip tekrar deneyin.",
+   "audioGenericError": "Bir hata oluştu. Lütfen tekrar deneyin.",
    "cancel": "İptal",
    "replace": "Değiştir"
   },

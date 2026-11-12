@@ -119,6 +119,9 @@
    "saving": "Saving...",
    "overwriteTitle": "Warning",
    "overwriteMessage": "This action will replace the existing recording for this step. Do you want to continue?",
+   "audioTranscriptionEmpty": "The transcription is empty. Please record your message again.",
+   "audioMicError": "Unable to access the microphone. Check permissions and try again.",
+   "audioGenericError": "An error occurred. Please try again.",
    "cancel": "Cancel",
    "replace": "Replace"
   },

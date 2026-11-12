@@ -119,6 +119,9 @@
    "saving": "ثبت کیږي...",
    "overwriteTitle": "پاملرنه",
    "overwriteMessage": "دا به موجود ثبت بدل کړي. دوام؟",
+   "audioTranscriptionEmpty": "لیکنه خالي ده. خپل پیغام بیا ثبت کړئ.",
+   "audioMicError": "مایکروفون ته لاسرسی نشي. اجازې وګورئ او بیا هڅه وکړئ.",
+   "audioGenericError": "یوه تېروتنه رامنځته شوه. بیا هڅه وکړئ.",
    "cancel": "لغوه",
    "replace": "بدلول"
   },

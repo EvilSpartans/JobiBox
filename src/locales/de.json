@@ -118,6 +118,9 @@
    "saving": "Sichern...",
    "overwriteTitle": "Achtung",
    "overwriteMessage": "Diese Aktion ersetzt die bestehende Aufnahme für diesen Schritt. Möchten Sie fortfahren?",
+   "audioTranscriptionEmpty": "Die Transkription ist leer. Nimm deine Nachricht erneut auf.",
+   "audioMicError": "Kein Zugriff auf das Mikrofon. Prüfe die Berechtigungen und versuche es erneut.",
+   "audioGenericError": "Ein Fehler ist aufgetreten. Bitte versuche es erneut.",
    "cancel": "Abbrechen",
    "replace": "Ersetzen"
   },

@@ -119,6 +119,9 @@
    "saving": "Se înregistrează...",
    "overwriteTitle": "Atenție",
    "overwriteMessage": "Această acțiune va înlocui înregistrarea existentă. Continui?",
+   "audioTranscriptionEmpty": "Transcrierea este goală. Înregistrează din nou mesajul.",
+   "audioMicError": "Nu se poate accesa microfonul. Verifică permisiunile și încearcă din nou.",
+   "audioGenericError": "A apărut o eroare. Încearcă din nou.",
    "cancel": "Anulează",
    "replace": "Înlocuiește"
   },

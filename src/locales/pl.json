@@ -119,6 +119,9 @@
    "saving": "Zapisywanie...",
    "overwriteTitle": "Uwaga",
    "overwriteMessage": "Ta akcja zastąpi istniejące nagranie dla tego kroku. Kontynuować?",
+   "audioTranscriptionEmpty": "Transkrypcja jest pusta. Nagraj wiadomość ponownie.",
+   "audioMicError": "Brak dostępu do mikrofonu. Sprawdź uprawnienia i spróbuj ponownie.",
+   "audioGenericError": "Wystąpił błąd. Spróbuj ponownie.",
    "cancel": "Anuluj",
    "replace": "Zastąp"
   },

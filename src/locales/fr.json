@@ -119,6 +119,9 @@
    "saving": "Enregistrement...",
    "overwriteTitle": "Attention",
    "overwriteMessage": "Cette action va remplacer l'enregistrement existant pour cette étape. Souhaites-tu continuer ?",
+   "audioTranscriptionEmpty": "La transcription est vide. Réenregistre ton message.",
+   "audioMicError": "Impossible d'accéder au micro. Vérifie les autorisations et réessaie.",
+   "audioGenericError": "Une erreur est survenue. Réessaie.",
    "cancel": "Annuler",
    "replace": "Remplacer"
   },

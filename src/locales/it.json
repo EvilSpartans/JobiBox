@@ -118,6 +118,9 @@
    "saving": "Salvataggio...",
    "overwriteTitle": "Attenzione",
    "overwriteMessage": "Questa azione sostituirà la registrazione esistente per questo passo. Vuoi continuare?",
+   "audioTranscriptionEmpty": "La trascrizione è vuota. Registra di nuovo il tuo messaggio.",
+   "audioMicError": "Impossibile accedere al microfono. Controlla le autorizzazioni e riprova.",
+   "audioGenericError": "Si è verificato un errore. Riprova.",
    "cancel": "Annulla",
    "replace": "Sostituisci"
   },

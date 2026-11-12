@@ -30,6 +30,7 @@ import {
 } from "../../utils/DateUtils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
+import { recordMicrophoneWav } from "../../utils/wavEncoder";
 
 /* ---------------- CONFIG ---------------- */
 
@@ -62,9 +63,9 @@ export default function SmartGeneration() {
  const [inputMode, setInputMode] = useState("audio");
  const [textInput, setTextInput] = useState("");
  const [textError, setTextError] = useState(null);
+ const [audioError, setAudioError] = useState(null);
 
- const mediaRecorderRef = useRef(null);
- const audioChunksRef = useRef([]);
+ const recordingRef = useRef(null);
 
  const currentKey = STEP_KEYS[step];
  const current = STEPS_CONFIG.find((s) => s.id === step);
@@ -181,6 +182,7 @@ export default function SmartGeneration() {
  useEffect(() => {
   setTextInput("");
   setTextError(null);
+  setAudioError(null);
  }, [step]);
 
  /* ----------- RECORDING ----------- */
@@ -203,48 +205,81 @@ export default function SmartGeneration() {
   }, 700);
  };
 
- const startRecording = async () => {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const mediaRecorder = new MediaRecorder(stream);
+ const startRecording = () => {
+  if (!navigator.mediaDevices?.getUserMedia) {
+   setRecording(false);
+   setAudioError(t("resume.smartGeneration.audioMicError"));
+   return;
+  }
 
-  audioChunksRef.current = [];
-
-  mediaRecorder.ondataavailable = (e) => {
-   if (e.data.size) audioChunksRef.current.push(e.data);
-  };
-
-  mediaRecorder.onstop = async () => {
-   const audioBlob = new Blob(audioChunksRef.current, {
-    type: "audio/wav",
+  recordMicrophoneWav()
+   .then((rec) => {
+    recordingRef.current = rec;
+    setRecording(true);
+   })
+   .catch(() => {
+    setRecording(false);
+    setAudioError(t("resume.smartGeneration.audioMicError"));
    });
-
-   await handleAudioComplete(audioBlob);
-   stream.getTracks().forEach((t) => t.stop());
-  };
-
-  mediaRecorderRef.current = mediaRecorder;
-  mediaRecorder.start();
-  setRecording(true);
  };
 
  const stopRecording = () => {
-  mediaRecorderRef.current?.stop();
+  if (!recordingRef.current) return;
+
+  const rec = recordingRef.current;
+  recordingRef.current = null;
   setRecording(false);
+
+  rec
+   .stop()
+   .then((file) => {
+    const key = STEP_KEYS[step];
+    const audioFile =
+     file.name === `${key}.wav`
+      ? file
+      : new File([file], `${key}.wav`, { type: file.type || "audio/wav" });
+    return handleAudioComplete(audioFile);
+   })
+   .catch((e) => {
+    console.error("Erreur enregistrement :", e);
+    setAudioError(t("resume.smartGeneration.audioGenericError"));
+   });
  };
 
  /* ----------- AUDIO → IA → UPDATE ----------- */
 
- const handleAudioComplete = async (audioBlob) => {
+ const isResumeAudioResultEmpty = (key, aiResult) => {
+  if (key === "presentation") {
+   const text =
+    typeof aiResult === "string"
+     ? aiResult
+     : aiResult?.json?.presentation || aiResult?.text || "";
+   return !String(text).trim();
+  }
+  if (key === "trainings") {
+   return (
+    !Array.isArray(aiResult?.json?.trainings) ||
+    aiResult.json.trainings.length === 0
+   );
+  }
+  if (key === "experiences") {
+   return (
+    !Array.isArray(aiResult?.json?.experiences) ||
+    aiResult.json.experiences.length === 0
+   );
+  }
+  return true;
+ };
+
+ const handleAudioComplete = async (audioFile) => {
   if (!resume?.id || !user?.token) return;
 
   setIsUploading(true); // 🔒 lock UI
 
   try {
-   const key = STEP_KEYS[step];
+   setAudioError(null);
 
-   const audioFile = new File([audioBlob], `${key}.wav`, {
-    type: "audio/wav",
-   });
+   const key = STEP_KEYS[step];
 
    const aiResult = await dispatch(
     uploadResumeAudio({
@@ -254,6 +289,11 @@ export default function SmartGeneration() {
      lang: getCurrentLang() || "fr",
     }),
    ).unwrap();
+
+   if (isResumeAudioResultEmpty(key, aiResult)) {
+    setAudioError(t("resume.smartGeneration.audioTranscriptionEmpty"));
+    return;
+   }
 
    const payload = {
     // 🔒 TOUT ce qui existe déjà (OBLIGATOIRE)
@@ -275,14 +315,22 @@ export default function SmartGeneration() {
     experiences: resume.experiences ?? [],
 
     // ✅ SEULEMENT la clé courante est modifiée
-    ...(key === "presentation" && { presentation: aiResult.json?.presentation || aiResult.text || "" }),
-    ...(key === "trainings" && {
-  trainings: aiResult.json?.trainings?.map((t) => normalizeAiTrainingDates(t)),
-}),
-   ...(key === "experiences" && {
-  experiences: aiResult.json?.experiences?.map((e) => normalizeAiExperienceDates(e)),
-}),
-
+    ...(key === "presentation" && {
+     presentation:
+      typeof aiResult === "string"
+       ? aiResult
+       : aiResult?.json?.presentation || aiResult?.text || "",
+    }),
+    ...(key === "trainings" &&
+     Array.isArray(aiResult?.json?.trainings) && {
+     trainings: aiResult.json.trainings.map((t) => normalizeAiTrainingDates(t)),
+    }),
+    ...(key === "experiences" &&
+     Array.isArray(aiResult?.json?.experiences) && {
+     experiences: aiResult.json.experiences.map((e) =>
+      normalizeAiExperienceDates(e),
+     ),
+    }),
    };
 
    await dispatch(
@@ -296,6 +344,13 @@ export default function SmartGeneration() {
    setValidatedSteps((prev) => [...new Set([...prev, step])]);
   } catch (e) {
    console.error("Erreur IA :", e);
+   const apiMsg =
+    typeof e === "string" ? e : e?.message || e?.error;
+   setAudioError(
+    typeof apiMsg === "string" && apiMsg
+     ? apiMsg
+     : t("resume.smartGeneration.audioGenericError"),
+   );
   } finally {
    setIsUploading(false); // 🔓 unlock UI
   }
@@ -831,6 +886,11 @@ export default function SmartGeneration() {
               ? t("resume.smartGeneration.recordAgain")
               : t("resume.smartGeneration.record")}
           </button>
+         )}
+         {audioError && (
+          <p className="text-sm text-red-400 flex-shrink-0 text-center px-2">
+           {audioError}
+          </p>
          )}
         </div>
        ) : (

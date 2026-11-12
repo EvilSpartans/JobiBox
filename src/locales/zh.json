@@ -119,6 +119,9 @@
    "saving": "保存中……",
    "overwriteTitle": "警告",
    "overwriteMessage": "此操作将替换该步骤的现有录音。是否继续？",
+   "audioTranscriptionEmpty": "转录内容为空。请重新录制您的消息。",
+   "audioMicError": "无法访问麦克风。请检查权限后重试。",
+   "audioGenericError": "发生错误。请重试。",
    "cancel": "取消",
    "replace": "替换"
   },
