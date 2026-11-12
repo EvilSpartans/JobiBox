@@ -77,7 +77,11 @@
    "noSoftSkill": "Nie wybrano umiejętności miękkich",
    "deleteLanguage": "Usuń język",
    "deleteSoftSkill": "Usuń umiejętność",
-   "delete": "Usuń"
+   "delete": "Usuń",
+   "vehicleOwner": "Posiada pojazd",
+   "electricScooter": "Hulajnoga elektryczna",
+   "bike": "Rower",
+   "noLicenseVehicle": "Pojazd bez prawa jazdy"
   },
   "smartGeneration": {
    "step": "Krok",

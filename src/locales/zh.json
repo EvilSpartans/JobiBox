@@ -77,7 +77,11 @@
    "noSoftSkill": "未选择软技能",
    "deleteLanguage": "删除语言",
    "deleteSoftSkill": "删除软技能",
-   "delete": "删除"
+   "delete": "删除",
+   "vehicleOwner": "拥有车辆",
+   "electricScooter": "电动滑板车",
+   "bike": "自行车",
+   "noLicenseVehicle": "无驾照车辆"
   },
   "smartGeneration": {
    "step": "步骤",

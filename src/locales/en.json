@@ -77,7 +77,11 @@
    "noSoftSkill": "No soft skill selected",
    "deleteLanguage": "Delete language",
    "deleteSoftSkill": "Delete soft skill",
-   "delete": "Delete"
+   "delete": "Delete",
+   "vehicleOwner": "Has vehicle",
+   "electricScooter": "Electric scooter",
+   "bike": "Bicycle",
+   "noLicenseVehicle": "Vehicle without license"
   },
   "smartGeneration": {
    "step": "Step",

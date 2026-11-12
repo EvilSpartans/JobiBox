@@ -76,7 +76,11 @@
    "noSoftSkill": "Nenhuma competência pessoal selecionada",
    "deleteLanguage": "Eliminar idioma",
    "deleteSoftSkill": "Eliminar competência pessoal",
-   "delete": "Eliminar"
+   "delete": "Eliminar",
+   "vehicleOwner": "Veículo próprio",
+   "electricScooter": "Trotinete elétrica",
+   "bike": "Bicicleta",
+   "noLicenseVehicle": "Veículo sem habilitação"
   },
   "smartGeneration": {
    "step": "Passo",

@@ -76,7 +76,11 @@
    "noSoftSkill": "Keine soziale Kompetenz ausgewählt",
    "deleteLanguage": "Sprache löschen",
    "deleteSoftSkill": "Soziale Kompetenz löschen",
-   "delete": "Löschen"
+   "delete": "Löschen",
+   "vehicleOwner": "Fahrzeug vorhanden",
+   "electricScooter": "E-Scooter",
+   "bike": "Fahrrad",
+   "noLicenseVehicle": "Fahrzeug ohne Führerschein"
   },
   "smartGeneration": {
    "step": "Schritt",

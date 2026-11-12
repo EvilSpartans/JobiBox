@@ -15,7 +15,11 @@ import { getCategories } from "../../store/slices/categorySlice";
 import { getSoftSkills } from "../../store/slices/softSkillSlice";
 import FormSeparator from "../../components/resume/FormSeparator";
 import GlowBackground from "../../components/resume/GlowBackground";
-import { CV_STEPS_STEPPER, LANGUAGES_RESUME } from "../../utils/IAResume";
+import {
+ CV_STEPS_STEPPER,
+ DRIVING_LICENSES,
+ LANGUAGES_RESUME,
+} from "../../utils/IAResume";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -62,6 +66,11 @@ export default function SkillsAndLanguages() {
  const [softSkillInput, setSoftSkillInput] = useState("");
  const [deleteLanguageTarget, setDeleteLanguageTarget] = useState(null);
  const [deleteSoftSkillTarget, setDeleteSoftSkillTarget] = useState(null);
+ const [drivingLicenses, setDrivingLicenses] = useState([]);
+ const [hasVehicle, setHasVehicle] = useState(false);
+ const [hasElectricScooter, setHasElectricScooter] = useState(false);
+ const [hasBike, setHasBike] = useState(false);
+ const [hasNoLicenseVehicle, setHasNoLicenseVehicle] = useState(false);
 
  /* ---------- FETCH RESUME + CATEGORIES ---------- */
 
@@ -91,6 +100,14 @@ export default function SkillsAndLanguages() {
   if (Array.isArray(resume.softSkills)) {
    setSoftSkills(resume.softSkills);
   }
+
+  setDrivingLicenses(
+   Array.isArray(resume.drivingLicenses) ? resume.drivingLicenses : [],
+  );
+  setHasVehicle(resume.hasVehicle ?? false);
+  setHasElectricScooter(resume.hasElectricScooter ?? false);
+  setHasBike(resume.hasBike ?? false);
+  setHasNoLicenseVehicle(resume.hasNoLicenseVehicle ?? false);
  }, [resume]);
 
  useEffect(() => {
@@ -204,6 +221,14 @@ export default function SkillsAndLanguages() {
   setCustomSkill("");
  };
 
+ const toggleLicense = (license) => {
+  setDrivingLicenses((prev) =>
+   prev.includes(license)
+    ? prev.filter((l) => l !== license)
+    : [...prev, license],
+  );
+ };
+
  const toggleSoftSkill = (label) => {
   setSoftSkills((prev) => {
    if (prev.includes(label)) {
@@ -260,7 +285,11 @@ export default function SkillsAndLanguages() {
    alternanceStartDate: resume?.alternanceStartDate || "",
    interests: resume?.interests || [],
    socialNetworks: resume?.socialNetworks || [],
-   drivingLicenses: resume?.drivingLicenses || [],
+   drivingLicenses,
+   hasVehicle,
+   hasElectricScooter,
+   hasBike,
+   hasNoLicenseVehicle,
    other: resume?.other,
    presentation: resume?.presentation || "",
    trainings: resume?.trainings || [],
@@ -561,6 +590,78 @@ export default function SkillsAndLanguages() {
          </div>
         </div>
       </>
+
+      <FormSeparator compact />
+
+      <div className="mt-8">
+       <h3 className="text-lg font-semibold text-emerald-300 mb-4">
+        {t("resume.personalInfo.licenses")}
+       </h3>
+       <div className="flex flex-wrap gap-3">
+        {DRIVING_LICENSES.map((license) => (
+         <button
+          key={license}
+          type="button"
+          onClick={() => toggleLicense(license)}
+          className={`px-4 py-2 rounded-full border text-sm transition
+                     ${
+                      drivingLicenses.includes(license)
+                       ? "bg-emerald-600/20 border-emerald-500 text-white"
+                       : "border-white/10 text-gray-300 hover:border-emerald-400"
+                     }`}
+         >
+          {license}
+         </button>
+        ))}
+       </div>
+      </div>
+
+      <div className="mt-8">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition hover:bg-white/5 text-gray-300">
+         <input
+          type="checkbox"
+          checked={hasVehicle}
+          onChange={() => setHasVehicle((prev) => !prev)}
+          className="h-5 w-5 text-emerald-500"
+         />
+         <span className="text-sm font-medium">
+          {t("resume.skills.vehicleOwner")}
+         </span>
+        </label>
+        <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition hover:bg-white/5 text-gray-300">
+         <input
+          type="checkbox"
+          checked={hasElectricScooter}
+          onChange={() => setHasElectricScooter((prev) => !prev)}
+          className="h-5 w-5 text-emerald-500"
+         />
+         <span className="text-sm font-medium">
+          {t("resume.skills.electricScooter")}
+         </span>
+        </label>
+        <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition hover:bg-white/5 text-gray-300">
+         <input
+          type="checkbox"
+          checked={hasBike}
+          onChange={() => setHasBike((prev) => !prev)}
+          className="h-5 w-5 text-emerald-500"
+         />
+         <span className="text-sm font-medium">{t("resume.skills.bike")}</span>
+        </label>
+        <label className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition hover:bg-white/5 text-gray-300">
+         <input
+          type="checkbox"
+          checked={hasNoLicenseVehicle}
+          onChange={() => setHasNoLicenseVehicle((prev) => !prev)}
+          className="h-5 w-5 text-emerald-500"
+         />
+         <span className="text-sm font-medium">
+          {t("resume.skills.noLicenseVehicle")}
+         </span>
+        </label>
+       </div>
+      </div>
      </section>
 
      <ConfirmModal

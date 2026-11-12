@@ -77,7 +77,11 @@
    "noSoftSkill": "Kişisel beceri seçilmedi",
    "deleteLanguage": "Dili sil",
    "deleteSoftSkill": "Beceriyi sil",
-   "delete": "Sil"
+   "delete": "Sil",
+   "vehicleOwner": "Araç sahibi",
+   "electricScooter": "Elektrikli scooter",
+   "bike": "Bisiklet",
+   "noLicenseVehicle": "Ehliyetsiz araç"
   },
   "smartGeneration": {
    "step": "Adım",

@@ -160,11 +160,13 @@ export const CONTRACTS = [
 
 export const DRIVING_LICENSES = [
  "B",
+ "AM",
+ "A1",
  "BE",
- "C",
- "CE",
  "C1",
  "C1E",
+ "C",
+ "CE",
  "D",
  "DE",
  "En cours",

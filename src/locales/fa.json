@@ -76,7 +76,11 @@
    "noSoftSkill": "لم يتم اختيار أي مهارة شخصية",
    "deleteLanguage": "حذف اللغة",
    "deleteSoftSkill": "حذف المهارة الشخصية",
-   "delete": "حذف"
+   "delete": "حذف",
+   "vehicleOwner": "دارای وسیله نقلیه",
+   "electricScooter": "اسکوتر برقی",
+   "bike": "دوچرخه",
+   "noLicenseVehicle": "وسیله بدون گواهینامه"
   },
   "smartGeneration": {
    "step": "مرحله",

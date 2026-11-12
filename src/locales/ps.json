@@ -77,7 +77,11 @@
    "noSoftSkill": "شخصي مهارت ندی ټاکل شوی",
    "deleteLanguage": "ژبه ړنګه کړئ",
    "deleteSoftSkill": "مهارت ړنګ کړئ",
-   "delete": "ړنګول"
+   "delete": "ړنګول",
+   "vehicleOwner": "د موټر لرونکی",
+   "electricScooter": "بریښنايي سکوټر",
+   "bike": "بایسکل",
+   "noLicenseVehicle": "بې جواز موټر"
   },
   "smartGeneration": {
    "step": "ګام",

@@ -77,7 +77,11 @@
    "noSoftSkill": "Aucun savoir-être sélectionné",
    "deleteLanguage": "Supprimer la langue",
    "deleteSoftSkill": "Supprimer le savoir-être",
-   "delete": "Supprimer"
+   "delete": "Supprimer",
+   "vehicleOwner": "Véhiculé",
+   "electricScooter": "Trottinette électrique",
+   "bike": "Vélo",
+   "noLicenseVehicle": "Véhicule sans permis"
   },
   "smartGeneration": {
    "step": "Étape",

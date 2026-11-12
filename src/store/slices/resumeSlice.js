@@ -365,6 +365,19 @@ export const updateResume = createAsyncThunk(
     });
    }
 
+   if (typeof payload.hasVehicle === "boolean") {
+    formData.append("hasVehicle", String(payload.hasVehicle));
+   }
+   if (typeof payload.hasElectricScooter === "boolean") {
+    formData.append("hasElectricScooter", String(payload.hasElectricScooter));
+   }
+   if (typeof payload.hasBike === "boolean") {
+    formData.append("hasBike", String(payload.hasBike));
+   }
+   if (typeof payload.hasNoLicenseVehicle === "boolean") {
+    formData.append("hasNoLicenseVehicle", String(payload.hasNoLicenseVehicle));
+   }
+
    if (payload.other !== undefined) {
     formData.append("other", payload.other || "");
    }

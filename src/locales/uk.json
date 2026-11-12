@@ -77,7 +77,11 @@
    "noSoftSkill": "М'які навички не обрані",
    "deleteLanguage": "Видалити мову",
    "deleteSoftSkill": "Видалити навичку",
-   "delete": "Видалити"
+   "delete": "Видалити",
+   "vehicleOwner": "Має транспорт",
+   "electricScooter": "Електросамокат",
+   "bike": "Велосипед",
+   "noLicenseVehicle": "Транспорт без посвідчення водія"
   },
   "smartGeneration": {
    "step": "Крок",

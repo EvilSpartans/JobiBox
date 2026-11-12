@@ -77,7 +77,11 @@
    "noSoftSkill": "Nicio abilitate selectată",
    "deleteLanguage": "Șterge limba",
    "deleteSoftSkill": "Șterge abilitatea",
-   "delete": "Șterge"
+   "delete": "Șterge",
+   "vehicleOwner": "Cu vehicul",
+   "electricScooter": "Trotinetă electrică",
+   "bike": "Bicicletă",
+   "noLicenseVehicle": "Vehicul fără permis"
   },
   "smartGeneration": {
    "step": "Pas",

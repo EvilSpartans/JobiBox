@@ -76,7 +76,11 @@
    "noSoftSkill": "Nessuna competenza trasversale selezionata",
    "deleteLanguage": "Elimina lingua",
    "deleteSoftSkill": "Elimina competenza trasversale",
-   "delete": "Elimina"
+   "delete": "Elimina",
+   "vehicleOwner": "Automunito",
+   "electricScooter": "Monopattino elettrico",
+   "bike": "Bicicletta",
+   "noLicenseVehicle": "Veicolo senza patente"
   },
   "smartGeneration": {
    "step": "Passo",

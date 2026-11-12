@@ -77,7 +77,11 @@
    "noSoftSkill": "선택된 소프트 스킬 없음",
    "deleteLanguage": "언어 삭제",
    "deleteSoftSkill": "소프트 스킬 삭제",
-   "delete": "삭제"
+   "delete": "삭제",
+   "vehicleOwner": "차량 보유",
+   "electricScooter": "전동 스쿠터",
+   "bike": "자전거",
+   "noLicenseVehicle": "면허 없는 차량"
   },
   "smartGeneration": {
    "step": "단계",

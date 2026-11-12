@@ -77,7 +77,11 @@
    "noSoftSkill": "कोई सॉफ्ट स्किल नहीं चुनी गई",
    "deleteLanguage": "भाषा हटाएँ",
    "deleteSoftSkill": "सॉफ्ट स्किल हटाएँ",
-   "delete": "हटाएँ"
+   "delete": "हटाएँ",
+   "vehicleOwner": "वाहन है",
+   "electricScooter": "इलेक्ट्रिक स्कूटर",
+   "bike": "साइकिल",
+   "noLicenseVehicle": "बिना लाइसेंस वाहन"
   },
   "smartGeneration": {
    "step": "चरण",

@@ -10,7 +10,7 @@ import ResumeHeader from "../../components/resume/ResumeHeader";
 import Footer from "../../components/resume/Footer";
 import CVStepper from "../../components/resume/Stepper";
 import FormSeparator from "../../components/resume/FormSeparator";
-import { CONTRACTS, CV_STEPS_STEPPER, DRIVING_LICENSES } from "../../utils/IAResume";
+import { CONTRACTS, CV_STEPS_STEPPER } from "../../utils/IAResume";
 import GlowBackground from "../../components/resume/GlowBackground";
 import { getResume, updateResume } from "../../store/slices/resumeSlice";
 
@@ -35,7 +35,6 @@ export default function PersonalInfo() {
   website: "",
   age: "",
   contractType: [],
-  drivingLicenses: [],
   alternanceDuration: "",
   alternanceStartDate: "",
  });
@@ -79,7 +78,6 @@ export default function PersonalInfo() {
    website: resume.personalInfo?.website || prev.website,
    age: resume.age ?? prev.age,
    contractType: Array.isArray(resume.contractType) ? resume.contractType : [],
-   drivingLicenses: resume.drivingLicenses || prev.drivingLicenses,
    alternanceDuration: resume.alternanceDuration || prev.alternanceDuration,
    alternanceStartDate: resume.alternanceStartDate || prev.alternanceStartDate,
   }));
@@ -91,15 +89,6 @@ export default function PersonalInfo() {
    contractType: prev.contractType.includes(type)
     ? prev.contractType.filter((c) => c !== type)
     : [...prev.contractType, type],
-  }));
- };
-
- const toggleLicense = (license) => {
-  setForm((prev) => ({
-   ...prev,
-   drivingLicenses: prev.drivingLicenses.includes(license)
-    ? prev.drivingLicenses.filter((l) => l !== license)
-    : [...prev.drivingLicenses, license],
   }));
  };
 
@@ -165,7 +154,6 @@ export default function PersonalInfo() {
    },
    age: form.age ? parseInt(form.age, 10) : undefined,
    contractType: form.contractType,
-   drivingLicenses: form.drivingLicenses,
   };
 
   try {
@@ -272,31 +260,6 @@ export default function PersonalInfo() {
      </div>
 
      <div className="mt-12">
-      <h3 className="text-lg font-semibold text-emerald-300 mb-4">
-       {t("resume.personalInfo.licenses")}
-      </h3>
-      <div className="flex flex-wrap gap-3">
-       {DRIVING_LICENSES.map((license) => (
-        <button
-         key={license}
-         type="button"
-         onClick={() => toggleLicense(license)}
-         className={`px-4 py-2 rounded-full border text-sm transition
-                    ${
-                     form.drivingLicenses.includes(license)
-                      ? "bg-emerald-600/20 border-emerald-500 text-white"
-                      : "border-white/10 text-gray-300 hover:border-emerald-400"
-                    }`}
-        >
-         {license}
-        </button>
-       ))}
-      </div>
-     </div>
-
-     <FormSeparator compact />
-
-     <div className="mt-8">
       <h3 className="text-lg font-semibold text-emerald-300 mb-4">
        {t("resume.personalInfo.contractType")}
       </h3>
