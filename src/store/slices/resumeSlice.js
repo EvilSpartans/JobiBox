@@ -360,9 +360,13 @@ export const updateResume = createAsyncThunk(
    }
 
    if (Array.isArray(payload.drivingLicenses)) {
-    payload.drivingLicenses.forEach((license, i) => {
-     formData.append(`drivingLicenses[${i}]`, license);
-    });
+    if (payload.drivingLicenses.length === 0) {
+     formData.append("drivingLicenses", "");
+    } else {
+     payload.drivingLicenses.forEach((license, i) => {
+      formData.append(`drivingLicenses[${i}]`, license);
+     });
+    }
    }
 
    if (typeof payload.hasVehicle === "boolean") {
