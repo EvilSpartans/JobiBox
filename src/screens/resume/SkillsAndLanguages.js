@@ -528,7 +528,7 @@ export default function SkillsAndLanguages() {
          {/* ===== PROPOSITIONS ===== */}
          <div className="h-[240px] rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col">
           <h4 className="text-sm font-semibold text-gray-300 mb-3">
-           Propositions
+           {t("resume.skills.propositions")}
           </h4>
 
           {availableSoftSkills.length === 0 ? (
@@ -568,7 +568,7 @@ export default function SkillsAndLanguages() {
          {/* ===== SÉLECTION ===== */}
          <div className="h-[240px] rounded-2xl bg-white/5 border border-white/10 p-4 flex flex-col">
           <h4 className="text-sm font-semibold text-gray-300 mb-3">
-           Sélection ({softSkills.length}/6)
+           {t("resume.skills.selection")} ({softSkills.length}/6)
           </h4>
 
           {softSkills.length === 0 ? (
