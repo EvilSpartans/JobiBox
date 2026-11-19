@@ -105,6 +105,8 @@ export default function Customization() {
 
  const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
  const sliderRef = useRef(null);
+ const selectedTemplateIndexRef = useRef(0);
+ const programmaticSlideRef = useRef(false);
 
  useEffect(() => {
   if (businessId == null || businessId === "" || !token) return;
@@ -128,7 +130,10 @@ export default function Customization() {
 
  useEffect(() => {
   const idx = filteredDesigns.findIndex((d) => d.key === selectedDesign);
-  if (idx >= 0) setSelectedTemplateIndex(idx);
+  if (idx >= 0) {
+   setSelectedTemplateIndex(idx);
+   selectedTemplateIndexRef.current = idx;
+  }
  }, [filteredDesigns, selectedDesign]);
 
  useEffect(() => {
@@ -159,27 +164,67 @@ export default function Customization() {
 
  const sliderKey = `${resume?.id ?? "new"}-${filteredDesigns.map((d) => d.key).join("|")}-${templateCategoryId}`;
 
+ const slidesToShow = Math.min(3, filteredDesigns.length);
+
+ const navigateTemplates = useCallback(
+  (delta) => {
+   const len = filteredDesigns.length;
+   if (!len || !sliderRef.current) return;
+   const base = selectedTemplateIndexRef.current;
+   const nextIdx = (base + delta + len) % len;
+   selectedTemplateIndexRef.current = nextIdx;
+   programmaticSlideRef.current = true;
+   sliderRef.current.slickGoTo(nextIdx);
+   // slickGoTo n'émet pas afterChange si la vue ne bouge pas (fin de liste) : on relâche le verrou
+   setTimeout(() => {
+    programmaticSlideRef.current = false;
+   }, 400);
+   setSelectedTemplateIndex(nextIdx);
+   setSelectedDesign(filteredDesigns[nextIdx].key);
+  },
+  [filteredDesigns],
+ );
+
  const sliderSettings = useMemo(
   () => ({
-   infinite: filteredDesigns.length > 3,
-   speed: 500,
-   slidesToShow: Math.min(3, filteredDesigns.length),
+   infinite: false,
+   waitForAnimate: false,
+   speed: 350,
+   slidesToShow,
    slidesToScroll: 1,
    centerMode: false,
-   arrows: true,
-   initialSlide: Math.max(
-    0,
-    resume?.template
-     ? filteredDesigns.findIndex((d) => d.key === resume.template)
-     : 0,
-   ),
+   arrows: false,
+   initialSlide: 0,
+   onInit: () => {
+    requestAnimationFrame(() => {
+     window.dispatchEvent(new Event("resize"));
+    });
+   },
    afterChange: (index) => {
-    setSelectedTemplateIndex(index);
-    setSelectedDesign(filteredDesigns[index]?.key ?? null);
+    if (programmaticSlideRef.current) {
+     programmaticSlideRef.current = false;
+     return;
+    }
+    const len = filteredDesigns.length;
+    if (!len) return;
+    const safe =
+     typeof index === "number" && index >= 0 && index < len
+      ? index
+      : ((index % len) + len) % len;
+    selectedTemplateIndexRef.current = safe;
+    setSelectedTemplateIndex(safe);
+    setSelectedDesign(filteredDesigns[safe]?.key ?? null);
    },
   }),
-  [filteredDesigns, resume?.template],
+  [filteredDesigns, slidesToShow],
  );
+
+ useEffect(() => {
+  if (!filteredDesigns.length || !sliderRef.current) return;
+  const idx = filteredDesigns.findIndex((d) => d.key === selectedDesign);
+  const target = idx >= 0 ? idx : 0;
+  sliderRef.current.slickGoTo(target, true);
+ }, [sliderKey]);
 
  const isValidHex = (hex) => /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(hex);
 
@@ -339,16 +384,33 @@ export default function Customization() {
        ))}
       </div>
 
-      <div className="template-slider-wrap flex-shrink-0 px-10 sm:px-12 py-2">
+      <div className="template-slider-wrap flex-shrink-0 px-14 sm:px-16 py-2 overflow-x-clip">
+       <button
+        type="button"
+        className="slick-arrow slick-prev template-slick-arrow"
+        aria-label="Template précédent"
+        onClick={() => navigateTemplates(-1)}
+       />
+       <button
+        type="button"
+        className="slick-arrow slick-next template-slick-arrow"
+        aria-label="Template suivant"
+        onClick={() => navigateTemplates(1)}
+       />
        <Slider ref={sliderRef} key={sliderKey} {...sliderSettings}>
         {filteredDesigns.map((design, index) => (
          <div
           key={design.key}
           className="flex justify-center cursor-pointer"
           onClick={() => {
+           selectedTemplateIndexRef.current = index;
+           programmaticSlideRef.current = true;
            setSelectedTemplateIndex(index);
            setSelectedDesign(design.key);
            sliderRef.current?.slickGoTo(index);
+           setTimeout(() => {
+            programmaticSlideRef.current = false;
+           }, 400);
           }}
          >
           <div
