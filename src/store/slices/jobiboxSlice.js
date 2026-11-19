@@ -11,9 +11,14 @@ const initialState = {
 
 export const getJobibox = createAsyncThunk(
     "api/jobibox",
-    async ( rejectWithValue ) => {
+    async ({ page = 1, limit = 10, search } = {}, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get(`${BASE_URL}/jobibox`, {});
+            const params = { page, limit: 10 };
+            const trimmedSearch = typeof search === "string" ? search.trim() : "";
+            if (trimmedSearch) {
+                params.search = trimmedSearch;
+            }
+            const { data } = await axios.get(`${BASE_URL}/jobibox`, { params });
             return data;
         } catch (error) {
             return rejectWithValue(error.response);

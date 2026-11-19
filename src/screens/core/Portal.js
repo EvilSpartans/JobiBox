@@ -6,7 +6,7 @@ import Logout from "../../components/core/Logout";
 export default function Portal() {
 
   return (
-  <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-hidden">
+  <div className="h-screen dark:bg-dark_bg_1 flex items-center justify-center overflow-y-auto">
     <GoBack itemsToRemove={["businessId"]} />
     <Logout />
     {/*Container*/}
