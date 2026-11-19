@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
 import { businessSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getJobibox, getJobiboxPortals } from "../../store/slices/jobiboxSlice";
+import axios from "axios";
+import { getJobibox } from "../../store/slices/jobiboxSlice";
 
 export default function JobiboxForm() {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ export default function JobiboxForm() {
   const searchInputRef = useRef(null);
   const blurTimerRef = useRef(null);
   const fetchGenerationRef = useRef(0);
+  const prefillIgnoredRef = useRef(false);
 
   const loadSuggestions = async (search) => {
     const generation = ++fetchGenerationRef.current;
@@ -64,17 +66,22 @@ export default function JobiboxForm() {
     if (!jobiboxId) return;
 
     const prefillConfiguredJobibox = async () => {
-      const response = await dispatch(getJobiboxPortals({ id: jobiboxId }));
-      if (response.meta?.requestStatus !== "fulfilled") return;
-      const payload = response.payload;
-      if (!payload?.id || !payload?.business?.title) return;
-      setSelectedJobibox(payload);
-      setSelectedId(payload.id);
-      setValue("business", String(payload.id));
+      try {
+        const { data } = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/jobibox/${jobiboxId}`
+        );
+        if (prefillIgnoredRef.current) return;
+        if (!data?.id || !data?.business?.title) return;
+        setSelectedJobibox(data);
+        setSelectedId(data.id);
+        setValue("business", String(data.id));
+      } catch {
+        return;
+      }
     };
 
     prefillConfiguredJobibox();
-  }, [dispatch, setValue]);
+  }, [setValue]);
 
   const openEditor = () => {
     if (blurTimerRef.current) {
@@ -114,6 +121,7 @@ export default function JobiboxForm() {
       clearTimeout(blurTimerRef.current);
       blurTimerRef.current = null;
     }
+    prefillIgnoredRef.current = true;
     setSelectedId(jobibox.id);
     setSelectedJobibox(jobibox);
     setValue("business", String(jobibox.id), { shouldValidate: true });
