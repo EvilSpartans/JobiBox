@@ -12,39 +12,40 @@ export default function JobiboxForm() {
   const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.jobibox);
   const [jobiboxData, setJobiboxData] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [page, setPage] = useState(1);
-  const [countPage, setCountPage] = useState(1);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedJobibox, setSelectedJobibox] = useState(null);
   const searchInputRef = useRef(null);
+  const blurTimerRef = useRef(null);
+  const fetchGenerationRef = useRef(0);
+
+  const loadSuggestions = async (search) => {
+    const generation = ++fetchGenerationRef.current;
+    const response = await dispatch(
+      getJobibox({ page: 1, limit: 10, search })
+    );
+    if (generation !== fetchGenerationRef.current) return;
+    if (response.meta?.requestStatus !== "fulfilled") return;
+    const payload = response.payload;
+    if (payload?.items) {
+      setJobiboxData(payload.items);
+    }
+  };
 
   useEffect(() => {
+    if (!isEditing) return;
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput.trim());
-      setPage(1);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchInput]);
+  }, [searchInput, isEditing]);
 
   useEffect(() => {
-    const fetchJobibox = async () => {
-      try {
-        const response = await dispatch(
-          getJobibox({ page, limit: 10, search: debouncedSearch })
-        );
-        const payload = response.payload;
-        if (payload?.items) {
-          setJobiboxData(payload.items);
-          setCountPage(Math.max(1, payload.countPage ?? 1));
-        }
-      } catch (err) {
-        console.error("Erreur lors de la récupération des jobiboxs :", err);
-      }
-    };
-    fetchJobibox();
-  }, [dispatch, page, debouncedSearch]);
+    if (!isEditing) return;
+    loadSuggestions(debouncedSearch);
+  }, [debouncedSearch, isEditing]);
 
   const {
     register,
@@ -55,10 +56,52 @@ export default function JobiboxForm() {
     resolver: yupResolver(businessSchema),
   });
 
+  const openEditor = () => {
+    if (blurTimerRef.current) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
+    setIsEditing(true);
+    setSearchInput("");
+    setDebouncedSearch("");
+    setJobiboxData([]);
+    loadSuggestions("");
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+      searchInputRef.current?.scrollIntoView({
+        block: "start",
+        behavior: "smooth",
+      });
+    });
+  };
+
+  const closeEditor = () => {
+    fetchGenerationRef.current += 1;
+    setIsEditing(false);
+    setSearchInput("");
+    setDebouncedSearch("");
+    setJobiboxData([]);
+  };
+
+  const handleInputBlur = () => {
+    blurTimerRef.current = setTimeout(() => {
+      closeEditor();
+    }, 200);
+  };
+
   const selectJobibox = (jobibox) => {
+    if (blurTimerRef.current) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
     setSelectedId(jobibox.id);
     setSelectedJobibox(jobibox);
     setValue("business", String(jobibox.id), { shouldValidate: true });
+    fetchGenerationRef.current += 1;
+    setIsEditing(false);
+    setSearchInput("");
+    setDebouncedSearch("");
+    setJobiboxData([]);
   };
 
   const onSubmit = async (data) => {
@@ -75,13 +118,8 @@ export default function JobiboxForm() {
     navigate("/welcome");
   };
 
-  const goToPreviousPage = () => {
-    if (page > 1) setPage((p) => p - 1);
-  };
-
-  const goToNextPage = () => {
-    if (page < countPage) setPage((p) => p + 1);
-  };
+  const displayLabel =
+    selectedJobibox?.business?.title ?? "Choisir un organisme";
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-y-auto">
@@ -93,86 +131,74 @@ export default function JobiboxForm() {
           </p>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
-          <div className="dark:text-dark_text_1 space-y-1">
-            <label
-              htmlFor="organisme-search"
-              className="text-base font-bold tracking-wide"
-            >
-              Rechercher un organisme
-            </label>
-            <input
-              ref={searchInputRef}
-              id="organisme-search"
-              type="search"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onFocus={() => {
-                searchInputRef.current?.scrollIntoView({
-                  block: "start",
-                  behavior: "smooth",
-                });
-              }}
-              className="w-full dark:bg-dark_bg_3 text-xl py-2 px-4 rounded-lg outline-none"
-              autoComplete="off"
-            />
-          </div>
-
           <input type="hidden" {...register("business")} />
 
-          <div className="dark:text-dark_text_1 space-y-2">
+          <div className="dark:text-dark_text_1 space-y-2 relative">
             <p className="text-base font-bold tracking-wide">Organisme</p>
-            <ul className="max-h-64 tall:max-h-96 overflow-y-auto space-y-2 rounded-lg">
-              {status === "loading" && jobiboxData.length === 0 ? (
-                <li className="flex justify-center py-6">
-                  <PulseLoader color="#60a5fa" size={12} />
-                </li>
-              ) : jobiboxData.length === 0 ? (
-                <li className="text-center text-lg py-4 dark:text-dark_text_2">
-                  Aucun organisme trouvé
-                </li>
-              ) : (
-                jobiboxData.map((jobibox) => (
-                  <li key={jobibox.id}>
-                    <button
-                      type="button"
-                      onClick={() => selectJobibox(jobibox)}
-                      className={`w-full text-left text-xl py-4 px-4 rounded-lg transition ease-in duration-200 ${
-                        selectedId === jobibox.id
-                          ? "bg-blue_3 text-gray-100"
-                          : "dark:bg-dark_bg_3 hover:bg-dark_bg_3/80"
-                      }`}
-                    >
-                      {jobibox.business.title}
-                    </button>
-                  </li>
-                ))
-              )}
-            </ul>
+            {!isEditing ? (
+              <button
+                type="button"
+                onClick={openEditor}
+                className={`w-full text-left text-xl py-4 px-4 rounded-lg dark:bg-dark_bg_3 outline-none ${
+                  selectedJobibox
+                    ? "dark:text-dark_text_1"
+                    : "dark:text-dark_text_2"
+                }`}
+              >
+                {displayLabel}
+              </button>
+            ) : (
+              <>
+                <input
+                  ref={searchInputRef}
+                  id="organisme-search"
+                  type="search"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onBlur={handleInputBlur}
+                  onFocus={() => {
+                    searchInputRef.current?.scrollIntoView({
+                      block: "start",
+                      behavior: "smooth",
+                    });
+                  }}
+                  placeholder="Rechercher un organisme"
+                  className="w-full dark:bg-dark_bg_3 text-xl py-4 px-4 rounded-lg outline-none"
+                  autoComplete="off"
+                />
+                <ul className="absolute z-10 left-0 right-0 mt-1 max-h-64 tall:max-h-96 overflow-y-auto space-y-2 rounded-lg dark:bg-dark_bg_2 shadow-lg">
+                  {status === "loading" && jobiboxData.length === 0 ? (
+                    <li className="flex justify-center py-6">
+                      <PulseLoader color="#60a5fa" size={12} />
+                    </li>
+                  ) : jobiboxData.length === 0 ? (
+                    <li className="text-center text-lg py-4 dark:text-dark_text_2">
+                      Aucun organisme trouvé
+                    </li>
+                  ) : (
+                    jobiboxData.map((jobibox) => (
+                      <li key={jobibox.id}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => selectJobibox(jobibox)}
+                          className={`w-full text-left text-xl py-4 px-4 rounded-lg transition ease-in duration-200 ${
+                            selectedId === jobibox.id
+                              ? "bg-blue_3 text-gray-100"
+                              : "dark:bg-dark_bg_3 hover:bg-dark_bg_3/80"
+                          }`}
+                        >
+                          {jobibox.business.title}
+                        </button>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </>
+            )}
             {errors?.business?.message && (
               <p className="text-red-400">{errors.business.message}</p>
             )}
-          </div>
-
-          <div className="flex items-center justify-between gap-4">
-            <button
-              type="button"
-              onClick={goToPreviousPage}
-              disabled={page <= 1 || status === "loading"}
-              className="flex-1 text-xl py-4 px-6 rounded-lg font-semibold dark:bg-dark_bg_3 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Précédent
-            </button>
-            <span className="text-xl font-bold dark:text-dark_text_1 whitespace-nowrap">
-              {page} / {countPage}
-            </span>
-            <button
-              type="button"
-              onClick={goToNextPage}
-              disabled={page >= countPage || status === "loading"}
-              className="flex-1 text-xl py-4 px-6 rounded-lg font-semibold dark:bg-dark_bg_3 disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Suivant
-            </button>
           </div>
 
           {error ? (

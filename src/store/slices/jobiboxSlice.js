@@ -13,7 +13,7 @@ export const getJobibox = createAsyncThunk(
     "api/jobibox",
     async ({ page = 1, limit = 10, search } = {}, { rejectWithValue }) => {
         try {
-            const params = { page, limit: 10 };
+            const params = { page, limit };
             const trimmedSearch = typeof search === "string" ? search.trim() : "";
             if (trimmedSearch) {
                 params.search = trimmedSearch;
