@@ -106,7 +106,8 @@ export default function Customization() {
  const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
  const sliderRef = useRef(null);
  const selectedTemplateIndexRef = useRef(0);
- const programmaticSlideRef = useRef(false);
+ const programmaticNavGenRef = useRef(0);
+ const programmaticNavUnlockTimerRef = useRef(null);
 
  useEffect(() => {
   if (businessId == null || businessId === "" || !token) return;
@@ -166,6 +167,17 @@ export default function Customization() {
 
  const slidesToShow = Math.min(3, filteredDesigns.length);
 
+ function armProgrammaticSliderNav() {
+  programmaticNavGenRef.current += 1;
+  const gen = programmaticNavGenRef.current;
+  clearTimeout(programmaticNavUnlockTimerRef.current);
+  programmaticNavUnlockTimerRef.current = setTimeout(() => {
+   if (programmaticNavGenRef.current === gen) {
+    programmaticNavGenRef.current = 0;
+   }
+  }, 400);
+ }
+
  const navigateTemplates = useCallback(
   (delta) => {
    const len = filteredDesigns.length;
@@ -173,12 +185,8 @@ export default function Customization() {
    const base = selectedTemplateIndexRef.current;
    const nextIdx = (base + delta + len) % len;
    selectedTemplateIndexRef.current = nextIdx;
-   programmaticSlideRef.current = true;
+   armProgrammaticSliderNav();
    sliderRef.current.slickGoTo(nextIdx);
-   // slickGoTo n'émet pas afterChange si la vue ne bouge pas (fin de liste) : on relâche le verrou
-   setTimeout(() => {
-    programmaticSlideRef.current = false;
-   }, 400);
    setSelectedTemplateIndex(nextIdx);
    setSelectedDesign(filteredDesigns[nextIdx].key);
   },
@@ -201,8 +209,7 @@ export default function Customization() {
     });
    },
    afterChange: (index) => {
-    if (programmaticSlideRef.current) {
-     programmaticSlideRef.current = false;
+    if (programmaticNavGenRef.current !== 0) {
      return;
     }
     const len = filteredDesigns.length;
@@ -221,8 +228,15 @@ export default function Customization() {
 
  useEffect(() => {
   if (!filteredDesigns.length || !sliderRef.current) return;
-  const idx = filteredDesigns.findIndex((d) => d.key === selectedDesign);
+
+  const resolvedKey = filteredDesigns.some((d) => d.key === selectedDesign)
+   ? selectedDesign
+   : pickDefaultTemplate(resume?.template, filteredDesigns);
+
+  const idx = filteredDesigns.findIndex((d) => d.key === resolvedKey);
   const target = idx >= 0 ? idx : 0;
+
+  armProgrammaticSliderNav();
   sliderRef.current.slickGoTo(target, true);
  }, [sliderKey]);
 
@@ -404,13 +418,10 @@ export default function Customization() {
           className="flex justify-center cursor-pointer"
           onClick={() => {
            selectedTemplateIndexRef.current = index;
-           programmaticSlideRef.current = true;
+           armProgrammaticSliderNav();
            setSelectedTemplateIndex(index);
            setSelectedDesign(design.key);
            sliderRef.current?.slickGoTo(index);
-           setTimeout(() => {
-            programmaticSlideRef.current = false;
-           }, 400);
           }}
          >
           <div
