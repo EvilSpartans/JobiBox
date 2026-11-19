@@ -109,6 +109,8 @@ export default function Customization() {
  const programmaticNavGenRef = useRef(0);
  const programmaticNavUnlockTimerRef = useRef(null);
 
+ useEffect(() => () => clearTimeout(programmaticNavUnlockTimerRef.current), []);
+
  useEffect(() => {
   if (businessId == null || businessId === "" || !token) return;
   dispatch(fetchResumeSettings({ token, businessId: String(businessId) }));
@@ -175,7 +177,7 @@ export default function Customization() {
    if (programmaticNavGenRef.current === gen) {
     programmaticNavGenRef.current = 0;
    }
-  }, 400);
+  }, 600);
  }
 
  const navigateTemplates = useCallback(
