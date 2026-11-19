@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { yupResolver } from "@hookForm/resolvers/yup";
 import { businessSchema } from "../../utils/Validation";
 import PulseLoader from "react-spinners/PulseLoader";
-import { getJobibox } from "../../store/slices/jobiboxSlice";
+import { getJobibox, getJobiboxPortals } from "../../store/slices/jobiboxSlice";
 
 export default function JobiboxForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { status, error } = useSelector((state) => state.jobibox);
+  const { error } = useSelector((state) => state.jobibox);
   const [jobiboxData, setJobiboxData] = useState([]);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -23,10 +24,12 @@ export default function JobiboxForm() {
 
   const loadSuggestions = async (search) => {
     const generation = ++fetchGenerationRef.current;
+    setIsSearchLoading(true);
     const response = await dispatch(
       getJobibox({ page: 1, limit: 10, search })
     );
     if (generation !== fetchGenerationRef.current) return;
+    setIsSearchLoading(false);
     if (response.meta?.requestStatus !== "fulfilled") return;
     const payload = response.payload;
     if (payload?.items) {
@@ -56,6 +59,23 @@ export default function JobiboxForm() {
     resolver: yupResolver(businessSchema),
   });
 
+  useEffect(() => {
+    const jobiboxId = localStorage.getItem("jobiboxId");
+    if (!jobiboxId) return;
+
+    const prefillConfiguredJobibox = async () => {
+      const response = await dispatch(getJobiboxPortals({ id: jobiboxId }));
+      if (response.meta?.requestStatus !== "fulfilled") return;
+      const payload = response.payload;
+      if (!payload?.id || !payload?.business?.title) return;
+      setSelectedJobibox(payload);
+      setSelectedId(payload.id);
+      setValue("business", String(payload.id));
+    };
+
+    prefillConfiguredJobibox();
+  }, [dispatch, setValue]);
+
   const openEditor = () => {
     if (blurTimerRef.current) {
       clearTimeout(blurTimerRef.current);
@@ -65,7 +85,6 @@ export default function JobiboxForm() {
     setSearchInput("");
     setDebouncedSearch("");
     setJobiboxData([]);
-    loadSuggestions("");
     requestAnimationFrame(() => {
       searchInputRef.current?.focus();
       searchInputRef.current?.scrollIntoView({
@@ -77,6 +96,7 @@ export default function JobiboxForm() {
 
   const closeEditor = () => {
     fetchGenerationRef.current += 1;
+    setIsSearchLoading(false);
     setIsEditing(false);
     setSearchInput("");
     setDebouncedSearch("");
@@ -98,6 +118,7 @@ export default function JobiboxForm() {
     setSelectedJobibox(jobibox);
     setValue("business", String(jobibox.id), { shouldValidate: true });
     fetchGenerationRef.current += 1;
+    setIsSearchLoading(false);
     setIsEditing(false);
     setSearchInput("");
     setDebouncedSearch("");
@@ -167,7 +188,7 @@ export default function JobiboxForm() {
                   autoComplete="off"
                 />
                 <ul className="absolute z-10 left-0 right-0 mt-1 max-h-64 tall:max-h-96 overflow-y-auto space-y-2 rounded-lg dark:bg-dark_bg_2 shadow-lg">
-                  {status === "loading" && jobiboxData.length === 0 ? (
+                  {isSearchLoading && jobiboxData.length === 0 ? (
                     <li className="flex justify-center py-6">
                       <PulseLoader color="#60a5fa" size={12} />
                     </li>
@@ -212,11 +233,7 @@ export default function JobiboxForm() {
           "
             type="submit"
           >
-            {status === "loading" ? (
-              <PulseLoader color="#fff" size={16} />
-            ) : (
-              "Valider"
-            )}
+            Valider
           </button>
         </form>
       </div>
